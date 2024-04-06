@@ -1,10 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { clipboard, dialog, powerMonitor } from 'electron';
+import { dialog, powerMonitor } from 'electron';
+import Store from 'electron-store';
 import {execaCommand as execa} from 'execa';
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
+
+const store = new Store();
+
 export default class extends Controller {
     constructor() {
         super();
@@ -14,7 +18,21 @@ export default class extends Controller {
     }
     
     @Route('vue-get-list')
-    getList() {}
+    getList() {
+        if (!store.get('vueProjects')) {
+            return {
+                list: [
+                    {
+                        name: 'dkd-jyzs-mobile',
+                        path: '/Users/linzhibin/Documents/project/dkd-jyzs-mobile'
+                    }
+                ]
+            }
+        }
+        return {
+            list: store.get('vueProjects')
+        }
+    }
     @Route('vue-add')
     async add() {
         const selected = await dialog.showOpenDialog({
