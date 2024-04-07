@@ -1,5 +1,3 @@
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import OSS from "ali-oss";
 import { omit } from "lodash-es";
 import db from "../plugins/database";
@@ -57,4 +55,10 @@ export default class extends Controller {
       list: [],
     };
   }
+  @Route('oss-delete-file')
+  async deleteFile() {}
+  @Route('oss-create-directory')
+  createDirectory() {}
+  @Route('oss-upload')
+  upload() {}
 }

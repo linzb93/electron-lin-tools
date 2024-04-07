@@ -46,8 +46,8 @@
 <script setup>
 import { ref, shallowRef, reactive, shallowReactive, onMounted } from "vue";
 import { ArrowDown } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
 import request from "@/plugins/request";
+import { copy } from "@/plugins/util";
 const list = ref([]);
 onMounted(async () => {
   const res = await request("vue-get-list");
@@ -70,10 +70,6 @@ const handleCommand = async (command) => {
   if (command === "build-serve") {
     await request("vue-build", project.path);
   }
-};
-const copy = (text) => {
-  request("copy", text);
-  ElMessage.success("复制成功");
 };
 </script>
 <style lang="scss" scoped>

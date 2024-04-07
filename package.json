@@ -26,7 +26,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.9",
     "@types/lowdb": "^1.0.15",
     "@vitejs/plugin-vue": "^5.0.4",
     "electron": "^29.1.1",
@@ -44,7 +43,7 @@
   },
   "dependencies": {
     "ali-oss": "^6.20.0",
-    "better-sqlite3": "^9.4.5",
+    "download": "^8.0.0",
     "electron-is-dev": "^3.0.1",
     "electron-store": "^8.2.0",
     "execa": "^8.0.1",

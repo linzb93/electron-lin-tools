@@ -19,5 +19,17 @@ export default createRouter({
       path: "/oss/detail",
       component: () => import("./views/oss/detail.vue"),
     },
+    {
+      path: '/iPhone',
+      component: () => import("./views/iPhone/index.vue"),
+    },
+    {
+      path: '/img-compress',
+      component: () => import("./views/img-compress/index.vue"),
+    },
+    {
+      path: '/cmd',
+      component: () => import("./views/cmd/index.vue"),
+    },
   ],
 });
