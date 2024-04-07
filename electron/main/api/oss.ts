@@ -39,26 +39,31 @@ export default class extends Controller {
     }
     const oss = new OSS(omit(match, ["name", "platform"]));
     const result = await oss.listV2({
-      ...config,
+      prefix: config.prefix,
+      delimiter: "/",
+      "max-keys": 100,
     });
-    if (result && result.prefixes) {
-      result.prefixes.forEach((subDir) => {
-        console.log("SubDir: %s", subDir);
-      });
-    }
-    if (result && result.objects) {
-      result.objects.forEach((obj) => {
-        console.log("Object: %s", obj.name);
-      });
-    }
+    const objects = result.objects
+      .filter((obj) => obj.size > 0)
+      .map((obj) => ({
+        ...obj,
+        name: obj.name.split("/").slice(-1)[0],
+      }));
     return {
-      list: [],
+      list: result.prefixes
+        ? result.prefixes
+            .map((subDir) => ({
+              name: subDir.replace(/\/$/, "").split("/").slice(-1)[0],
+              type: "dir",
+            }))
+            .concat(objects)
+        : objects,
     };
   }
-  @Route('oss-delete-file')
+  @Route("oss-delete-file")
   async deleteFile() {}
-  @Route('oss-create-directory')
+  @Route("oss-create-directory")
   createDirectory() {}
-  @Route('oss-upload')
+  @Route("oss-upload")
   upload() {}
 }

@@ -16,7 +16,7 @@
       </div>
     </div>
     <template #reference>
-      <el-button size="small" type="danger">删除</el-button>
+      <el-link type="danger" style="margin-left: 10px">删除</el-link>
     </template>
   </el-popover>
 </template>
@@ -61,7 +61,7 @@ export default {
     font-size: 14px;
     margin-top: 10px;
     color: #666;
-    ::v-deep span {
+    :deep(span) {
       color: #ff3e40;
     }
   }
