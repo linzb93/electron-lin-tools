@@ -22,11 +22,6 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-// Remove electron security warnings
-// This warning only shows in development mode
-// Read more on https://www.electronjs.org/docs/latest/tutorial/security
-// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-
 let win: BrowserWindow | null = null;
 // Here, you can also use other preload
 const preload = join(__dirname, "../preload/index.mjs");
@@ -49,7 +44,7 @@ async function createWindow() {
     // electron-vite-vue#298
     win.loadURL(url);
     // Open devTool if the app is not packaged
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
   }
@@ -112,3 +107,7 @@ ipcMain.handle("open-win", (_, arg) => {
     childWindow.loadFile(indexHtml, { hash: arg });
   }
 });
+
+export function getMainWindow() {
+  return win;
+}

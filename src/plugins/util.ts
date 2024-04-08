@@ -16,3 +16,17 @@ export const download = async (url:string) => {
     }
     ElMessage.success('下载成功');
 }
+
+export const handleMainPost = (receiveMethod: string, callback:Function) => {
+    window.ipcRenderer.on('main-post', async (evt, {requestId, method, data}) => {
+        if (method !== receiveMethod) {
+            return;
+        }
+        const ret = await callback(data);
+        window.ipcRenderer.send('main-post-receive', JSON.stringify({
+            requestId,
+            method,
+            data: ret
+        }))
+    });
+}

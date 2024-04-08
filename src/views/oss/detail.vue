@@ -1,7 +1,7 @@
 <template>
-  <div class="path flexalign-center">
+  <div class="path flex">
     <div
-      class="path-item"
+      class="path-item flexalign-center"
       v-for="(item, index) in pathList"
       :key="item"
       @click="clickPath(index)"
@@ -16,7 +16,7 @@
     </div>
   </div>
   <div>
-    <el-icon @click="router.back()"><back /></el-icon>
+    <el-icon @click="router.back()" class="mr10"><back /></el-icon>
     <el-button type="primary" @click="createDir">创建文件夹</el-button>
     <el-button type="primary" @click="upload">上传文件</el-button>
     <el-button type="primary" @click="getData">刷新</el-button>
@@ -85,8 +85,21 @@ const clickPath = (index) => {
 const handleSelectionChange = (val) => {
   console.log(val);
 };
+const getExtName = (name) => {
+  return name.split("/").at(-1).split(".").at(-1);
+};
 const getFileExt = (item) => {
-  return "";
+  if (item.type === "dir") {
+    return "dir";
+  }
+  const extName = getExtName(item.name);
+  if (["jpg", "jpeg", "png", "webp"].includes(extName)) {
+    return "img";
+  }
+  if (["mp4", "wav"].includes("extName")) {
+    return "video";
+  }
+  return "file";
 };
 const del = async (item) => {
   await request("oss-delete-file", {

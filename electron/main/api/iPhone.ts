@@ -1,10 +1,12 @@
 import express from 'express';
 import {Notification, clipboard} from 'electron';
+import bodyParser from 'body-parser';
+import fs from 'node:fs';
+import cors from 'cors';
+import {mainPost} from '../plugins/utils';
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
-import bodyParser from 'body-parser';
-import cors from 'cors';
 
 export default class extends Controller {
   private app;
@@ -34,7 +36,14 @@ export default class extends Controller {
     });
 
     // iPhone批量获取电脑图片
-    app.get('/getImgList', async(req, res) => {});
+    app.get('/getImgList', async(req, res) => {
+      const data = await mainPost({
+        method: 'iPhone-get-img',
+        data: {}
+      });
+      console.log(data);
+      fs.createReadStream(data[0]).pipe(res);
+    });
     // iPhone批量给电脑发送图片
     app.post('/sendImg', async (req, res) => {});
     app.listen(5010);

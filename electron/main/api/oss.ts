@@ -1,3 +1,4 @@
+import {dialog} from 'electron';
 import OSS from "ali-oss";
 import { omit } from "lodash-es";
 import db from "../plugins/database";
@@ -65,5 +66,24 @@ export default class extends Controller {
   @Route("oss-create-directory")
   createDirectory() {}
   @Route("oss-upload")
-  upload() {}
+  async upload(params) {
+    const { id, config } = params.params;
+    await db.read();
+    const match = (db.data as any).oss.find((item) => item.id === id);
+    if (!match) {
+      return {
+        code: HTTP_STATUS.BAD_REQUEST,
+        message: "不存在",
+      };
+    }
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile']
+    });
+    if (result.canceled) {
+      return;
+    }
+    const oss = new OSS(omit(match, ["name", "platform"]));
+    const resp = await oss.put(result.filePaths[0]);
+    console.log(resp.name);
+  }
 }

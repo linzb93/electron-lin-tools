@@ -12,7 +12,7 @@ export default () => {
   new CommonController();
   new VueController();
   new OSSController();
-  // new iPhoneController();
+  process.platform !== 'darwin' && new iPhoneController();
 
   ipcMain.handle("api", async (_, requestStr: string) => {
     const request = JSON.parse(requestStr) as Request;
