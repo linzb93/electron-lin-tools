@@ -27,9 +27,5 @@ export default createRouter({
       path: '/img-compress',
       component: () => import("./views/img-compress/index.vue"),
     },
-    {
-      path: '/cmd',
-      component: () => import("./views/cmd/index.vue"),
-    },
   ],
 });

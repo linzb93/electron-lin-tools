@@ -62,7 +62,25 @@ export default class extends Controller {
     };
   }
   @Route("oss-delete-file")
-  async deleteFile() {}
+  async deleteFile(params:any) {
+    const { id, config } = params.params;
+    await db.read();
+    const match = (db.data as any).oss.find((item) => item.id === id);
+    if (!match) {
+      return {
+        code: HTTP_STATUS.BAD_REQUEST,
+        message: "不存在",
+      };
+    }
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile']
+    });
+    if (result.canceled) {
+      return;
+    }
+    const oss = new OSS(omit(match, ["name", "platform"]));
+    await oss.delete(config.path);
+  }
   @Route("oss-create-directory")
   createDirectory() {}
   @Route("oss-upload")

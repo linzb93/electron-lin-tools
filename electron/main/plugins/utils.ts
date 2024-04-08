@@ -19,12 +19,14 @@ export const uuid = (len = 36) => {
 export const mainPost = ({method, data}) => new Promise(resolve => {
     const win = getMainWindow();
     const uid = uuid();
-    ipcMain.on('main-post-receive', (evt, dataStr:any) => {
+    const handler = (_, dataStr:any) => {
         const data = JSON.parse(dataStr);
         if (data.requestId === uid && data.method === method) {
+            ipcMain.off('main-post-receive', handler);
             resolve(data.data);
         }
-    });
+    };
+    ipcMain.on('main-post-receive', handler);
     win.webContents.send('main-post', {
         requestId: uid,
         method,

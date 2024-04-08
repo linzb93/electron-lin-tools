@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain, screen } from "electron";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,8 +12,6 @@ process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
   ? join(process.env.DIST_ELECTRON, "../public")
   : process.env.DIST;
-
-const isMac = process.platform === "darwin";
 
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
@@ -64,6 +63,10 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow();
+  // 设置开机自启动
+  app.setLoginItemSettings({
+    openAtLogin: !isDev
+  });
   registerRoute();
 });
 
