@@ -1,10 +1,21 @@
+import { join, dirname } from "node:path";
+import fs from 'node:fs';
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
-import { join } from "node:path";
-import { app } from "electron";
 import cachedir from 'cachedir';
-const db = new Low(new JSONFile(join(app.getAppPath(), "app.json")), {});
+
+const dbPath = join(cachedir('electron-lin-tools'), 'app.json');
+console.log(dbPath);
+try {
+    fs.accessSync(dbPath)
+} catch (error) {
+    fs.mkdirSync(dirname(dbPath), {
+        recursive: true
+    })
+    fs.writeFileSync(dbPath, JSON.stringify({
+        vue: [],
+        oss: []
+    }), {})
+}
+const db = new Low(new JSONFile(dbPath), {});
 export default db;
-
-
-// 目录：~/linzhibin-app/lin-tools/Cache/database/xx.json

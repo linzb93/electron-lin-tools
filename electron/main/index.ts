@@ -64,9 +64,9 @@ async function createWindow() {
 app.whenReady().then(async () => {
   createWindow();
   // 设置开机自启动
-  app.setLoginItemSettings({
-    openAtLogin: !isDev
-  });
+  // app.setLoginItemSettings({
+  //   openAtLogin: !isDev
+  // });
   registerRoute();
 });
 

@@ -12,7 +12,7 @@ export default () => {
   new CommonController();
   new VueController();
   new OSSController();
-  process.platform !== 'darwin' && new iPhoneController();
+  process.platform !== "darwin" && new iPhoneController();
 
   ipcMain.handle("api", async (_, requestStr: string) => {
     const request = JSON.parse(requestStr) as Request;
@@ -27,7 +27,7 @@ export default () => {
         return wrapResponse(ret);
       } catch (error) {
         console.log(`api ${chalk.green(match.path)} error`);
-        console.log(error.message);
+        console.trace(error.message);
         return wrapResponse({
           code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
           message: "服务器故障",

@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, reactive, shallowReactive, onMounted } from "vue";
+import { ref, shallowRef, onMounted } from "vue";
 import request from "@/plugins/request";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
@@ -75,7 +75,7 @@ const getPlatformName = (type) => {
 };
 const jump = (item) => {
   router.push({
-    path: "/oss/detail",
+    path: "/oss/detail/",
     query: {
       id: item.id,
     },
@@ -85,5 +85,23 @@ const jump = (item) => {
 <style lang="scss" scoped>
 .el-link + .el-link {
   margin-left: 10px;
+}
+ul {
+  margin-top: 30px;
+}
+li {
+  margin-left: 30px;
+  padding: 0 10px;
+  width: 120px;
+  height: 30px;
+  border-radius: 4px;
+  line-height: 30px;
+  border: 1px solid #999;
+  font-size: 18px;
+  color: #333;
+  cursor: pointer;
+  &:first-child {
+    margin-left: 0;
+  }
 }
 </style>

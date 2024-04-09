@@ -1,7 +1,15 @@
 <template>
-  <div class="path flex">
+  <div class="path flexalign-center">
+    <template v-if="pathList.length">
+      <el-icon @click="clickPath(-1)" class="curp">
+        <home-filled />
+      </el-icon>
+      <el-icon class="mr10">
+        <arrow-right />
+      </el-icon>
+    </template>
     <div
-      class="path-item flexalign-center"
+      class="path-item flexalign-center curp"
       v-for="(item, index) in pathList"
       :key="item"
       @click="clickPath(index)"
@@ -9,24 +17,30 @@
       <el-icon>
         <folder />
       </el-icon>
-      <span>{{ item }}</span>
+      <span class="path-name">{{ item }}</span>
       <el-icon v-if="index < pathList.length - 1">
         <arrow-right />
       </el-icon>
     </div>
   </div>
-  <div>
+  <div class="mt20">
     <el-icon @click="router.back()" class="mr10"><back /></el-icon>
     <el-button type="primary" @click="createDir">创建文件夹</el-button>
     <el-button type="primary" @click="upload">上传文件</el-button>
     <el-button type="primary" @click="getData">刷新</el-button>
   </div>
-  <el-table :data="fileList" @selection-change="handleSelectionChange">
+  <el-table
+    class="mt30"
+    :data="fileList"
+    @selection-change="handleSelectionChange"
+  >
     <el-table-column type="selection" width="55" />
     <el-table-column label="名称">
       <template #default="scope">
         <file-type-icon :type="getFileExt(scope.row)" />
-        <span @click="jumpInner(scope.row)">{{ scope.row.name }}</span>
+        <span class="file-name" @click="jumpInner(scope.row)">{{
+          scope.row.name
+        }}</span>
       </template>
     </el-table-column>
     <el-table-column label="类型/大小">
@@ -35,7 +49,11 @@
         <template v-else>{{ getSize(scope.row) }}</template>
       </template>
     </el-table-column>
-    <el-table-column label="最后修改时间" prop="lastModified"></el-table-column>
+    <el-table-column label="最后修改时间">
+      <template #default="scope">
+        {{ dayjs(scope.row.lastModified).format("YYYY-MM-DD HH:mm:ss") }}
+      </template>
+    </el-table-column>
     <el-table-column label="操作">
       <template #default="scope">
         <el-link
@@ -52,10 +70,12 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, onMounted } from "vue";
+import { ref, shallowRef, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessageBox, ElMessage } from "element-plus";
-import { Folder, ArrowRight, Back } from "@element-plus/icons-vue";
+import dayjs from "dayjs";
+import { Folder, ArrowRight, Back, HomeFilled } from "@element-plus/icons-vue";
+import { scrollTo } from "@/plugins/scroll-to";
 import request from "@/plugins/request";
 import { copy } from "@/plugins/util";
 import FileTypeIcon from "./components/FileTypeIcon.vue";
@@ -64,22 +84,28 @@ const route = useRoute();
 const router = useRouter();
 
 const fileList = shallowRef([]);
+const pathList = ref([]);
+const fullPath = computed(() =>
+  pathList.value.map((item) => `${item}/`).join("")
+);
+
 const getData = async () => {
   const data = await request("oss-get-oss-list", {
-    id: route.query.id,
+    id: Number(route.query.id),
     config: {
-      prefix: pathList.value.map((item) => `${item}/`).join(""),
+      prefix: fullPath.value,
     },
   });
   fileList.value = data.list;
+  scrollTo(0, 800);
 };
 onMounted(() => {
   getData();
 });
 
-const pathList = ref([]);
 const clickPath = (index) => {
-  pathList.value = pathList.value.slice(0, index);
+  pathList.value = pathList.value.slice(0, index + 1);
+  getData();
 };
 
 const handleSelectionChange = (val) => {
@@ -102,9 +128,13 @@ const getFileExt = (item) => {
   return "file";
 };
 const del = async (item) => {
+  const name = item.type === "dir" ? `${item.name}/` : item.name;
   await request("oss-delete-file", {
-    name: item.name,
+    id: Number(route.query.id),
+    file: `${fullPath.value}${name}`,
   });
+  ElMessage.success("删除成功");
+  getData();
 };
 const jumpInner = (item) => {
   if (item.size > 0) {
@@ -137,6 +167,8 @@ const createDir = () => {
         return;
       }
       request("oss-create-directory", {
+        id: Number(route.query.id),
+        path: fullPath.value,
         name: value,
       });
     })
@@ -144,12 +176,26 @@ const createDir = () => {
       //
     });
 };
-const upload = () => {
-  request("oss-upload");
+const upload = async () => {
+  await request("oss-upload", {
+    id: Number(route.query.id),
+    path: fullPath.value,
+  });
+  ElMessage.success("上传成功");
+  getData();
 };
 </script>
 <style lang="scss" scoped>
 .el-link + .el-link {
   margin-left: 10px;
+}
+.path-name {
+  margin-left: 4px;
+}
+.file-name {
+  cursor: pointer;
+  &:hover {
+    color: #409eff;
+  }
 }
 </style>
