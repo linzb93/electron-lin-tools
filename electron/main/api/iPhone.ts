@@ -3,6 +3,8 @@ import {Notification, clipboard} from 'electron';
 import bodyParser from 'body-parser';
 import fs from 'node:fs';
 import cors from 'cors';
+import multer from "multer";
+import intoStream from "into-stream";
 import {mainPost} from '../plugins/utils';
 import Controller from "../plugins/route/Controller";
 import { HTTP_STATUS } from "../plugins/constant";
@@ -11,6 +13,7 @@ export default class extends Controller {
   constructor() {
     super();
     const app = express();
+    const upload = multer();
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json({ limit: '5mb' }));
     app.use(cors());
@@ -33,17 +36,27 @@ export default class extends Controller {
       res.send(encodeURIComponent(copyData));
     });
 
-    // iPhone批量获取电脑图片
-    app.get('/getImgList', async(_, res) => {
+    // iPhone批量获取电脑图片地址
+    app.get('/get-img-list', async(_, res) => {
       const data = await mainPost({
         method: 'iPhone-get-img',
         data: {}
       });
-      fs.createReadStream(data[0]).pipe(res);
+      res.send({
+        list: data
+      });
     });
-    // iPhone批量给电脑发送图片
-    app.post('/sendImg', async (req, res) => {
-      req.pipe(fs.createWriteStream("图片.jpg"));
+
+    // iPhone下载电脑图片
+    app.get('/get-img', (req,res) => {
+      const { path } = req.query;
+      fs.createReadStream(path).pipe(res);
+    })
+    // iPhone给电脑发送图片
+    app.post('/send-image', upload.single("file"), async (req, res) => {
+      const uid = parseInt((Math.random() * 10e9).toString());
+      const filename = `${uid}.jpg`;
+      intoStream(req.file.buffer).pipe(fs.createWriteStream(filename));
       res.send('ok');
     });
     app.listen(5010);
