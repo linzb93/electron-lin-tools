@@ -2,17 +2,10 @@
   "name": "electron-lin-tools",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
-  "description": "Really simple Electron + Vue + Vite boilerplate.",
+  "description": "自用Electron开发的效率工具",
   "author": "linzb93",
   "license": "MIT",
   "private": true,
-  "keywords": [
-    "electron",
-    "rollup",
-    "vite",
-    "vue3",
-    "vue"
-  ],
   "debug": {
     "env": {
       "VITE_DEV_SERVER_URL": "http://127.0.0.1:3344/"

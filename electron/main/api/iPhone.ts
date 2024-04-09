@@ -5,11 +5,9 @@ import fs from 'node:fs';
 import cors from 'cors';
 import {mainPost} from '../plugins/utils';
 import Controller from "../plugins/route/Controller";
-import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 
 export default class extends Controller {
-  private app;
   constructor() {
     super();
     const app = express();
@@ -30,28 +28,24 @@ export default class extends Controller {
     });
 
     // iPhone从电脑获取
-    app.get('/copy-data', (req, res) => {
+    app.get('/copy-data', (_, res) => {
       const copyData = clipboard.readText();
-      res.send(copyData);
+      res.send(encodeURIComponent(copyData));
     });
 
     // iPhone批量获取电脑图片
-    app.get('/getImgList', async(req, res) => {
+    app.get('/getImgList', async(_, res) => {
       const data = await mainPost({
         method: 'iPhone-get-img',
         data: {}
       });
-      console.log(data);
       fs.createReadStream(data[0]).pipe(res);
     });
     // iPhone批量给电脑发送图片
     app.post('/sendImg', async (req, res) => {
-      req.pipe(fs.createWriteStream('test.png'));
-      const { file } = req.body;
-      // await fs.writeFile(path.resolve(helper.desktop, '图片.png'), file);
+      req.pipe(fs.createWriteStream("图片.jpg"));
       res.send('ok');
     });
     app.listen(5010);
-    this.app = app;
   }
 }
