@@ -5,12 +5,7 @@ import multer from "multer";
 import intoStream from "into-stream";
 import {mainPost, tempPath} from '../plugins/utils';
 import {join} from 'node:path';
-
-interface RequestWithFile extends Request {
-  file: {
-    buffer: Buffer
-  }
-}
+import {config} from '../plugins/server';
 
 const {Router} = express;
 const router = Router();
@@ -60,14 +55,19 @@ router.get('/get-img', (req,res) => {
 
 
 // iPhone给电脑发送图片
-router.post('/send-img', upload.single("file"), async (req: RequestWithFile, res) => {
+router.post('/send-img', upload.single("file"), async (req, res) => {
   const uid = Date.now();
   const filename = join(tempPath, `${uid}.jpg`);
   intoStream(req.file.buffer).pipe(fs.createWriteStream(filename));
+  const notice = new Notification({
+    title: '温馨提醒',
+    body: '收到来自iPhone的图片 '
+  });
+  notice.show();
   mainPost({
     method: 'iPhone-upload-img',
     data: {
-      url: `http://localhost:5010/assets/${uid}.jpg`
+      url: `http://localhost:${config.port}${config.static}/${uid}.jpg`
     }
   });
   res.send('ok');

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 // import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
 import "./plugins/server";
+import "./plugins/schedule";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

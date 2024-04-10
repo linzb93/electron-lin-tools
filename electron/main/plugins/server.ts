@@ -6,6 +6,11 @@ import { join } from "node:path";
 import iPhoneRouter from '../api/iPhone';
 import { root, tempPath } from './utils';
 
+export const config = {
+    port: 5010,
+    static: '/assets'
+}
+
 try {
     fs.accessSync(tempPath);
 } catch (error) {
@@ -16,8 +21,8 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(cors());
-app.use('/assets', express.static(join(root, '.temp')));
+app.use(config.static, express.static(join(root, '.temp')));
 
 app.use('/iPhone-sync', iPhoneRouter);
 
-app.listen(5010);
+app.listen(config.port);

@@ -1,13 +1,11 @@
 import fs from 'node:fs/promises';
-import path from 'node:path';
+import { join, basename} from 'node:path';
 import { dialog, powerMonitor } from 'electron';
-import Store from 'electron-store';
 import {execaCommand as execa} from 'execa';
+import db from '../plugins/database';
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
-
-const store = new Store();
 
 export default class extends Controller {
     constructor() {
@@ -18,19 +16,11 @@ export default class extends Controller {
     }
     
     @Route('vue-get-list')
-    getList() {
-        if (!store.get('vueProjects')) {
-            return {
-                list: [
-                    {
-                        name: 'dkd-jyzs-mobile',
-                        path: '/Users/linzhibin/Documents/project/dkd-jyzs-mobile'
-                    }
-                ]
-            }
-        }
+    async getList() {
+        await db.read();
+        const list = (db.data as any).vue;
         return {
-            list: store.get('vueProjects')
+            list
         }
     }
     @Route('vue-add')
@@ -38,32 +28,59 @@ export default class extends Controller {
         const selected = await dialog.showOpenDialog({
             properties: ['openDirectory']
         });
+        const dest = selected.filePaths[0];
         try {
-            await fs.open(path.resolve(selected.filePaths[0], 'vue.config.js'))
+            await fs.access(join(dest, 'vue.config.js'))
         } catch (error) {
             return {
                 code: HTTP_STATUS.BAD_REQUEST
             }
+        }
+        await db.read();
+        (db.data as any).vue.push({
+            name: basename(dest),
+            url: dest,
+            port: 0,
+        });
+        await db.write();
+        return {
+            path: selected.filePaths[0]
         }
     }
     @Route('vue-serve')
     async serve(projPath: string) {
         await execa(`nvm exec v14.18.2 npm run serve`, {
             cwd: projPath
-        });;
+        });
+        return {
+            message: 'ok'
+        }
     }
     @Route('vue-build')
     async build(projPath: string) {
         await execa(`nvm exec v14.18.2 npm run build`, {
             cwd: projPath
         });
+        return {
+            message: 'ok'
+        }
     }
     @Route('vue-build-serve')
     async buildServe(projPath: string) {
         await execa(`nvm exec v14.18.2 npm run build`, {
             cwd: projPath
         });
+        return {
+            message: 'ok'
+        }
     }
     @Route('vue-remove')
-    async remove(projPath: string) {}
+    async remove(projPath: string) {
+        await db.read();
+        (db.data as any).vue = (db.data as any).vue.filter(item => item.url !== projPath);
+        await db.write();
+        return {
+            message: 'ok'
+        }
+    }
 }

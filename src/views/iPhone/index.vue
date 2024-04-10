@@ -7,31 +7,58 @@
     @drop="dropFile"
   >
     <p>请将需要同步的图片拖拽至此</p>
+    <div class="sended-img">
+      <el-image
+        v-for="img in files"
+        :key="img"
+        :src="img"
+        fit="cover"
+        class="img-item"
+      />
+    </div>
   </div>
-  <p>已上传图片：{{ files[0] }}</p>
-  <p>
-    收到图片：
-    <el-image :src="gettedImg" fit="cover" class="received-image" />
-  </p>
+  <el-dialog title="收到图片" v-model:visible="visible" width="500px">
+    <el-image :src="gettedImg" class="received-image" />
+    <template #footer>
+      <el-button type="primary" @change="download">下载</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { shallowRef, ref } from "vue";
+import { ElMessage } from "element-plus";
 import { handleMainPost } from "@/plugins/util";
+import { request } from "@/plugins/request";
+
 const files = ref([]);
 const active = shallowRef(false);
-const dropFile = (event) => {
+const dropFile = async (event) => {
   active.value = false;
-  const f = event.dataTransfer.files;
-  files.value.push(f[0].path);
+  const fList = event.dataTransfer.files;
+  const list = await request(
+    "save-temp",
+    fList.map((file) => file.path)
+  );
+  files.value = list;
 };
+
+// iPhone批量获取电脑图片地址
 handleMainPost("iPhone-get-img", () => {
   return files.value;
 });
+
+// iPhone批量上传图片
 const gettedImg = shallowRef("");
+const visible = shallowRef(false);
 handleMainPost("iPhone-upload-img", (data) => {
   gettedImg.value = data.url;
+  visible.value = true;
 });
+const download = async () => {
+  await request("download", gettedImg.value);
+  ElMessage.success("下载成功");
+};
 </script>
 <style lang="scss" scoped>
 .drop-box {
@@ -45,5 +72,17 @@ handleMainPost("iPhone-upload-img", (data) => {
   height: 150px;
   border-radius: 2px;
   margin-right: 10px;
+}
+.sended-img {
+  margin-top: 30px;
+  .img-item {
+    width: 120px;
+    height: 120px;
+    border-radius: 2px;
+    margin-left: 10px;
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 }
 </style>

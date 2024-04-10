@@ -34,6 +34,9 @@
                 <el-dropdown-item command="build-serve"
                   >打包后启动服务</el-dropdown-item
                 >
+                <el-dropdown-item command="open-project"
+                  >打开项目</el-dropdown-item
+                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>
