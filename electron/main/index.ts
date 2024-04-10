@@ -1,8 +1,9 @@
 import { app, BrowserWindow, shell, ipcMain, screen } from "electron";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import isDev from "electron-is-dev";
+// import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
+import "./plugins/server";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

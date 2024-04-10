@@ -1,5 +1,7 @@
+import { join } from "node:path";
 import { ipcMain } from "electron";
 import { getMainWindow } from "..";
+import cachedir from 'cachedir';
 
 export const uuid = (len = 36) => {
     const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
@@ -32,4 +34,7 @@ export const mainPost = ({method, data}) => new Promise(resolve => {
         method,
         data
     });
-})
+});
+
+export const root = cachedir('electron-lin-tools');
+export const tempPath = join(root, '.temp');

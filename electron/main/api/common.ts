@@ -30,4 +30,10 @@ export default class extends Controller {
       message: "下载成功",
     };
   }
+  @Route('save-temp')
+  async saveTemp(list: any[]) {
+    return {
+      list: []
+    }
+  }
 }

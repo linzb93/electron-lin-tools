@@ -9,6 +9,10 @@
     <p>请将需要同步的图片拖拽至此</p>
   </div>
   <p>已上传图片：{{ files[0] }}</p>
+  <p>
+    收到图片：
+    <el-image :src="gettedImg" fit="cover" class="received-image" />
+  </p>
 </template>
 
 <script setup>
@@ -24,6 +28,10 @@ const dropFile = (event) => {
 handleMainPost("iPhone-get-img", () => {
   return files.value;
 });
+const gettedImg = shallowRef("");
+handleMainPost("iPhone-upload-img", (data) => {
+  gettedImg.value = data.url;
+});
 </script>
 <style lang="scss" scoped>
 .drop-box {
@@ -31,5 +39,11 @@ handleMainPost("iPhone-get-img", () => {
   height: 300px;
   border: 1px solid #999;
   border-radius: 4px;
+}
+.receive-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 2px;
+  margin-right: 10px;
 }
 </style>

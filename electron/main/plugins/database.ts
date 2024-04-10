@@ -2,10 +2,10 @@ import { join, dirname } from "node:path";
 import fs from 'node:fs';
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
-import cachedir from 'cachedir';
+import { root } from "./utils";
 
-const dbPath = join(cachedir('electron-lin-tools'), 'app.json');
-console.log(dbPath);
+const dbPath = join(root, 'app.json');
+
 try {
     fs.accessSync(dbPath)
 } catch (error) {
