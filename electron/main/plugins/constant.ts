@@ -1,3 +1,6 @@
+import { join } from "node:path";
+import cachedir from 'cachedir';
+
 export const HTTP_STATUS = {
   SUCCESS: 200, // 请求成功
   BAD_REQUEST: 400, // 请求参数有误
@@ -15,3 +18,6 @@ export const HTTP_STATUS = {
   DATAEXPIRED: 6000, // 数据过期
   BUSINESSERROR: 7000, // 业务性异常
 };
+
+export const root = cachedir('electron-lin-tools');
+export const tempPath = join(root, '.temp');

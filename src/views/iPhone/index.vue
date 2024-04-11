@@ -29,7 +29,7 @@
 import { shallowRef, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { handleMainPost } from "@/plugins/util";
-import { request } from "@/plugins/request";
+import request from "@/plugins/request";
 
 const files = ref([]);
 const active = shallowRef(false);

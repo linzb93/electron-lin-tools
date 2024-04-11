@@ -8,10 +8,6 @@ export default createRouter({
       component: () => import("./views/home/index.vue"),
     },
     {
-      path: "/vue",
-      component: () => import("./views/vue/index.vue"),
-    },
-    {
       path: "/oss",
       component: () => import("./views/oss/index.vue"),
     },

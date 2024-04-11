@@ -3,7 +3,8 @@ import {Notification, clipboard} from 'electron';
 import fs from 'node:fs';
 import multer from "multer";
 import intoStream from "into-stream";
-import {mainPost, tempPath} from '../plugins/utils';
+import { tempPath} from '../plugins/constant';
+import { mainPost } from '../plugins/utils';
 import {join} from 'node:path';
 import {config} from '../plugins/server';
 
@@ -53,6 +54,24 @@ router.get('/get-img', (req,res) => {
   fs.createReadStream(imgPath).pipe(res);
 });
 
+// 当数据一段时间内不再变化时，触发事件
+function waitUntil(getObs: Function, { delta, interval = 1000 }) {
+  return new Promise((resolve) => {
+    let rawData = 0;
+    let prevTime = Date.now();
+    const timer = setInterval(() => {
+      const obs = getObs();
+      const now = Date.now();
+      if (obs !== rawData) {
+        rawData = obs;
+        prevTime = now;
+      } else if (now - prevTime >= delta) {
+        clearInterval(timer);
+        resolve(null);
+      }
+    }, interval);
+  });
+}
 
 // iPhone给电脑发送图片
 router.post('/send-img', upload.single("file"), async (req, res) => {

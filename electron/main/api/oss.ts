@@ -25,7 +25,7 @@ export default class extends Controller {
     }
     return {
       success: true,
-      client: new OSS(match, ['platform','name'])
+      client: new OSS(omit(match, ['platform','name']))
     };
   }
 

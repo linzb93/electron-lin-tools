@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { join } from "node:path";
 import iPhoneRouter from '../api/iPhone';
-import { root, tempPath } from './utils';
+import { root, tempPath } from './constant';
 
 export const config = {
     port: 5010,

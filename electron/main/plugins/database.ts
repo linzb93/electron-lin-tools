@@ -2,7 +2,7 @@ import { join, dirname } from "node:path";
 import fs from 'node:fs';
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
-import { root } from "./utils";
+import { root } from "./constant";
 
 const dbPath = join(root, 'app.json');
 

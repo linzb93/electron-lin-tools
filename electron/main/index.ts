@@ -14,9 +14,9 @@ process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
   ? join(process.env.DIST_ELECTRON, "../public")
   : process.env.DIST;
-
+const isMac = process.platform === "darwin";
 // Set application name for Windows 10+ notifications
-if (process.platform === "win32") app.setAppUserModelId(app.getName());
+if (!isMac) app.setAppUserModelId(app.getName());
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -30,12 +30,29 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 async function createWindow() {
-  const screenInfo = screen.getPrimaryDisplay();
+  const screens = screen.getAllDisplays();
+  const mainScreen = screens.find(screen => screen.id === screens[0].id);
+  const secondScreen = screens.find(screen => screen.id === screens[1].id);
+  // 如果有双屏，窗口在第二屏全屏，否则第一屏右半屏
+  let bounds;
+  if (secondScreen) {
+    bounds = {
+      width: secondScreen.size.width,
+      height: secondScreen.size.height,
+      x: 0,
+      y: 0
+    };
+  } else {
+    bounds = {
+      width: mainScreen.size.width / 2,
+      height: mainScreen.size.height,
+      x: mainScreen.size.width / 2,
+      y: 0
+    }
+  }
   win = new BrowserWindow({
     title: "小林工具箱",
-    width: screenInfo.size.width / 2,
-    height: screenInfo.size.height,
-    x: screenInfo.size.width,
+    ...bounds,
     webPreferences: {
       preload,
     },

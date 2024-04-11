@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {deleteAsync} from 'del';
 import db from './database';
-import { tempPath } from './utils';
+import { tempPath } from './constant';
 
 (async () => {
     await db.read();

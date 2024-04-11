@@ -9,7 +9,7 @@ import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 import { getMainWindow } from "..";
 import {config} from '../plugins/server';
-import {tempPath} from '../plugins/utils';
+import {tempPath} from '../plugins/constant';
 export default class extends Controller {
   @Route("copy")
   doCopy(params: any) {
@@ -36,8 +36,8 @@ export default class extends Controller {
     };
   }
   @Route('save-temp')
-  async saveTemp(list: any[]) {
-    const resultList = await pMap(list, async item => {
+  async saveTemp(inputList: any[]) {
+    const list = await pMap(inputList, async item => {
       const uid = Date.now();
       const filename = `${uid}${extname(item)}`;
       const dest = join(tempPath, filename);
@@ -45,7 +45,7 @@ export default class extends Controller {
       return `http://localhost:${config.port}${config.static}/${filename}`;
     }, {concurrency: 4});
     return {
-      list:resultList
+      list
     }
   }
   @Route('change-window-size')
