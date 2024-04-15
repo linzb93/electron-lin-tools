@@ -11,10 +11,6 @@ import { shallowRef } from "vue";
 
 const menuList = shallowRef([
   {
-    title: "Vue",
-    to: "/vue",
-  },
-  {
     title: "OSS",
     to: "/oss",
   },

@@ -32,15 +32,15 @@ const indexHtml = join(process.env.DIST, "index.html");
 async function createWindow() {
   const screens = screen.getAllDisplays();
   const mainScreen = screens.find(screen => screen.id === screens[0].id);
-  const secondScreen = screens.find(screen => screen.id === screens[1].id);
+  const secondScreen = screens.find(display => display.bounds.x !== 0 || display.bounds.y !== 0);
   // 如果有双屏，窗口在第二屏全屏，否则第一屏右半屏
   let bounds;
   if (secondScreen) {
     bounds = {
-      width: secondScreen.size.width,
-      height: secondScreen.size.height,
-      x: 0,
-      y: 0
+      width: secondScreen.bounds.width,
+      height: secondScreen.bounds.height,
+      x: secondScreen.bounds.x,
+      y: secondScreen.bounds.y
     };
   } else {
     bounds = {
