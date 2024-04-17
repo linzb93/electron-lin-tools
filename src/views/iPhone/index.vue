@@ -1,13 +1,14 @@
 <template>
   <div
     class="drop-box"
+    :class="{ active: active }"
     id="drop-area"
     @dragover.prevent="active = true"
     @dragleave="active = false"
     @drop="dropFile"
   >
-    <p>请将需要同步的图片拖拽至此</p>
-    <div class="sended-img">
+    <p v-if="files.length === 0">请将需要同步的图片拖拽至此</p>
+    <div class="sended-img" v-else>
       <el-image
         v-for="img in files"
         :key="img"
@@ -36,11 +37,11 @@ const active = shallowRef(false);
 const dropFile = async (event) => {
   active.value = false;
   const fList = event.dataTransfer.files;
-  const list = await request(
+  const res = await request(
     "save-temp",
-    fList.map((file) => file.path)
+    Array.from(fList).map((file) => file.path)
   );
-  files.value = list;
+  files.value = files.value.concat(res.list);
 };
 
 // iPhone批量获取电脑图片地址
@@ -66,6 +67,20 @@ const download = async () => {
   height: 300px;
   border: 1px solid #999;
   border-radius: 4px;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+  &.active {
+    &:after {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 2;
+      background: rgba(255, 255, 0, 0.4);
+    }
+  }
 }
 .receive-image {
   width: 150px;

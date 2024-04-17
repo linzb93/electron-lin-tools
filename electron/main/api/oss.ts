@@ -16,16 +16,16 @@ export default class extends Controller {
     const match = (db.data as any).oss.find((item) => item.id === id);
     if (!match) {
       return {
-        success:false,
+        success: false,
         response: {
           code: HTTP_STATUS.BAD_REQUEST,
           message: "不存在",
-        }
+        },
       };
     }
     return {
       success: true,
-      client: new OSS(omit(match, ['platform','name']))
+      client: new OSS(omit(match, ["platform", "name"])),
     };
   }
 
@@ -68,7 +68,7 @@ export default class extends Controller {
     if (!projectRes.success) {
       return projectRes.response;
     }
-    const {client} = projectRes;
+    const { client } = projectRes;
     const result = await client.listV2({
       prefix: config.prefix,
       delimiter: "/",
@@ -100,28 +100,26 @@ export default class extends Controller {
     if (!projectRes.success) {
       return projectRes.response;
     }
-    const {client} = projectRes;
+    const { client } = projectRes;
     await client.delete(file);
     return {
-      message: 'success'
-    }
+      message: "success",
+    };
   }
 
   // 创建目录
   @Route("oss-create-directory")
   async createDirectory(params) {
-    const { id, path: uploadPath,name } = params.params;
+    const { id, path: uploadPath, name } = params.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
     }
-    const {client} = projectRes;
-    await client.put(
-      `${uploadPath}${name}/`,Buffer.from('')
-    );
+    const { client } = projectRes;
+    await client.put(`${uploadPath}${name}/`, Buffer.from(""));
     return {
-      message: 'success'
-    }
+      message: "success",
+    };
   }
 
   // 上传目录
@@ -132,7 +130,7 @@ export default class extends Controller {
     if (!projectRes.success) {
       return projectRes.response;
     }
-    const {client} = projectRes;
+    const { client } = projectRes;
     const result = await dialog.showOpenDialog({
       properties: ["openFile"],
     });

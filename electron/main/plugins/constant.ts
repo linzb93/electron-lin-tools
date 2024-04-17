@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import cachedir from 'cachedir';
+import cachedir from "cachedir";
 
 export const HTTP_STATUS = {
   SUCCESS: 200, // 请求成功
@@ -19,5 +19,5 @@ export const HTTP_STATUS = {
   BUSINESSERROR: 7000, // 业务性异常
 };
 
-export const root = cachedir('electron-lin-tools');
-export const tempPath = join(root, '.temp');
+export const root = cachedir("electron-lin-tools");
+export const tempPath = join(root, ".temp");

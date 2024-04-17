@@ -1,33 +1,33 @@
-import express, {Request} from 'express';
-import {Notification, clipboard} from 'electron';
-import fs from 'node:fs';
+import express from "express";
+import { Notification, clipboard } from "electron";
+import fs from "node:fs";
 import multer from "multer";
 import intoStream from "into-stream";
-import { tempPath} from '../plugins/constant';
-import { mainPost } from '../plugins/utils';
-import {join} from 'node:path';
-import {config} from '../plugins/server';
+import { tempPath } from "../plugins/constant";
+import { mainPost } from "../plugins/utils";
+import { join, basename } from "node:path";
+import { config } from "../plugins/server";
 
-const {Router} = express;
+const { Router } = express;
 const router = Router();
 const upload = multer();
 
 // iPhone发往电脑
-router.post('/copy', (req, res) => {
-  const {text} = req.body;
+router.post("/send-copy-data", (req, res) => {
+  const { text } = req.body;
   const notice = new Notification({
-    title: '温馨提醒',
-    body: '收到来自iPhone的剪贴'
+    title: "温馨提醒",
+    body: "收到来自iPhone的剪贴",
   });
   notice.show();
   clipboard.writeText(decodeURIComponent(text));
-  res.send('ok');
+  res.send("ok");
 });
 
 // iPhone从电脑获取
-router.get('/copy-data', (_, res) => {
+router.get("/get-copy-data", (_, res) => {
   const copyData = clipboard.readText();
-  if(copyData !== '') {
+  if (copyData !== "") {
     res.send(encodeURIComponent(copyData));
     return;
   }
@@ -38,20 +38,20 @@ router.get('/copy-data', (_, res) => {
 });
 
 // iPhone批量获取电脑图片地址
-router.get('/get-img-list', async(_, res) => {
-  const data = await mainPost({
-    method: 'iPhone-get-img',
-    data: {}
-  });
+router.get("/get-img-list", async (_, res) => {
+  const data = (await mainPost({
+    method: "iPhone-get-img",
+    data: {},
+  })) as any[];
   res.send({
-    list: data
+    list: data.map((imgUrl) => basename(imgUrl)),
   });
 });
 
 // iPhone下载电脑图片
-router.get('/get-img', (req,res) => {
+router.get("/get-img", (req, res) => {
   const imgPath = req.query.path as string;
-  fs.createReadStream(imgPath).pipe(res);
+  fs.createReadStream(join(tempPath, imgPath)).pipe(res);
 });
 
 // 当数据一段时间内不再变化时，触发事件
@@ -74,22 +74,22 @@ function waitUntil(getObs: Function, { delta, interval = 1000 }) {
 }
 
 // iPhone给电脑发送图片
-router.post('/send-img', upload.single("file"), async (req, res) => {
+router.post("/send-img", upload.single("file"), async (req, res) => {
   const uid = Date.now();
   const filename = join(tempPath, `${uid}.jpg`);
   intoStream(req.file.buffer).pipe(fs.createWriteStream(filename));
   const notice = new Notification({
-    title: '温馨提醒',
-    body: '收到来自iPhone的图片 '
+    title: "温馨提醒",
+    body: "收到来自iPhone的图片 ",
   });
   notice.show();
   mainPost({
-    method: 'iPhone-upload-img',
+    method: "iPhone-upload-img",
     data: {
-      url: `http://localhost:${config.port}${config.static}/${uid}.jpg`
-    }
+      url: `http://localhost:${config.port}${config.static}/${uid}.jpg`,
+    },
   });
-  res.send('ok');
+  res.send("ok");
 });
 
 export default router;
