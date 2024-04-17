@@ -33,13 +33,14 @@ export default class extends Controller {
       }
       await pMap(
         params.params,
-        async (url: string) => {
-          return await new Promise((resolve) => {
+        (url: string) =>
+          new Promise((resolve) => {
             download(url)
-              .pipe(fs.createWriteStream(result.filePaths[0]))
-              .on("finished", resolve);
-          });
-        },
+              .pipe(
+                fs.createWriteStream(join(result.filePaths[0], basename(url)))
+              )
+              .on("finish", resolve);
+          }),
         { concurrency: 4 }
       );
       return {
@@ -56,7 +57,7 @@ export default class extends Controller {
     }
     await new Promise((resolve) => {
       download(url)
-        .pipe(fs.createWriteStream(result.filePath))
+        .pipe(fs.createWriteStream(join(result.filePath, basename(url))))
         .on("finished", resolve);
     });
     return {

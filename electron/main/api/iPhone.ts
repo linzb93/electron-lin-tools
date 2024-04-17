@@ -1,11 +1,12 @@
 import express from "express";
+import { Observable, debounceTime } from "rxjs";
 import { Notification, clipboard } from "electron";
 import fs from "node:fs";
 import multer from "multer";
 import intoStream from "into-stream";
 import { tempPath } from "../plugins/constant";
 import { mainPost } from "../plugins/utils";
-import { join, basename } from "node:path";
+import { join } from "node:path";
 import { config } from "../plugins/server";
 
 const { Router } = express;
@@ -54,42 +55,41 @@ router.get("/get-img", (req, res) => {
   fs.createReadStream(imgPath).pipe(res);
 });
 
-// 当数据一段时间内不再变化时，触发事件
-function waitUntil(getObs: Function, { delta, interval = 1000 }) {
-  return new Promise((resolve) => {
-    let rawData = 0;
-    let prevTime = Date.now();
-    const timer = setInterval(() => {
-      const obs = getObs();
-      const now = Date.now();
-      if (obs !== rawData) {
-        rawData = obs;
-        prevTime = now;
-      } else if (now - prevTime >= delta) {
-        clearInterval(timer);
-        resolve(null);
-      }
-    }, interval);
+const obs$ = new Observable((observer) => {
+  // iPhone给电脑发送图片
+  router.post("/send-img", upload.single("file"), async (req, res) => {
+    const uid = Date.now();
+    const filename = join(tempPath, `${uid}.jpg`);
+    intoStream(req.file.buffer).pipe(fs.createWriteStream(filename));
+    observer.next(`http://localhost:${config.port}${config.static}/${uid}.jpg`);
+    res.send("ok");
   });
-}
-
-// iPhone给电脑发送图片
-router.post("/send-img", upload.single("file"), async (req, res) => {
-  const uid = Date.now();
-  const filename = join(tempPath, `${uid}.jpg`);
-  intoStream(req.file.buffer).pipe(fs.createWriteStream(filename));
+  // iPhone给电脑批量发送图片
+  router.post("/send-img-batch", (req, res) => {
+    const uid = Date.now();
+    const filename = join(tempPath, `${uid}.jpg`);
+    req.pipe(fs.createWriteStream(filename)).on("finish", () => {
+      observer.next(
+        `http://localhost:${config.port}${config.static}/${uid}.jpg`
+      );
+    });
+    res.send("ok");
+  });
+});
+obs$.subscribe({
+  next: (url) => {
+    mainPost({
+      method: "iPhone-upload-img",
+      data: url,
+    });
+  },
+});
+obs$.pipe(debounceTime(3000)).subscribe(() => {
   const notice = new Notification({
     title: "温馨提醒",
-    body: "收到来自iPhone的图片 ",
+    body: `收到来自iPhone的图片`,
   });
   notice.show();
-  mainPost({
-    method: "iPhone-upload-img",
-    data: {
-      url: `http://localhost:${config.port}${config.static}/${uid}.jpg`,
-    },
-  });
-  res.send("ok");
 });
 
 export default router;

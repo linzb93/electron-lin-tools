@@ -1,7 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain, screen } from "electron";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-// import isDev from "electron-is-dev";
+import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
 import "./plugins/server";
 import "./plugins/schedule";
@@ -66,7 +66,7 @@ async function createWindow() {
     // electron-vite-vue#298
     win.loadURL(url);
     // Open devTool if the app is not packaged
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
   }
@@ -87,9 +87,10 @@ async function createWindow() {
 app.whenReady().then(async () => {
   createWindow();
   // 设置开机自启动
-  // app.setLoginItemSettings({
-  //   openAtLogin: !isDev
-  // });
+  !isMac &&
+    app.setLoginItemSettings({
+      openAtLogin: !isDev,
+    });
   registerRoute();
 });
 
