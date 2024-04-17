@@ -55,8 +55,8 @@ async function createWindow() {
   win = new BrowserWindow({
     title: "小林工具箱",
     // ...bounds,
-    width: 600,
-    height: 550,
+    width: 1000,
+    height: 750,
     webPreferences: {
       preload,
     },

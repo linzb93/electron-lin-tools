@@ -10,9 +10,6 @@
 import Menus from "./components/Menus.vue";
 </script>
 <style scoped>
-.container {
-  padding: 0 20px;
-}
 .cont {
   padding: 20px;
 }

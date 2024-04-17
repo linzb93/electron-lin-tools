@@ -39,19 +39,19 @@ router.get("/get-copy-data", (_, res) => {
 
 // iPhone批量获取电脑图片地址
 router.get("/get-img-list", async (_, res) => {
-  const data = (await mainPost({
+  const list = (await mainPost({
     method: "iPhone-get-img",
     data: {},
   })) as any[];
   res.send({
-    list: data.map((imgUrl) => basename(imgUrl)),
+    list,
   });
 });
 
 // iPhone下载电脑图片
 router.get("/get-img", (req, res) => {
   const imgPath = req.query.path as string;
-  fs.createReadStream(join(tempPath, imgPath)).pipe(res);
+  fs.createReadStream(imgPath).pipe(res);
 });
 
 // 当数据一段时间内不再变化时，触发事件

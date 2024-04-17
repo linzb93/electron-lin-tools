@@ -42,6 +42,7 @@
     "cachedir": "^2.4.0",
     "cors": "^2.8.5",
     "del": "^7.1.0",
+    "download": "^8.0.0",
     "electron-is-dev": "^3.0.1",
     "execa": "^8.0.1",
     "express": "^4.19.2",
