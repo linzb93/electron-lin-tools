@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import chalk from "chalk";
 import CommonController from "../../api/common";
 import OSSController from "../../api/oss";
+import VueController from '../../api/vue';
 import { getApiList } from "./decorators";
 import wrapResponse from "../../plugins/wrapResponse";
 import { HTTP_STATUS } from "../../plugins/constant";
@@ -10,6 +11,7 @@ import { Request } from "../../types/api";
 export default () => {
   new CommonController();
   new OSSController();
+  new VueController();
 
   ipcMain.handle("api", async (_, requestStr: string) => {
     const request = JSON.parse(requestStr) as Request;

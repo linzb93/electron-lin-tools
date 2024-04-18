@@ -22,6 +22,7 @@
     "@types/express": "^4.17.21",
     "@types/lowdb": "^1.0.15",
     "@types/multer": "^1.4.11",
+    "@types/node-ipc": "^9.2.3",
     "@vitejs/plugin-vue": "^5.0.4",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
@@ -49,6 +50,7 @@
     "into-stream": "^8.0.1",
     "lowdb": "^7.0.1",
     "multer": "^1.4.5-lts.1",
+    "node-ipc": "^11.1.0",
     "p-map": "^7.0.2",
     "rxjs": "^7.8.1"
   }

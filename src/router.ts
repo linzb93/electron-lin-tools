@@ -20,6 +20,10 @@ export default createRouter({
       component: () => import("./views/iPhone/index.vue"),
     },
     {
+      path: '/vue',
+      component: () => import("./views/vue/index.vue"),
+    },
+    {
       path: '/img-compress',
       component: () => import("./views/img-compress/index.vue"),
     },

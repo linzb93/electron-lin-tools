@@ -16,7 +16,7 @@
       </div>
     </div>
     <template #reference>
-      <el-link type="danger" style="margin-left: 10px">删除</el-link>
+      <el-link type="danger" :underline="false" class="ml10">删除</el-link>
     </template>
   </el-popover>
 </template>

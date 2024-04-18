@@ -17,7 +17,7 @@
 
 <script setup>
 import { shallowRef } from "vue";
-import { Refresh, Iphone } from "@element-plus/icons-vue";
+import { Refresh, Iphone, Platform } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -32,6 +32,11 @@ const menuList = shallowRef([
     title: "iPhone",
     to: "/iPhone",
     icon: Iphone,
+  },
+  {
+    title: "Vue",
+    to: "/vue",
+    icon: Platform,
   },
 ]);
 const isActive = (menu) => route.path.startsWith(menu.to);
