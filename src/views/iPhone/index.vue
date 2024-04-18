@@ -9,6 +9,7 @@
   >
     <p v-if="visibleFiles.length === 0">请将需要同步的图片拖拽至此</p>
     <div class="sended-img" v-else>
+      <p>准备同步的图片：</p>
       <el-image
         v-for="img in visibleFiles.filter((item, index) => index < max)"
         :key="img"

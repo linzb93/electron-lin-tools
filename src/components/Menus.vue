@@ -1,24 +1,40 @@
 <template>
   <ul class="menu-list full-height">
-    <li v-for="menu in menuList" :key="menu.title">
-      <router-link :to="menu.to">{{ menu.title }}</router-link>
+    <li
+      v-for="menu in menuList"
+      :key="menu.title"
+      :class="{ active: isActive(menu) }"
+    >
+      <router-link :to="menu.to" class="flexalign-center">
+        <el-icon class="pre-icon">
+          <component :is="menu.icon" />
+        </el-icon>
+        <span>{{ menu.title }}</span>
+      </router-link>
     </li>
   </ul>
 </template>
 
 <script setup>
 import { shallowRef } from "vue";
+import { Refresh, Iphone } from "@element-plus/icons-vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const menuList = shallowRef([
   {
     title: "OSS",
     to: "/oss",
+    icon: Refresh,
   },
   {
     title: "iPhone",
     to: "/iPhone",
+    icon: Iphone,
   },
 ]);
+const isActive = (menu) => route.path.startsWith(menu.to);
 </script>
 <style lang="scss" scoped>
 .menu-list {
@@ -30,16 +46,21 @@ const menuList = shallowRef([
     padding: 0 10px;
     line-height: 2;
     color: #e9eaf2;
-    font-size: 14px;
+    font-size: 16px;
+    cursor: pointer;
     &:first-child {
       margin-top: 0;
     }
-    &:hover {
-      color: #fff;
+    &:hover,
+    &.active {
+      background-color: lighten(#3f4156, 5%);
     }
     a {
       color: inherit;
     }
+  }
+  .pre-icon {
+    margin-right: 5px;
   }
 }
 </style>
