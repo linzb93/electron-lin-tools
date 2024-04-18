@@ -8,11 +8,15 @@ import pkg from './package.json'
 export default defineConfig(({ command }) => {
   fs.rmSync('dist-electron', { recursive: true, force: true })
 
+  const isMac = process.platform === 'darwin';
   const isServe = command === 'serve'
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
   return {
+    define: {
+      'process.platform': JSON.stringify(process.platform)
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -75,14 +79,5 @@ export default defineConfig(({ command }) => {
       }
     })(),
     clearScreen: false,
-    userConfig: {
-      loadModule: {
-        vue: true,
-        capture: true,
-        cmd: true,
-        imageCompress: true,
-        iPhone: true
-      }
-    }
   }
 })

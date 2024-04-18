@@ -91,4 +91,18 @@ export default class extends Controller {
       message: "ok",
     };
   }
+  @Route('select-path')
+  async selectPath() {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory"]
+    });
+    if (result.canceled) {
+      return {
+        path: ''
+      };
+    }
+    return {
+      path: result.filePaths[0]
+    }
+  }
 }

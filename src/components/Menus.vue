@@ -16,22 +16,24 @@
 </template>
 
 <script setup>
-import { shallowRef } from "vue";
-import { Refresh, Iphone, Platform } from "@element-plus/icons-vue";
+import { shallowRef, computed } from "vue";
+import { Iphone, Platform } from "@element-plus/icons-vue";
+import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const menuList = shallowRef([
+const list = shallowRef([
   {
     title: "OSS",
     to: "/oss",
-    icon: Refresh,
+    icon: VueIcon,
   },
   {
     title: "iPhone",
     to: "/iPhone",
     icon: Iphone,
+    hide: process.platform === "darwin",
   },
   {
     title: "Vue",
@@ -39,6 +41,7 @@ const menuList = shallowRef([
     icon: Platform,
   },
 ]);
+const menuList = computed(() => list.value.filter((item) => !item.hide));
 const isActive = (menu) => route.path.startsWith(menu.to);
 </script>
 <style lang="scss" scoped>
