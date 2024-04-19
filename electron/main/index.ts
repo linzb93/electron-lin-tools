@@ -32,7 +32,7 @@ const indexHtml = join(process.env.DIST, "index.html");
 
 async function createWindow() {
   win = new BrowserWindow({
-    title: "小林工具箱",
+    title: "我的工具箱",
     width: 1000,
     height: 750,
     webPreferences: {
@@ -41,15 +41,11 @@ async function createWindow() {
   });
 
   if (process.env.VITE_DEV_SERVER_URL) {
-    // electron-vite-vue#298
     win.loadURL(url);
-    // Open devTool if the app is not packaged
-    // win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
   }
 
-  // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
   });
@@ -59,38 +55,43 @@ async function createWindow() {
     if (url.startsWith("https:")) shell.openExternal(url);
     return { action: "deny" };
   });
-  // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
 app.whenReady().then(async () => {
   createWindow();
-  let tray = new Tray(nativeImage.createFromPath(join(__dirname, '../../public/logo.png')));
+  app.dock.setIcon(nativeImage.createFromPath(join(__dirname, '../../public/logo.icns')))
+  // 托盘
+  let tray = new Tray(nativeImage.createFromPath(join(__dirname, '../../public/icon_16x16.png')));
   const contextMenu = Menu.buildFromTemplate([
-    { label: '打开窗口', click: () => {
-      createWindow();
-    }},
-    { label: '退出', click: () => {app.quit()}},
+    { label: '打开窗口', click: createWindow },
+    { label: '退出', click: app.quit },
   ])
   tray.setContextMenu(contextMenu);
-  tray.on('click', () => {
+  tray.on("double-click", () => {
     if (!win) createWindow();
   })
-  // 设置开机自启动
-  !isMac &&
-    app.setLoginItemSettings({
-      openAtLogin: !isDev,
-    });
+    // 应用菜单
     const menu = Menu.buildFromTemplate([
-      {role: 'reload'},
-      {role: 'toggleDevTools'},
-      {role: 'quit'},
       {
-        label: '打开缓存页面',
-        click: () => {
-          shell.openPath(tempPath);
-        },
-        visible: isDev
-      }
+        label: '应用',
+        submenu: [
+          {role: 'reload'},
+          {role: 'quit'},
+        ]
+      },
+      {
+        label: '调试',
+        submenu: [
+          {role: 'toggleDevTools'},
+          {
+            label: '打开缓存页面',
+            click: () => {
+              shell.openPath(tempPath);
+            },
+            visible: isDev
+          }
+        ]
+      },
     ]);
     Menu.setApplicationMenu(menu);
   registerRoute();

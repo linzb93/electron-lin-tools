@@ -10,7 +10,9 @@ import {Database} from '../types/api';
   const lastTimeDayjs = dayjs(lastModifiedTime).format("YYYY-MM-DD 00:00:00");
   if (dayjs().isAfter(lastTimeDayjs, "d") || !lastModifiedTime) {
     // 每天清理一次.temp文件夹
-    await deleteAsync(`${tempPath}/**`);
+    await deleteAsync(`${tempPath}/**`,{
+      force: true
+    });
     (db.data as Database).lastModifiedTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     await db.write();
   }

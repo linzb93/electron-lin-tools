@@ -32,9 +32,7 @@
           <el-link :underline="false" type="primary" @click="build(scope.row)"
             >打包</el-link
           >
-          <delete-confirm @confirm="remove(scope.row)"
-            >确认删除？</delete-confirm
-          >
+          <delete-confirm @confirm="remove(scope.row)"></delete-confirm>
           <el-dropdown
             class="ml10"
             @command="(command) => handleMore(scope.row, command)"
@@ -61,7 +59,13 @@
     :title="isEdit ? '编辑项目' : '添加项目'"
     width="400px"
   >
-    <el-form ref="formRef" label-width="80px" label-suffix="：">
+    <el-form
+      ref="formRef"
+      :model="form"
+      :rules="rules"
+      label-width="80px"
+      label-suffix="："
+    >
       <el-form-item label="名称" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
@@ -101,6 +105,12 @@ const form = ref({
   name: "",
   path: "",
 });
+const rules = {
+  path: {
+    required: true,
+    message: "请选择或输入项目地址",
+  },
+};
 const formRef = ref(null);
 const visible = shallowRef(false);
 const isEdit = shallowRef(false);
@@ -119,6 +129,7 @@ const submit = () => {
     }
     await request("vue-add", form.value);
     ElMessage.success("添加成功");
+    visible.value = false;
     getList();
   });
 };

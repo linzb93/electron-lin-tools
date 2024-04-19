@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { Refresh, Iphone } from "@element-plus/icons-vue";
+import { Refresh, Iphone, HomeFilled } from "@element-plus/icons-vue";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
 
@@ -24,18 +24,23 @@ const route = useRoute();
 
 const list = [
   {
-    title: "OSS",
+    title: "首页",
+    to: "/",
+    icon: HomeFilled,
+  },
+  {
+    title: "阿里OSS",
     to: "/oss",
     icon: Refresh,
   },
   {
-    title: "iPhone",
+    title: "iPhone同步",
     to: "/iPhone",
     icon: Iphone,
     hide: process.platform === "darwin",
   },
   {
-    title: "Vue",
+    title: "Vue项目管理",
     to: "/vue",
     icon: VueIcon,
   },
