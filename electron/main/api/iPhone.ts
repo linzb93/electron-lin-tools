@@ -43,7 +43,7 @@ router.get("/get-img-list", async (_, res) => {
   const list = (await mainPost({
     method: "iPhone-get-img",
     data: {},
-  })) as any[];
+  })) as string[];
   res.send({
     list,
   });

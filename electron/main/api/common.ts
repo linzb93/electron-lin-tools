@@ -11,10 +11,12 @@ import { getMainWindow } from "..";
 import { config } from "../plugins/server";
 import { tempPath } from "../plugins/constant";
 import download from "download";
+import { Request } from "../types/api";
+
 export default class extends Controller {
   @Route("copy")
-  doCopy(params: any) {
-    const text = params.params;
+  doCopy(req: Request<string>) {
+    const text = req.params;
     clipboard.writeText(text);
     return {
       code: HTTP_STATUS.SUCCESS,
@@ -22,8 +24,8 @@ export default class extends Controller {
     };
   }
   @Route("download")
-  async download(params: any) {
-    if (Array.isArray(params.params)) {
+  async download(req: Request<string | string[]>) {
+    if (Array.isArray(req.params)) {
       // 下载多份
       const result = await dialog.showOpenDialog({
         properties: ["openDirectory"],
@@ -32,7 +34,7 @@ export default class extends Controller {
         return {};
       }
       await pMap(
-        params.params,
+        req.params,
         (url: string) =>
           new Promise((resolve) => {
             download(url)
@@ -48,7 +50,7 @@ export default class extends Controller {
         message: "下载成功",
       };
     }
-    const url = params.params as string;
+    const url = req.params as string;
     const result = await dialog.showSaveDialog({
       defaultPath: basename(url),
     });
@@ -66,8 +68,8 @@ export default class extends Controller {
     };
   }
   @Route("save-temp")
-  async saveTemp(params: any) {
-    const inputList = params.params as any[];
+  async saveTemp(req: Request<string[]>) {
+    const inputList = req.params;
     const list = await pMap(
       inputList,
       async (item) => {

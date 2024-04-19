@@ -1,11 +1,12 @@
 import path from "node:path";
 import { dialog } from "electron";
-import OSS from "ali-oss";
+import OSS, { OssConfig } from "ali-oss";
 import { omit } from "lodash-es";
 import db from "../plugins/database";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
+import { Request, Database } from "../types/api";
 export default class extends Controller {
   constructor() {
     super();
@@ -13,7 +14,7 @@ export default class extends Controller {
   // 查找对应的用户信息
   private async findClient(id: string) {
     await db.read();
-    const match = (db.data as any).oss.find((item) => item.id === id);
+    const match = (db.data as Database).oss.find((item) => item.id === id);
     if (!match) {
       return {
         success: false,
@@ -23,20 +24,21 @@ export default class extends Controller {
         },
       };
     }
+    const ossobj = omit(match, ["platform", "name"]) as unknown as OssConfig;
     return {
       success: true,
-      client: new OSS(omit(match, ["platform", "name"])),
+      client: new OSS(ossobj),
     };
   }
 
   // 添加用户，目前仅支持阿里OSS
   @Route("oss-create")
-  async create(params: any) {
+  async create(req: Request) {
     await db.read();
-    const data = db.data as any;
-    const id = data.at(-1).id + 1;
+    const data = db.data as Database;
+    const id = data.oss.at(-1).id + 1;
     data.oss.push({
-      ...params.params,
+      ...req.params,
       id,
     });
     await db.write();
@@ -48,22 +50,22 @@ export default class extends Controller {
 
   // 移除用户
   @Route("oss-remove-account")
-  async removeAccount(params: any) {}
+  async removeAccount(req: Request) {}
 
   // 获取用户列表
   @Route("oss-get-project-list")
   async getProjectList() {
     await db.read();
     return {
-      list: (db.data as any).oss,
+      list: (db.data as Database).oss,
     };
   }
 
   // 获取文件/目录列表
   @Route("oss-get-oss-list")
-  async getOssList(params) {
+  async getOssList(req: Request) {
     // https://help.aliyun.com/zh/oss/developer-reference/list-objects-5?spm=a2c4g.11186623.0.i2
-    const { id, config } = params.params;
+    const { id, config } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
@@ -94,8 +96,8 @@ export default class extends Controller {
 
   // 删除文件
   @Route("oss-delete-file")
-  async deleteFile(params: any) {
-    const { id, file } = params.params;
+  async deleteFile(req: Request) {
+    const { id, file } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
@@ -109,8 +111,8 @@ export default class extends Controller {
 
   // 创建目录
   @Route("oss-create-directory")
-  async createDirectory(params) {
-    const { id, path: uploadPath, name } = params.params;
+  async createDirectory(req: Request) {
+    const { id, path: uploadPath, name } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
@@ -124,8 +126,8 @@ export default class extends Controller {
 
   // 上传目录
   @Route("oss-upload")
-  async upload(params) {
-    const { id, path: uploadPath } = params.params;
+  async upload(req: Request) {
+    const { id, path: uploadPath } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;

@@ -14,7 +14,6 @@ export default async (path: string, params: any, options?: Option) => {
   if (options?.delay) {
     await sleep(options.delay);
   }
-  const len = 10;
   console.groupCollapsed(
     `发送请求：%c${path}%c`,
     "color:green",

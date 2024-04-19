@@ -1,10 +1,11 @@
 import {basename} from "node:path";
-import { dialog } from "electron";
 import ipc from 'node-ipc';
 import db from "../plugins/database";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
-import { HTTP_STATUS } from "../plugins/constant";
+// import { HTTP_STATUS } from "../plugins/constant";
+import { Request, Database } from "../types/api";
+
 export default class extends Controller {
   constructor() {
     super();
@@ -15,7 +16,7 @@ export default class extends Controller {
   @Route('vue-get-list')
   async getList() {
     await db.read();
-    const list = (db.data as any).vue;
+    const list = (db.data as Database).vue;
     return {
         list
     }
@@ -23,10 +24,10 @@ export default class extends Controller {
 
   // 添加项目
   @Route("vue-add")
-  async add(params: any) {
-    const data = params.params;
+  async add(req: Request) {
+    const data = req.params;
     await db.read();
-    const list = (db.data as any).vue;
+    const list = (db.data as Database).vue;
     list.push({
         serveUrl: '',
         path: data.path,
@@ -36,7 +37,7 @@ export default class extends Controller {
 
   // 打包项目
   @Route('vue-build')
-  async build(params: any) {
-    const {path} = params.params;
+  async build(req: Request) {
+    const {path} = req.params;
   }
 }
