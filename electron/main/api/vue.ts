@@ -51,11 +51,50 @@ export default class extends Controller {
         path: data.path,
         name: data.name || basename(data.path)
     });
+    await db.write();
+    return {
+        message: 'vue-add'
+    }
   }
 
   // 打包项目
   @Route('vue-build')
   async build(req: Request) {
     const {path} = req.params;
+    // ipc.of.node14.emit("message", "Hello from client");
+    return {
+      message: 'vue-build'
+    }
+  }
+
+  // 启动项目
+  @Route('vue-start')
+  async start(req: Request) {
+    const {path} = req.params;
+    // ipc.of.node14.emit("message", "Hello from client");
+    return {
+      message: 'vue-start'
+    }
+  }
+
+  // 停止项目
+  @Route('vue-stop')
+  async stop(req: Request) {
+    const {path} = req.params;
+    // ipc.of.node14.emit("message", "Hello from client");
+    return {
+      message: 'vue-stop'
+    }
+  }
+
+
+  // 删除项目
+  @Route('vue-delete')
+  async delete(req: Request) {
+    const {path} = req.params;
+    // ipc.of.node14.emit("message", "Hello from client");
+    return {
+      message: 'vue-delete'
+    }
   }
 }
