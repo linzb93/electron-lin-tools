@@ -20,6 +20,9 @@ export const download = async (url:string) => {
 // 处理来自主进程的请求
 export const handleMainPost = (receiveMethod: string, callback:Function) => {
     window.ipcRenderer.on('main-post', async (evt, {requestId, method, data}) => {
+        console.groupCollapsed(`收到来自主进程发起的请求：%c${receiveMethod}`, 'color:orange');
+        console.log(data);
+        console.groupEnd();
         if (method !== receiveMethod) {
             return;
         }

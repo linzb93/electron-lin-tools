@@ -29,7 +29,7 @@ export default () => {
         console.trace(error.message);
         return wrapResponse({
           code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          message: "服务器故障",
+          message: "Server error",
         });
       }
     }

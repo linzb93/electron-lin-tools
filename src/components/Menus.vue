@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { Iphone, Platform } from "@element-plus/icons-vue";
+import { Refresh, Iphone } from "@element-plus/icons-vue";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
 
@@ -26,7 +26,7 @@ const list = [
   {
     title: "OSS",
     to: "/oss",
-    icon: VueIcon,
+    icon: Refresh,
   },
   {
     title: "iPhone",
@@ -37,7 +37,7 @@ const list = [
   {
     title: "Vue",
     to: "/vue",
-    icon: Platform,
+    icon: VueIcon,
   },
 ];
 const menuList = list.filter((item) => !item.hide);

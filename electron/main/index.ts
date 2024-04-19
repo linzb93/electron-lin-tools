@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, shell, ipcMain, Menu, Tray, nativeImage } from "electron";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
@@ -64,6 +64,17 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow();
+  let tray = new Tray(nativeImage.createFromPath(join(__dirname, '../../public/logo.png')));
+  const contextMenu = Menu.buildFromTemplate([
+    { label: '打开窗口', click: () => {
+      createWindow();
+    }},
+    { label: '退出', click: () => {app.quit()}},
+  ])
+  tray.setContextMenu(contextMenu);
+  tray.on('click', () => {
+    if (!win) createWindow();
+  })
   // 设置开机自启动
   !isMac &&
     app.setLoginItemSettings({
@@ -87,9 +98,9 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
   win = null;
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  // if (process.platform !== "darwin") {
+  //   app.quit();
+  // }
 });
 
 app.on("second-instance", () => {

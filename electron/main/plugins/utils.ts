@@ -17,7 +17,7 @@ export const uuid = (len = 36) => {
   return arr.join("");
 };
 
-export const mainPost = ({ method, data, listener }: {method: string; data:any; listener:boolean}) =>
+export const mainPost = ({ method, data, listener }: {method: string; data:any; listener?:boolean}) =>
   new Promise((resolve) => {
     const win = getMainWindow();
     const uid = uuid();
@@ -31,7 +31,7 @@ export const mainPost = ({ method, data, listener }: {method: string; data:any; 
       };
       ipcMain.on("main-post-receive", handler);
     }
-    win.webContents.send("main-post", {
+    win && win.webContents.send("main-post", {
       requestId: uid,
       method,
       data,

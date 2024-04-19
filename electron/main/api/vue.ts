@@ -13,22 +13,22 @@ export default class extends Controller {
     ipc.config.id = 'electron-lin-tools';
     ipc.config.retry = 1500;
     ipc.config.silent = true;
-    ipc.connectTo("node14", () => {
-      ipc.of.node14.on("connect",() => {
-        mainPost({
-          method: 'vue-ipc-is-connect',
-          data: true,
-          listener:false,
-        });
-      });
-      ipc.of.node14.on("disconnect", () => {
-        mainPost({
-          method: 'vue-ipc-is-connect',
-          data: false,
-          listener:false,
-        });
-      });
-    });
+    // ipc.connectTo("node14", () => {
+    //   ipc.of.node14.on("connect",() => {
+    //     mainPost({
+    //       method: 'vue-ipc-is-connect',
+    //       data: true,
+    //       listener:false,
+    //     });
+    //   });
+    //   ipc.of.node14.on("disconnect", () => {
+    //     mainPost({
+    //       method: 'vue-ipc-is-connect',
+    //       data: false,
+    //       listener:false,
+    //     });
+    //   });
+    // });
   }
   // 获取项目列表
   @Route('vue-get-list')
