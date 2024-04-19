@@ -1,8 +1,9 @@
-import { app, BrowserWindow, shell, ipcMain, screen } from "electron";
+import { app, BrowserWindow, shell, ipcMain, Menu } from "electron";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
+import {tempPath} from  "./plugins/constant";
 import "./plugins/server";
 import "./plugins/schedule";
 
@@ -30,31 +31,8 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 async function createWindow() {
-  const screens = screen.getAllDisplays();
-  const mainScreen = screens.find((screen) => screen.id === screens[0].id);
-  const secondScreen = screens.find(
-    (display) => display.bounds.x !== 0 || display.bounds.y !== 0
-  );
-  // 如果有双屏，窗口在第二屏全屏，否则第一屏右半屏
-  let bounds;
-  if (secondScreen) {
-    bounds = {
-      width: secondScreen.bounds.width,
-      height: secondScreen.bounds.height,
-      x: secondScreen.bounds.x,
-      y: secondScreen.bounds.y,
-    };
-  } else {
-    bounds = {
-      width: mainScreen.size.width / 2,
-      height: mainScreen.size.height,
-      x: mainScreen.size.width / 2,
-      y: 0,
-    };
-  }
   win = new BrowserWindow({
     title: "小林工具箱",
-    // ...bounds,
     width: 1000,
     height: 750,
     webPreferences: {
@@ -91,6 +69,19 @@ app.whenReady().then(async () => {
     app.setLoginItemSettings({
       openAtLogin: !isDev,
     });
+    const menu = Menu.buildFromTemplate([
+      {role: 'reload'},
+      {role: 'toggleDevTools'},
+      {role: 'quit'},
+      {
+        label: '打开缓存页面',
+        click: () => {
+          shell.openPath(tempPath);
+        },
+        visible: isDev
+      }
+    ]);
+    Menu.setApplicationMenu(menu);
   registerRoute();
 });
 

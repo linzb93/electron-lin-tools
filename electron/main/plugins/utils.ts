@@ -17,18 +17,20 @@ export const uuid = (len = 36) => {
   return arr.join("");
 };
 
-export const mainPost = ({ method, data }) =>
+export const mainPost = ({ method, data, listener }: {method: string; data:any; listener:boolean}) =>
   new Promise((resolve) => {
     const win = getMainWindow();
     const uid = uuid();
-    const handler = (_, dataStr: string) => {
-      const data = JSON.parse(dataStr);
-      if (data.requestId === uid && data.method === method) {
-        ipcMain.off("main-post-receive", handler);
-        resolve(data.data);
-      }
-    };
-    ipcMain.on("main-post-receive", handler);
+    if (listener) {
+      const handler = (_:any, dataStr: string) => {
+        const dataObj = JSON.parse(dataStr);
+        if (dataObj.requestId === uid && dataObj.method === method) {
+          ipcMain.off("main-post-receive", handler);
+          resolve(dataObj.data);
+        }
+      };
+      ipcMain.on("main-post-receive", handler);
+    }
     win.webContents.send("main-post", {
       requestId: uid,
       method,

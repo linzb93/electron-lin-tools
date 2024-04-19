@@ -7,9 +7,11 @@
     @dragleave="active = false"
     @drop="dropFile"
   >
-    <p v-if="visibleFiles.length === 0">请将需要同步的图片拖拽至此</p>
+    <p v-if="visibleFiles.length === 0" class="center">
+      请将需要同步的图片拖拽至此
+    </p>
     <div class="sended-img" v-else>
-      <p>准备同步的图片：</p>
+      <p class="center">准备同步的图片：</p>
       <el-image
         v-for="img in visibleFiles.filter((item, index) => index < max)"
         :key="img"
@@ -86,7 +88,6 @@ const closed = () => {
   height: 300px;
   border: 1px solid #999;
   border-radius: 4px;
-  text-align: center;
   padding: 10px;
   position: relative;
   &.active {
@@ -100,6 +101,9 @@ const closed = () => {
       background: rgba(255, 255, 0, 0.4);
     }
   }
+  .center {
+    text-align: center;
+  }
 }
 .received-image {
   width: 120px;
@@ -108,7 +112,6 @@ const closed = () => {
   margin-right: 10px;
 }
 .sended-img {
-  margin-top: 30px;
   .img-item {
     width: 120px;
     height: 120px;

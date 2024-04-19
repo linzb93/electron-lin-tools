@@ -1,4 +1,7 @@
 <template>
+  <el-alert type="error" :closeable="false" v-if="isDisconnect"
+    >服务器已断联，请重新打开</el-alert
+  >
   <el-button type="primary" @click="add">添加项目</el-button>
   <el-table :data="list">
     <el-table-column label="名称" prop="name"></el-table-column>
@@ -62,7 +65,7 @@
       <el-form-item label="名称" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="地址" prop="name">
+      <el-form-item label="地址" prop="path">
         <el-input v-model="form.path" style="width: 218px" />
         <el-button type="primary" class="ml10" @click="selectPath"
           >选择</el-button
@@ -78,22 +81,21 @@
 <script setup>
 import { ref, shallowRef } from "vue";
 import request from "@/plugins/request";
+import { handleMainPost } from "../../plugins/util";
 import { ElMessage } from "element-plus";
 import { ArrowDown } from "@element-plus/icons-vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 
-const list = ref([
-  {
-    name: "dkd-jyzs-mobile",
-    path: "/meituan/dkd-jyzs-mobile",
-    status: false,
-  },
-]);
+const isDisconnect = shallowRef(false); // 是否与ipc断联
+handleMainPost("vue-ipc-is-connect", (ret) => {
+  isDisconnect.value = ret;
+});
+const list = ref([]);
 const getList = async () => {
   const res = await request("vue-get-list");
   list.value = res.list;
 };
-// getList();
+getList();
 
 const form = ref({
   name: "",

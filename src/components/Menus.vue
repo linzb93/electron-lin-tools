@@ -16,14 +16,13 @@
 </template>
 
 <script setup>
-import { shallowRef, computed } from "vue";
 import { Iphone, Platform } from "@element-plus/icons-vue";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const list = shallowRef([
+const list = [
   {
     title: "OSS",
     to: "/oss",
@@ -40,8 +39,8 @@ const list = shallowRef([
     to: "/vue",
     icon: Platform,
   },
-]);
-const menuList = computed(() => list.value.filter((item) => !item.hide));
+];
+const menuList = list.filter((item) => !item.hide);
 const isActive = (menu) => route.path.startsWith(menu.to);
 </script>
 <style lang="scss" scoped>

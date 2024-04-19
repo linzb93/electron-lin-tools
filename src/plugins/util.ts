@@ -17,6 +17,7 @@ export const download = async (url:string) => {
     ElMessage.success('下载成功');
 }
 
+// 处理来自主进程的请求
 export const handleMainPost = (receiveMethod: string, callback:Function) => {
     window.ipcRenderer.on('main-post', async (evt, {requestId, method, data}) => {
         if (method !== receiveMethod) {

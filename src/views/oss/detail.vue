@@ -119,11 +119,38 @@ const getFileExt = (item) => {
     return "dir";
   }
   const extName = getExtName(item.name);
-  if (["jpg", "jpeg", "png", "webp"].includes(extName)) {
+  if (["jpg", "jpeg", "png", "webp", "gif"].includes(extName)) {
     return "img";
   }
-  if (["mp4", "wav"].includes("extName")) {
+  if (["mp4", "wav", "avi", "mpeg", "mov", "flv"].includes(extName)) {
     return "video";
+  }
+  if (
+    [
+      "html",
+      "css",
+      "js",
+      "vue",
+      "json",
+      "md",
+      "jsx",
+      "vue",
+      "scss",
+      "svg",
+      "txt",
+      "ts",
+    ].includes(extName)
+  ) {
+    return extName;
+  }
+  if (extName.startsWith("json")) {
+    return "json";
+  }
+  if (["sass", "less"].includes(extName)) {
+    return "scss";
+  }
+  if (extName === "tsx") {
+    return "jsx";
   }
   return "file";
 };
