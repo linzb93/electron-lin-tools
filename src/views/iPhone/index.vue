@@ -33,7 +33,7 @@
       +{{ receiveList.length - max }}
     </div>
     <template #footer>
-      <el-button type="primary" @click="download">下载</el-button>
+      <el-button type="primary" @click="startDownload">下载</el-button>
     </template>
   </el-dialog>
 </template>
@@ -41,9 +41,7 @@
 <script setup>
 import { cloneDeep } from "lodash-es";
 import { shallowRef, ref } from "vue";
-import { ElMessage } from "element-plus";
-import { handleMainPost } from "@/plugins/util";
-import request from "@/plugins/request";
+import { handleMainPost, download } from "@/plugins/util";
 
 const max = 3;
 const visibleFiles = ref([]);
@@ -74,9 +72,8 @@ handleMainPost("iPhone-upload-img", (url) => {
   receiveList.value.push(url);
   visible.value = true;
 });
-const download = async () => {
-  await request("download", receiveList.value);
-  ElMessage.success("下载成功");
+const startDownload = async () => {
+  await download(receiveList.value);
   visible.value = false;
 };
 const closed = () => {
