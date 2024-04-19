@@ -1,10 +1,19 @@
 <template>
   <el-button type="primary" @click="add">添加项目</el-button>
-  <ul>
-    <li v-for="item in list" :key="item.id" @click="jump(item)">
-      {{ item.name }}({{ getPlatformName(item.platform) }})
-    </li>
-  </ul>
+  <el-table :data="list">
+    <el-table-column label="名称" prop="name"></el-table-column>
+    <el-table-column label="平台">
+      <template #default="scope">
+        {{ getPlatformName(scope.row.platform) }}
+      </template>
+    </el-table-column>
+    <el-table-column label="操作">
+      <template #default="scope">
+        <el-link type="primary" @click="jump(scope.row)">进入</el-link>
+        <el-link type="primary" @click="edit(scope.row)">编辑</el-link>
+      </template>
+    </el-table-column>
+  </el-table>
   <el-dialog v-model="visible" title="添加项目" width="400" @close="close">
     <el-form :model="form" label-suffix=":" label-width="130px">
       <el-form-item label="名称">
@@ -56,6 +65,10 @@ onMounted(() => {
 const visible = shallowRef(false);
 const add = () => {
   visible.value = true;
+};
+const edit = (item) => {
+  visible.value = true;
+  form.value = { ...item };
 };
 const form = ref({});
 const close = () => {

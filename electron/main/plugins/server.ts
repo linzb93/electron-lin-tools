@@ -16,13 +16,18 @@ try {
 } catch (error) {
   fs.mkdirSync(tempPath);
 }
-const app = express();
+(() => {
+  if (process.platform === 'darwin') {
+    return;
+  }
+  const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({ limit: "5mb" }));
-app.use(cors());
-app.use(config.static, express.static(join(root, ".temp")));
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json({ limit: "5mb" }));
+  app.use(cors());
+  app.use(config.static, express.static(join(root, ".temp")));
 
-app.use("/iPhone-sync", iPhoneRouter);
+  app.use("/iPhone-sync", iPhoneRouter);
 
-app.listen(config.port);
+  app.listen(config.port);
+})()

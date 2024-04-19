@@ -3,7 +3,7 @@
   <el-table :data="list">
     <el-table-column label="名称" prop="name"></el-table-column>
     <el-table-column label="地址" prop="path"></el-table-column>
-    <el-table-column label="状态">
+    <el-table-column label="状态" width="80px">
       <template #default="scope">
         <div class="status active" v-if="scope.row.status"></div>
         <div class="status nothing" v-else></div>
@@ -60,15 +60,17 @@
   >
     <el-form ref="formRef" label-width="80px" label-suffix="：">
       <el-form-item label="名称" prop="name">
-        <el-input size="small" v-model="form.name" />
+        <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="名称" prop="name">
-        <el-input size="small" v-model="form.path" />
-        <el-button size="small" @click="selectPath">选择</el-button>
+      <el-form-item label="地址" prop="name">
+        <el-input v-model="form.path" style="width: 218px" />
+        <el-button type="primary" class="ml10" @click="selectPath"
+          >选择</el-button
+        >
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button size="small" type="primary" @click="submit">提交</el-button>
+      <el-button type="primary" @click="submit">提交</el-button>
     </template>
   </el-dialog>
 </template>
@@ -105,8 +107,8 @@ const add = async () => {
   visible.value = true;
 };
 const selectPath = async () => {
-  const pt = await request("select-path");
-  form.value.path = pt;
+  const { path } = await request("select-path");
+  form.value.path = path;
 };
 const submit = () => {
   formRef.value.validate(async (isValid) => {
