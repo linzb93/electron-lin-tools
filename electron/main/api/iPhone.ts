@@ -60,9 +60,12 @@ const obs$ = new Observable((observer) => {
   router.post("/send-img", upload.single("file"), async (req, res) => {
     const uid = Date.now();
     const filename = join(tempPath, `${uid}.jpg`);
-    intoStream(req.file.buffer).pipe(fs.createWriteStream(filename));
-    observer.next(`http://localhost:${config.port}${config.static}/${uid}.jpg`);
-    res.send("ok");
+    intoStream(req.file.buffer)
+    .pipe(fs.createWriteStream(filename))
+    .on('finish', () => {
+      observer.next(`http://localhost:${config.port}${config.static}/${uid}.jpg`);
+      res.send("ok");
+    });
   });
   // iPhone给电脑批量发送图片
   router.post("/send-img-batch", (req, res) => {
@@ -78,7 +81,6 @@ const obs$ = new Observable((observer) => {
 });
 obs$.subscribe({
   next: (url) => {
-    console.log(url);
     mainPost({
       method: "iPhone-upload-img",
       data: url,

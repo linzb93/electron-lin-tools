@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
 import {tempPath} from  "./plugins/constant";
+import unhandled from "electron-unhandled";
+unhandled();
 import "./plugins/server";
 import "./plugins/schedule";
 
