@@ -59,9 +59,9 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow();
-  app.dock.setIcon(nativeImage.createFromPath(join(__dirname, '../../public/logo.icns')))
+  isMac && app.dock.setIcon(nativeImage.createFromPath(join(__dirname, '../../public/logo.icns')))
   // 托盘
-  let tray = new Tray(nativeImage.createFromPath(join(__dirname, '../../public/icon_16x16.png')));
+  let tray = new Tray(nativeImage.createFromPath(join(__dirname, '../../public/logo_16x16.png')));
   const contextMenu = Menu.buildFromTemplate([
     { label: '打开窗口', click: createWindow },
     { label: '退出', click: app.quit },

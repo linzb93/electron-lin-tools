@@ -11,7 +11,8 @@ import { getMainWindow } from "..";
 import { config } from "../plugins/server";
 import { tempPath } from "../plugins/constant";
 import download from "download";
-import { Request } from "../types/api";
+import db from "../plugins/database";
+import { Request, Database } from "../types/api";
 
 export default class extends Controller {
   @Route("copy")
@@ -67,8 +68,8 @@ export default class extends Controller {
       message: "下载成功",
     };
   }
-  @Route("save-temp")
-  async saveTemp(req: Request<string[]>) {
+  @Route("save-temp-file")
+  async saveTempFile(req: Request<string[]>) {
     const inputList = req.params;
     const list = await pMap(
       inputList,
@@ -106,5 +107,12 @@ export default class extends Controller {
     return {
       path: result.filePaths[0]
     }
+  }
+  @Route('save-ipc')
+  async saveIpc(req: Request) {
+    const {name} = req.params;
+    await db.read();
+    (db.data as Database).ipc = name;
+    await db.write();
   }
 }

@@ -1,4 +1,5 @@
 <template>
+  <p class="mb20">iPhone同步包括剪贴板同步、图片（批量）同步</p>
   <div
     class="drop-box"
     :class="{ active: active }"
@@ -11,7 +12,7 @@
       请将需要同步的图片拖拽至此
     </p>
     <div class="sended-img" v-else>
-      <p class="center">准备同步的图片：</p>
+      <p class="center">准备同步的图片</p>
       <el-image
         v-for="img in visibleFiles.filter((item, index) => index < max)"
         :key="img"

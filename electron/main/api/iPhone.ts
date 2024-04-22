@@ -42,7 +42,7 @@ router.get("/get-copy-data", (_, res) => {
 router.get("/get-img-list", async (_, res) => {
   const list = (await mainPost({
     method: "iPhone-get-img",
-    data: {},
+    data: {}
   })) as string[];
   res.send({
     list,
@@ -72,15 +72,17 @@ const obs$ = new Observable((observer) => {
       observer.next(
         `http://localhost:${config.port}${config.static}/${uid}.jpg`
       );
+      res.send("ok");
     });
-    res.send("ok");
   });
 });
 obs$.subscribe({
   next: (url) => {
+    console.log(url);
     mainPost({
       method: "iPhone-upload-img",
       data: url,
+      listener:false,
     });
   },
 });

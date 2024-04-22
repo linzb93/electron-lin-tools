@@ -18,5 +18,6 @@ export interface Database {
     id: string;
     platform?: string;
     name?: string;
-  }[]
+  }[];
+  ipc: string;
 }

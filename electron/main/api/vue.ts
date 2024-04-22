@@ -16,18 +16,26 @@ const isMac = process.platform === 'darwin';
 export default class extends Controller {
   constructor() {
     super();
+    this.init();
+  }
+  private async init() {
     ipc.config.id = 'electron-lin-tools';
     ipc.config.retry = 1500;
     ipc.config.silent = true;
-    // ipc.connectTo("node14", () => {
-    //   ipc.of.node14.on("connect",() => {
+    await db.read();
+    const serverIpcId = (db.data as Database).ipc;
+    if (!serverIpcId) {
+      return;
+    }
+    // ipc.connectTo(serverIpcId, () => {
+    //   ipc.of[serverIpcId].on("connect",() => {
     //     mainPost({
     //       method: 'vue-ipc-is-connect',
     //       data: true,
     //       listener:false,
     //     });
     //   });
-    //   ipc.of.node14.on("disconnect", () => {
+    //   ipc.of[serverIpcId].on("disconnect", () => {
     //     mainPost({
     //       method: 'vue-ipc-is-connect',
     //       data: false,

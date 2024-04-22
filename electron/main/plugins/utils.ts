@@ -17,7 +17,7 @@ export const uuid = (len = 36) => {
   return arr.join("");
 };
 
-export const mainPost = ({ method, data, listener }: {method: string; data:any; listener?:boolean}) =>
+export const mainPost = ({ method, data, listener = true }: {method: string; data:any; listener?:boolean}) =>
   new Promise((resolve) => {
     const win = getMainWindow();
     const uid = uuid();
