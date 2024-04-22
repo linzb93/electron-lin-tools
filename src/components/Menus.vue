@@ -1,24 +1,57 @@
 <template>
-  <ul class="menu-list full-height">
-    <li
-      v-for="menu in menuList"
-      :key="menu.title"
-      :class="{ active: isActive(menu) }"
+  <div class="menu-list full-heigh">
+    <div class="flexpack-end">
+      <el-icon @click="startSync" :class="{ loading: syncing }">
+        <Refresh />
+      </el-icon>
+    </div>
+    <ul>
+      <li
+        v-for="menu in menuList"
+        :key="menu.title"
+        :class="{ active: isActive(menu) }"
+      >
+        <router-link :to="menu.to" class="flexalign-center">
+          <el-icon class="pre-icon">
+            <component :is="menu.icon" />
+          </el-icon>
+          <span>{{ menu.title }}</span>
+        </router-link>
+      </li>
+    </ul>
+  </div>
+  <el-dialog v-model="visible" title="登录" width="400px">
+    <el-form
+      label-suffix="："
+      label-width="70px"
+      :model="account"
+      :rules="rules"
+      ref="accountRef"
     >
-      <router-link :to="menu.to" class="flexalign-center">
-        <el-icon class="pre-icon">
-          <component :is="menu.icon" />
-        </el-icon>
-        <span>{{ menu.title }}</span>
-      </router-link>
-    </li>
-  </ul>
+      <el-form-item label="账号">
+        <el-input v-model="account.user" placeholder="请输入账号" />
+      </el-form-item>
+      <el-form-item label="密码">
+        <el-input
+          v-model="account.password"
+          type="password"
+          placeholder="请输入密码"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" @click="save">保存</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
+import { ElMessage } from "element-plus";
 import { Refresh, Iphone, HomeFilled } from "@element-plus/icons-vue";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
+import request from "@/plugins/request";
+import { shallowReactive, ref, shallowRef } from "vue";
 
 const route = useRoute();
 
@@ -47,8 +80,53 @@ const list = [
 ];
 const menuList = list.filter((item) => !item.hide);
 const isActive = (menu) => route.path.startsWith(menu.to);
+
+// 同步
+const syncing = shallowRef(false);
+const visible = shallowRef(false);
+const account = shallowReactive({
+  user: "",
+  password: "",
+});
+const rules = {
+  user: { required: true, message: "请输入账号" },
+  password: { required: true, message: "请输入密码" },
+};
+const accountRef = ref(null);
+const startSync = async () => {
+  syncing.value = true;
+  const result = await request("sync");
+  if (!result.success) {
+    // 未登录账号
+    visible.value = true;
+  }
+  syncing.value = false;
+};
+const save = () => {
+  accountRef.value.validate(async (isValid) => {
+    if (!isValid) {
+      return;
+    }
+    await request("login", ...account);
+    ElMessage.success("登录成功");
+    syncing.value = true;
+    await request("sync");
+    syncing.value = false;
+  });
+};
 </script>
 <style lang="scss" scoped>
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.loading {
+  animation: rotate 0.8s linear infinite;
+}
 .menu-list {
   width: 200px;
   padding-top: 20px;

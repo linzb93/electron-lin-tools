@@ -1,20 +1,30 @@
+import { join, extname, basename } from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
-import { join, extname, basename } from "node:path";
-import { uuid } from "../plugins/utils";
 import { clipboard, dialog } from "electron";
+import { createClient } from 'webdav';
 import pMap from "p-map";
+import download from "download";
+import { getMainWindow } from "..";
+import { uuid } from "../plugins/utils";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
-import { HTTP_STATUS } from "../plugins/constant";
-import { getMainWindow } from "..";
+import { HTTP_STATUS, root, tempPath } from "../plugins/constant";
 import { config } from "../plugins/server";
-import { tempPath } from "../plugins/constant";
-import download from "download";
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
 
 export default class extends Controller {
+  private syncClient = null;
+  constructor() {
+    super();
+    this.init();
+  }
+  private async init() {
+    await db.read();
+    const account  =(db.data as Database).sync;
+    this.syncClient = createClient('', account);
+  }
   @Route("copy")
   doCopy(req: Request<string>) {
     const text = req.params;
@@ -114,5 +124,27 @@ export default class extends Controller {
     await db.read();
     (db.data as Database).ipc = name;
     await db.write();
+  }
+  // 同步
+  @Route('sync')
+  async sync() {
+    fs.createReadStream(join(root, 'sync.json'))
+    .pipe(this.syncClient.createWriteStream('electron-lin-tools/sync.json'));
+    return {
+      success: true,
+    }
+  }
+  // 登录
+  async login(req: Request) {
+    const {params} = req;
+    await db.read();
+    (db.data as Database).sync = {
+      user: params.user,
+      password: params.password
+    };
+    await db.write();
+    return {
+      success: true
+    }
   }
 }
