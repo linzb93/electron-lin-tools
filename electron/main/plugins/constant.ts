@@ -1,4 +1,5 @@
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import cachedir from "cachedir";
 
 export const HTTP_STATUS = {
@@ -21,3 +22,4 @@ export const HTTP_STATUS = {
 
 export const root = cachedir("electron-lin-tools");
 export const tempPath = join(root, ".temp");
+export const publicPath = join(dirname(fileURLToPath(import.meta.url)), '../../public');

@@ -12,7 +12,7 @@ export default class extends Controller {
     super();
   }
   // 查找对应的用户信息
-  private async findClient(id: string) {
+  private async findClient(id: number) {
     await db.read();
     const match = (db.data as Database).oss.find((item) => item.id === id);
     if (!match) {
@@ -36,7 +36,7 @@ export default class extends Controller {
   async create(req: Request) {
     await db.read();
     const data = db.data as Database;
-    const id = data.oss.at(-1).id + 1;
+    const id = data.oss.length ? Number(data.oss.at(-1).id + 1) : 1;
     data.oss.push({
       ...req.params,
       id,

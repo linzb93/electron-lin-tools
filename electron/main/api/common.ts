@@ -2,14 +2,14 @@ import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { join, extname, basename } from "node:path";
 import { uuid } from "../plugins/utils";
-import { clipboard, dialog } from "electron";
+import { clipboard, dialog, nativeImage, IpcMainEvent } from "electron";
 import pMap from "p-map";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 import { getMainWindow } from "..";
 import { config } from "../plugins/server";
-import { tempPath } from "../plugins/constant";
+import { tempPath, publicPath } from "../plugins/constant";
 import download from "download";
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
@@ -114,5 +114,17 @@ export default class extends Controller {
     await db.read();
     (db.data as Database).ipc = name;
     await db.write();
+  }
+  @Route('drag')
+  async drag(req: Request, event:IpcMainEvent) {
+    const {url} = req.params;
+    const dragIcon = await nativeImage.createThumbnailFromPath(join(publicPath, 'drag-and-drop.png'), {
+      width: 128,
+      height: 128
+    });
+    event.sender.startDrag({
+      file: join(tempPath, basename(url)),
+      icon: dragIcon
+    })
   }
 }

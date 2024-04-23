@@ -1,9 +1,9 @@
-import { app, BrowserWindow, shell, ipcMain, Menu, Tray, nativeImage } from "electron";
+import { app, BrowserWindow, shell, ipcMain, Menu, Tray, nativeImage, dialog } from "electron";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
 import registerRoute from "./plugins/route";
-import {tempPath} from  "./plugins/constant";
+import {tempPath, publicPath} from  "./plugins/constant";
 import unhandled from "electron-unhandled";
 unhandled();
 import "./plugins/server";
@@ -61,9 +61,9 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow();
-  isMac && app.dock.setIcon(nativeImage.createFromPath(join(__dirname, '../../public/logo.icns')))
+  isMac && app.dock.setIcon(nativeImage.createFromPath(join(publicPath, 'logo.icns')))
   // 托盘
-  let tray = new Tray(nativeImage.createFromPath(join(__dirname, '../../public/logo_16x16.png')));
+  let tray = new Tray(nativeImage.createFromPath(join(publicPath, './logo_16x16.png')));
   const contextMenu = Menu.buildFromTemplate([
     { label: '打开窗口', click: createWindow },
     { label: '退出', click: app.quit },
@@ -78,6 +78,19 @@ app.whenReady().then(async () => {
         label: '应用',
         submenu: [
           {role: 'reload'},
+          {
+            label: 'about',
+            click: async () => {
+              const pkg = {
+                version: 'v1.1.0'
+              }
+              dialog.showMessageBox({
+                title: '关于我们',
+                message:`${pkg.version}\n @copyright ${new Date().getFullYear()} linzb93`
+              })
+            }
+          },
+          {type: 'separator'},
           {role: 'quit'},
         ]
       },

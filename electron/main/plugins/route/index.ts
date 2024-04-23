@@ -13,7 +13,7 @@ export default () => {
   new OSSController();
   new VueController();
 
-  ipcMain.handle("api", async (_, requestStr: string) => {
+  ipcMain.handle("api", async (event, requestStr: string) => {
     const request = JSON.parse(requestStr) as Request;
     const { path } = request;
     const apiList = getApiList();
@@ -22,11 +22,11 @@ export default () => {
       const { Class, propertyKey } = match;
       try {
         const ctor = new Class();
-        const ret = await ctor[propertyKey](request);
+        const ret = await ctor[propertyKey](request, event);
         return wrapResponse(ret);
       } catch (error) {
         console.log(`api ${chalk.green(match.path)} error`);
-        console.trace(error.message);
+        error && console.trace(error.message);
         return wrapResponse({
           code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
           message: "Server error",

@@ -15,7 +15,7 @@ export interface Database {
     serveUrl: string;
   }[];
   oss: {
-    id: string;
+    id: number;
     platform?: string;
     name?: string;
   }[];

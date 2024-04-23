@@ -17,12 +17,12 @@
         <div class="status nothing" v-else></div>
       </template>
     </el-table-column>
-    <el-table-column label="端口" prop="port">
+    <el-table-column label="端口" prop="port" width="80px">
       <template #default="scope">
         {{ scope.row.port || "无" }}
       </template>
     </el-table-column>
-    <el-table-column label="操作">
+    <el-table-column label="操作" width="250px">
       <template #default="scope">
         <div class="flexalign-center">
           <el-link

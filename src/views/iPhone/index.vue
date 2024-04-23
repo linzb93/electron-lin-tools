@@ -27,10 +27,12 @@
   </div>
   <el-dialog title="收到图片" v-model="visible" width="580px" @closed="closed">
     <el-image
-      v-for="img in receiveList.filter((item, index) => index < max)"
+      v-for="img in receiveList.filter((_, index) => index < max)"
       :src="img"
       class="received-image"
+      draggable="true"
       fit="cover"
+      @dragstart.native.stop="startDrag(img)"
     />
     <div class="more" v-if="receiveList.length > max">
       +{{ receiveList.length - max }}
@@ -45,7 +47,7 @@
 import { cloneDeep } from "lodash-es";
 import { shallowRef, ref } from "vue";
 import { handleMainPost, download } from "@/plugins/util";
-
+import request from "@/plugins/request";
 const max = 3;
 const visibleFiles = ref([]);
 const realFiles = ref([]);
@@ -81,6 +83,11 @@ const startDownload = async () => {
 };
 const closed = () => {
   receiveList.value = [];
+};
+const startDrag = async (url) => {
+  await request("drag", {
+    url,
+  });
 };
 </script>
 <style lang="scss" scoped>
