@@ -20,4 +20,8 @@ export interface Database {
     name?: string;
   }[];
   ipc: string;
+  sync: {
+    user: string;
+    password: string;
+  }
 }

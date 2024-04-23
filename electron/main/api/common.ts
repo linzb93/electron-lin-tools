@@ -1,20 +1,41 @@
+import { join, extname, basename } from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
+<<<<<<< HEAD
 import { join, extname, basename } from "node:path";
 import { uuid } from "../plugins/utils";
 import { clipboard, dialog, nativeImage, IpcMainEvent } from "electron";
+=======
+import { clipboard, dialog } from "electron";
+import { createClient } from 'webdav';
+>>>>>>> 9034ea3953d7afe845d2533871e1150ac2a7b7a9
 import pMap from "p-map";
+import download from "download";
+import { getMainWindow } from "..";
+import { uuid } from "../plugins/utils";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
-import { HTTP_STATUS } from "../plugins/constant";
-import { getMainWindow } from "..";
+import { HTTP_STATUS, root, tempPath } from "../plugins/constant";
 import { config } from "../plugins/server";
+<<<<<<< HEAD
 import { tempPath, publicPath } from "../plugins/constant";
 import download from "download";
+=======
+>>>>>>> 9034ea3953d7afe845d2533871e1150ac2a7b7a9
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
 
 export default class extends Controller {
+  private syncClient = null;
+  constructor() {
+    super();
+    this.init();
+  }
+  private async init() {
+    await db.read();
+    const account  =(db.data as Database).sync;
+    this.syncClient = createClient('', account);
+  }
   @Route("copy")
   doCopy(req: Request<string>) {
     const text = req.params;
@@ -115,6 +136,7 @@ export default class extends Controller {
     (db.data as Database).ipc = name;
     await db.write();
   }
+<<<<<<< HEAD
   @Route('drag')
   async drag(req: Request, event:IpcMainEvent) {
     const {url} = req.params;
@@ -126,5 +148,28 @@ export default class extends Controller {
       file: join(tempPath, basename(url)),
       icon: dragIcon
     })
+=======
+  // 同步
+  @Route('sync')
+  async sync() {
+    fs.createReadStream(join(root, 'sync.json'))
+    .pipe(this.syncClient.createWriteStream('electron-lin-tools/sync.json'));
+    return {
+      success: true,
+    }
+  }
+  // 登录
+  async login(req: Request) {
+    const {params} = req;
+    await db.read();
+    (db.data as Database).sync = {
+      user: params.user,
+      password: params.password
+    };
+    await db.write();
+    return {
+      success: true
+    }
+>>>>>>> 9034ea3953d7afe845d2533871e1150ac2a7b7a9
   }
 }
