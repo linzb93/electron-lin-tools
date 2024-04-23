@@ -24,7 +24,7 @@
     </div>
   </div>
   <div class="mt20">
-    <el-icon @click="router.back()" class="mr10"><back /></el-icon>
+    <el-icon @click="router.back()" class="mr10 curp"><back /></el-icon>
     <el-button type="primary" @click="createDir">创建文件夹</el-button>
     <el-button type="primary" @click="upload">上传文件</el-button>
     <el-button type="primary" @click="getData">刷新</el-button>
@@ -37,10 +37,19 @@
     <el-table-column type="selection" width="55" />
     <el-table-column label="名称">
       <template #default="scope">
-        <file-type-icon :type="getFileExt(scope.row)" />
-        <span class="file-name" @click="jumpInner(scope.row)">{{
-          scope.row.name
-        }}</span>
+        <div class="flexalign-center">
+          <el-icon
+            v-if="scope.row.type === 'dir'"
+            :size="16"
+            style="margin-right: 5px"
+          >
+            <folder />
+          </el-icon>
+          <file-type-icon :type="getFileExt(scope.row)" v-else />
+          <span class="file-name" @click="jumpInner(scope.row)">{{
+            scope.row.name
+          }}</span>
+        </div>
       </template>
     </el-table-column>
     <el-table-column label="类型/大小">
@@ -51,7 +60,11 @@
     </el-table-column>
     <el-table-column label="最后修改时间">
       <template #default="scope">
-        {{ dayjs(scope.row.lastModified).format("YYYY-MM-DD HH:mm:ss") }}
+        {{
+          scope.row.type === "dir"
+            ? ""
+            : dayjs(scope.row.lastModified).format("YYYY-MM-DD HH:mm:ss")
+        }}
       </template>
     </el-table-column>
     <el-table-column label="操作">
@@ -62,24 +75,26 @@
           v-if="scope.row.type !== 'dir'"
           >获取地址</el-link
         >
-        <el-link type="primary">下载</el-link>
+        <el-link type="primary" @click="download(scope.row.url)">下载</el-link>
         <delete-confirm @confirm="del(scope.row)"></delete-confirm>
       </template>
     </el-table-column>
   </el-table>
+  <progress-drawer v-model:visible="visible.progress" />
 </template>
 
 <script setup>
-import { ref, shallowRef, onMounted, computed } from "vue";
+import { ref, shallowRef, shallowReactive, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessageBox, ElMessage } from "element-plus";
 import dayjs from "dayjs";
 import { Folder, ArrowRight, Back, HomeFilled } from "@element-plus/icons-vue";
 import { scrollTo } from "@/plugins/scroll-to";
 import request from "@/plugins/request";
-import { copy } from "@/plugins/util";
+import { copy, download } from "@/plugins/util";
 import FileTypeIcon from "./components/FileTypeIcon.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+import ProgressDrawer from "./components/Progress.vue";
 const route = useRoute();
 const router = useRouter();
 
@@ -88,6 +103,9 @@ const pathList = ref([]);
 const fullPath = computed(() =>
   pathList.value.map((item) => `${item}/`).join("")
 );
+const visible = shallowReactive({
+  progress: true,
+});
 
 const getData = async () => {
   const data = await request("oss-get-oss-list", {
@@ -122,7 +140,9 @@ const getFileExt = (item) => {
   if (["jpg", "jpeg", "png", "webp", "gif"].includes(extName)) {
     return "img";
   }
-  if (["mp4", "wav", "avi", "mpeg", "mov", "flv"].includes(extName)) {
+  if (
+    ["mp4", "wav", "avi", "mpeg", "mov", "flv", "m4a", "mp3"].includes(extName)
+  ) {
     return "video";
   }
   if (

@@ -28,7 +28,7 @@
           <el-link
             :underline="false"
             type="primary"
-            @click="serve(scope.row)"
+            @click="building(scope.row)"
             v-if="!scope.row.serveUrl"
             >启动服务</el-link
           >
@@ -198,6 +198,8 @@ const handleMore = async (item, command) => {
     });
     ElMessage.success("启动成功");
     getList();
+  } else {
+    building();
   }
 };
 
@@ -208,6 +210,13 @@ const remove = async (item) => {
   });
   ElMessage.success("移除成功");
   getList();
+};
+
+// 即将上线
+const building = () => {
+  ElMessageBox.alert("该功能即将上线，敬请期待", "温馨提醒", {
+    confirmButtonText: "我知道了",
+  });
 };
 </script>
 <style lang="scss" scoped>

@@ -1,5 +1,7 @@
 <template>
-  <component :is="map[type]" />
+  <span class="file-icon">
+    <component :is="map[type]" />
+  </span>
 </template>
 
 <script setup>
@@ -39,4 +41,11 @@ const map = {
   file: File,
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.file-icon {
+  width: 20px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+</style>

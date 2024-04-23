@@ -2,8 +2,10 @@
   <el-drawer
     class="progress-drawer"
     title="上传进度"
-    :size="808"
+    :size="300"
     :model-value="visible"
+    direction="btt"
+    style="width: 700px; left: auto"
   >
     <ul class="upload-list">
       <li v-for="item in list"></li>

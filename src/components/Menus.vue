@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-list full-heigh">
+  <div class="menu-list full-height">
     <div class="flexpack-end">
       <el-icon @click="startSync" :class="{ loading: syncing }">
         <Refresh />

@@ -1,14 +1,8 @@
 import { join, extname, basename } from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
-<<<<<<< HEAD
-import { join, extname, basename } from "node:path";
-import { uuid } from "../plugins/utils";
-import { clipboard, dialog, nativeImage, IpcMainEvent } from "electron";
-=======
 import { clipboard, dialog } from "electron";
 import { createClient } from 'webdav';
->>>>>>> 9034ea3953d7afe845d2533871e1150ac2a7b7a9
 import pMap from "p-map";
 import download from "download";
 import { getMainWindow } from "..";
@@ -17,11 +11,6 @@ import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS, root, tempPath } from "../plugins/constant";
 import { config } from "../plugins/server";
-<<<<<<< HEAD
-import { tempPath, publicPath } from "../plugins/constant";
-import download from "download";
-=======
->>>>>>> 9034ea3953d7afe845d2533871e1150ac2a7b7a9
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
 
@@ -81,8 +70,8 @@ export default class extends Controller {
     }
     await new Promise((resolve) => {
       download(url)
-        .pipe(fs.createWriteStream(join(result.filePath, basename(url))))
-        .on("finished", resolve);
+        .pipe(fs.createWriteStream(result.filePath))
+        .on("finish", resolve);
     });
     return {
       code: HTTP_STATUS.SUCCESS,
@@ -136,19 +125,6 @@ export default class extends Controller {
     (db.data as Database).ipc = name;
     await db.write();
   }
-<<<<<<< HEAD
-  @Route('drag')
-  async drag(req: Request, event:IpcMainEvent) {
-    const {url} = req.params;
-    const dragIcon = await nativeImage.createThumbnailFromPath(join(publicPath, 'drag-and-drop.png'), {
-      width: 128,
-      height: 128
-    });
-    event.sender.startDrag({
-      file: join(tempPath, basename(url)),
-      icon: dragIcon
-    })
-=======
   // 同步
   @Route('sync')
   async sync() {
@@ -170,6 +146,5 @@ export default class extends Controller {
     return {
       success: true
     }
->>>>>>> 9034ea3953d7afe845d2533871e1150ac2a7b7a9
   }
 }
