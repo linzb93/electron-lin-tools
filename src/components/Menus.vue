@@ -1,7 +1,12 @@
 <template>
   <div class="menu-list full-height">
     <div class="flexpack-end">
-      <el-icon @click="startSync" :class="{ loading: syncing }">
+      <el-icon
+        @click="startSync"
+        class="btn-refresh curp"
+        title="同步"
+        :class="{ loading: syncing }"
+      >
         <Refresh />
       </el-icon>
     </div>
@@ -124,8 +129,13 @@ const save = () => {
     transform: rotate(360deg);
   }
 }
+.btn-refresh {
+  font-size: 16px;
+  color: #fff;
+  margin: 0 10px 10px 0;
+}
 .loading {
-  animation: rotate 0.8s linear infinite;
+  animation: rotate 1.2s linear infinite;
 }
 .menu-list {
   width: 200px;

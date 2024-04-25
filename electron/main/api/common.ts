@@ -1,16 +1,13 @@
-import { join, extname, basename } from "node:path";
+import { join, basename } from "node:path";
 import fs from "node:fs";
-import fsp from "node:fs/promises";
 import { clipboard, dialog } from "electron";
-import { createClient } from 'webdav';
+import { createClient } from "webdav";
 import pMap from "p-map";
 import download from "download";
 import { getMainWindow } from "..";
-import { uuid } from "../plugins/utils";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
-import { HTTP_STATUS, root, tempPath } from "../plugins/constant";
-import { config } from "../plugins/server";
+import { HTTP_STATUS, root } from "../plugins/constant";
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
 
@@ -22,8 +19,8 @@ export default class extends Controller {
   }
   private async init() {
     await db.read();
-    const account  =(db.data as Database).sync;
-    this.syncClient = createClient('', account);
+    const account = (db.data as Database).sync;
+    this.syncClient = createClient("", account);
   }
   @Route("copy")
   doCopy(req: Request<string>) {
@@ -37,7 +34,7 @@ export default class extends Controller {
   @Route("download")
   async download(req: Request<string | string[]>) {
     if (Array.isArray(req.params)) {
-      // 下载多份
+      // 下载多份文件
       const result = await dialog.showOpenDialog({
         properties: ["openDirectory"],
       });
@@ -78,73 +75,61 @@ export default class extends Controller {
       message: "下载成功",
     };
   }
-  @Route("save-temp-file")
-  async saveTempFile(req: Request<string[]>) {
-    const inputList = req.params;
-    const list = await pMap(
-      inputList,
-      async (item) => {
-        const uid = uuid();
-        const filename = `${uid}${extname(item)}`;
-        const dest = join(tempPath, filename);
-        await fsp.copyFile(item, dest);
-        return `http://localhost:${config.port}${config.static}/${filename}`;
-      },
-      { concurrency: 4 }
-    );
-    return {
-      list,
-    };
-  }
+
   @Route("change-window-size")
-  changeWindowSize({ width, height }: { width: number; height: number }) {
+  changeWindowSize(
+    req: Request<{
+      width: number;
+      height: number;
+    }>
+  ) {
+    const { width, height } = req.params;
     const win = getMainWindow();
     win.setSize(width, height);
     return {
       message: "ok",
     };
   }
-  @Route('select-path')
+  @Route("get-selected-path")
   async selectPath() {
     const result = await dialog.showOpenDialog({
-      properties: ["openDirectory"]
+      properties: ["openDirectory"],
     });
     if (result.canceled) {
       return {
-        path: ''
+        path: "",
       };
     }
     return {
-      path: result.filePaths[0]
-    }
-  }
-  @Route('save-ipc')
-  async saveIpc(req: Request) {
-    const {name} = req.params;
-    await db.read();
-    (db.data as Database).ipc = name;
-    await db.write();
+      path: result.filePaths[0],
+    };
   }
   // 同步
-  @Route('sync')
+  @Route("sync")
   async sync() {
-    fs.createReadStream(join(root, 'sync.json'))
-    .pipe(this.syncClient.createWriteStream('electron-lin-tools/sync.json'));
+    fs.createReadStream(join(root, "sync.json")).pipe(
+      this.syncClient.createWriteStream("electron-lin-tools/sync.json")
+    );
     return {
       success: true,
-    }
+    };
   }
   // 登录
-  async login(req: Request) {
-    const {params} = req;
+  async login(
+    req: Request<{
+      user: string;
+      password: string;
+    }>
+  ) {
+    const { params } = req;
     await db.read();
     (db.data as Database).sync = {
       user: params.user,
-      password: params.password
+      password: params.password,
     };
     await db.write();
     return {
-      success: true
-    }
+      success: true,
+    };
   }
 }

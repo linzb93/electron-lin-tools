@@ -4,7 +4,6 @@
   >
   <div>
     <el-button type="primary" @click="add">添加项目</el-button>
-    <el-button type="primary" v-if="isWindows" @click="inputIpc">ipc</el-button>
   </div>
 
   <el-table :data="list">
@@ -110,10 +109,9 @@ import { ArrowDown } from "@element-plus/icons-vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 
 const isDisconnect = shallowRef(false); // 是否与ipc断联
-handleMainPost("vue-ipc-is-connect", (ret) => {
+handleMainPost("ipc-is-connect", (ret) => {
   isDisconnect.value = ret;
 });
-const isWindows = process.platform !== "darwin";
 const list = ref([]);
 const getList = async () => {
   const res = await request("vue-get-list");
@@ -139,7 +137,7 @@ const add = async () => {
   visible.value = true;
 };
 const selectPath = async () => {
-  const { path } = await request("select-path");
+  const { path } = await request("get-selected-path");
   form.value.path = path;
 };
 const submit = () => {
@@ -165,11 +163,23 @@ const inputIpc = () => {
 
 // 启动服务
 const serve = async (item) => {
-  await request("vue-serve", {
-    path: item.path,
+  ElMessage({
+    type: "info",
+    message: "正在启动项目",
+    duration: 3000,
   });
-  ElMessage.success("启动成功");
-  getList();
+  item.status = 1;
+  try {
+    const { port } = await request("vue-serve", {
+      path: item.path,
+    });
+    ElMessage.success("启动成功");
+    item.port = port;
+    item.status = 2;
+  } catch (error) {
+    ElMessage.success("启动失败");
+    console.log(error);
+  }
 };
 // 中断服务
 const kill = async (item) => {
@@ -177,15 +187,27 @@ const kill = async (item) => {
     path: item.path,
   });
   ElMessage.success("停止成功");
-  getList();
+  item.status = 0;
+  item.port = "";
 };
 
 // 打包
 const build = async (item) => {
-  await request("vue-build", {
-    path: item.path,
+  ElMessage({
+    type: "info",
+    message: "正在打包项目",
+    duration: 3000,
   });
-  ElMessage.success("打包成功");
+  item.status = 1;
+  try {
+    await request("vue-build", {
+      path: item.path,
+    });
+    ElMessage.success("打包成功");
+  } catch (error) {
+    ElMessage.success("打包失败");
+    console.log(error);
+  }
 };
 
 // 更多操作
@@ -233,5 +255,28 @@ const building = () => {
 }
 .nothing {
   background-color: #ccc;
+}
+@keyframes scaleLight {
+  from {
+    transform: none;
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+.doing {
+  background-color: #67c23a;
+  position: relative;
+  &:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    animation: scaleLight 1.2s infinite;
+  }
 }
 </style>

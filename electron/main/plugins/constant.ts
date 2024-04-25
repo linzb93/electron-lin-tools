@@ -22,4 +22,8 @@ export const HTTP_STATUS = {
 
 export const root = cachedir("electron-lin-tools");
 export const tempPath = join(root, ".temp");
-export const publicPath = join(dirname(fileURLToPath(import.meta.url)), '../../public');
+export const serverStaticPath = join(root, "pages");
+export const publicPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../public"
+);

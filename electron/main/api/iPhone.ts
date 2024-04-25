@@ -42,7 +42,7 @@ router.get("/get-copy-data", (_, res) => {
 router.get("/get-img-list", async (_, res) => {
   const list = (await mainPost({
     method: "iPhone-get-img",
-    data: {}
+    data: {},
   })) as string[];
   res.send({
     list,
@@ -61,11 +61,13 @@ const obs$ = new Observable((observer) => {
     const uid = Date.now();
     const filename = join(tempPath, `${uid}.jpg`);
     intoStream(req.file.buffer)
-    .pipe(fs.createWriteStream(filename))
-    .on('finish', () => {
-      observer.next(`http://localhost:${config.port}${config.static}/${uid}.jpg`);
-      res.send("ok");
-    });
+      .pipe(fs.createWriteStream(filename))
+      .on("finish", () => {
+        observer.next(
+          `http://localhost:${config.port}${config.static}/${uid}.jpg`
+        );
+        res.send("ok");
+      });
   });
   // iPhone给电脑批量发送图片
   router.post("/send-img-batch", (req, res) => {
@@ -84,7 +86,7 @@ obs$.subscribe({
     mainPost({
       method: "iPhone-upload-img",
       data: url,
-      listener:false,
+      listener: false,
     });
   },
 });

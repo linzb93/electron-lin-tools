@@ -2,22 +2,25 @@ import express from "express";
 import fs from "node:fs";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { join } from "node:path";
 import iPhoneRouter from "../api/iPhone";
-import { root, tempPath } from "./constant";
+fs.accessSync(tempPath);
+import { tempPath, serverStaticPath } from "./constant";
 
 export const config = {
   port: 5010,
   static: "/assets",
+  server: "/pages",
 };
 
 try {
   fs.accessSync(tempPath);
+  fs.accessSync(serverStaticPath);
 } catch (error) {
   fs.mkdirSync(tempPath);
+  fs.mkdirSync(serverStaticPath);
 }
 (() => {
-  if (process.platform === 'darwin') {
+  if (process.platform === "darwin") {
     return;
   }
   const app = express();
@@ -25,9 +28,10 @@ try {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: "5mb" }));
   app.use(cors());
-  app.use(config.static, express.static(join(root, ".temp")));
+  app.use(config.static, express.static(tempPath)); // 存放临时文件
+  app.use(config.server, express.static(serverStaticPath)); // 存放前端打包页面
 
   app.use("/iPhone-sync", iPhoneRouter);
 
   app.listen(config.port);
-})()
+})();

@@ -1,7 +1,7 @@
 import Application from "./Application";
-import Route from './Route';
-export const createIpcRoute = (eventName:string) => {
-    return new Application(eventName);
-}
+import Route from "./Route";
+export const createIpcRoute = (eventName: string) => {
+  return new Application(eventName);
+};
 
-export {Route};
+export { Route };

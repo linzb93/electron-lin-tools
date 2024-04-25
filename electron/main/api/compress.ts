@@ -8,15 +8,20 @@ import { Request, Database } from "../types/api";
 export default class extends Controller {
   @Route("compress-start")
   async start(req: Request) {
-    const {list} = req.params;
-    await pMap(list, picture => new Promise(resolve => {
-      sharp(picture)
-      .resize()
-      .toFile('', (err, info) => {
-        resolve(null);
-      })
-    }), {concurrency: 4});
+    const { list } = req.params;
+    await pMap(
+      list,
+      (picture) =>
+        new Promise((resolve) => {
+          sharp(picture)
+            .resize()
+            .toFile("", (err, info) => {
+              resolve(null);
+            });
+        }),
+      { concurrency: 4 }
+    );
   }
-  @Route('compress-save')
+  @Route("compress-save")
   async save(req: Request) {}
 }

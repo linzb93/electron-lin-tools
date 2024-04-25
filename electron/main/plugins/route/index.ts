@@ -2,14 +2,17 @@ import { ipcMain } from "electron";
 import chalk from "chalk";
 import CommonController from "../../api/common";
 import OSSController from "../../api/oss";
-import VueController from '../../api/vue';
+import VueController from "../../api/vue";
+import { IpcController } from "../ipc";
 import { getApiList } from "./decorators";
-import wrapResponse from "../../plugins/wrapResponse";
-import { HTTP_STATUS } from "../../plugins/constant";
+import wrapResponse from "../wrapResponse";
+import { HTTP_STATUS } from "../constant";
 import { Request } from "../../types/api";
+import logger from "../logger";
 
 export default () => {
   new CommonController();
+  new IpcController();
   new OSSController();
   new VueController();
 
@@ -25,8 +28,11 @@ export default () => {
         const ret = await ctor[propertyKey](request, event);
         return wrapResponse(ret);
       } catch (error) {
-        console.log(`api ${chalk.green(match.path)} error`);
-        error && console.trace(error.message);
+        error &&
+          error.message &&
+          logger(`api ${chalk.green(match.path)} error:
+        ${error.message}`);
+
         return wrapResponse({
           code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
           message: "Server error",

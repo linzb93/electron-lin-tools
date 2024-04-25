@@ -7,6 +7,7 @@ import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 import { Request, Database } from "../types/api";
+
 export default class extends Controller {
   constructor() {
     super();
@@ -42,7 +43,6 @@ export default class extends Controller {
       id,
     });
     await db.write();
-    // const oss = new OSS(omit(config, ["name", "type"]));
     return {
       message: "ok",
     };
