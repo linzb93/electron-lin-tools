@@ -23,8 +23,10 @@
       </el-icon>
     </div>
   </div>
-  <div class="mt20">
-    <el-icon @click="router.back()" class="mr10 curp"><back /></el-icon>
+  <div class="mt20 flexalign-center">
+    <el-icon @click="router.back()" class="mr10 curp" title="返回" :size="20"
+      ><back
+    /></el-icon>
     <el-button type="primary" @click="createDir">创建文件夹</el-button>
     <el-button type="primary" @click="upload">上传文件</el-button>
     <el-button type="primary" @click="getData">刷新</el-button>
@@ -32,6 +34,7 @@
   <el-table
     class="mt30"
     :data="fileList"
+    v-loading="loading"
     @selection-change="handleSelectionChange"
   >
     <el-table-column type="selection" width="55" />
@@ -80,7 +83,11 @@
       </template>
     </el-table-column>
   </el-table>
-  <progress-drawer v-model:visible="visible.progress" />
+  <progress-drawer
+    v-model:visible="visible.progress"
+    :upload-list="uploadingList"
+    @refresh="getData"
+  />
 </template>
 
 <script setup>
@@ -104,9 +111,10 @@ const fullPath = computed(() =>
   pathList.value.map((item) => `${item}/`).join("")
 );
 const visible = shallowReactive({
-  progress: true,
+  progress: false,
 });
-
+const loading = shallowRef(true);
+loading.value = true;
 const getData = async () => {
   const data = await request("oss-get-oss-list", {
     id: Number(route.query.id),
@@ -114,6 +122,7 @@ const getData = async () => {
       prefix: fullPath.value,
     },
   });
+  loading.value = false;
   fileList.value = data.list;
   scrollTo(0, 800);
 };
@@ -223,11 +232,15 @@ const createDir = () => {
       //
     });
 };
+
+const uploadingList = ref([]);
 const upload = async () => {
-  await request("oss-upload", {
+  const { list } = await request("oss-upload", {
     id: Number(route.query.id),
     path: fullPath.value,
   });
+  visible.progress = true;
+  uploadingList.value = list;
   ElMessage.success("上传成功");
   getData();
 };

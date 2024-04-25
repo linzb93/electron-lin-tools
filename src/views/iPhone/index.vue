@@ -48,10 +48,14 @@ import { cloneDeep } from "lodash-es";
 import { shallowRef, ref } from "vue";
 import { handleMainPost, download } from "@/plugins/util";
 import request from "@/plugins/request";
+
 const max = 3;
+
 const visibleFiles = ref([]);
 const realFiles = ref([]);
 const active = shallowRef(false);
+
+// 拖拽上传
 const dropFile = async (event) => {
   active.value = false;
   const fList = event.dataTransfer.files;
@@ -77,6 +81,8 @@ handleMainPost("iPhone-upload-img", (url) => {
   receiveList.value.push(url);
   visible.value = true;
 });
+
+// 下载
 const startDownload = async () => {
   await download(receiveList.value);
   visible.value = false;
@@ -84,6 +90,8 @@ const startDownload = async () => {
 const closed = () => {
   receiveList.value = [];
 };
+
+// 拖拽下载
 const startDrag = async (url) => {
   await request("drag", {
     url,

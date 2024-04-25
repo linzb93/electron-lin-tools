@@ -12,5 +12,7 @@ import Menus from "./components/Menus.vue";
 <style scoped>
 .cont {
   padding: 20px;
+  height: 100%;
+  overflow: auto;
 }
 </style>

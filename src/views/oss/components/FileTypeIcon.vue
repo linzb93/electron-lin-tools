@@ -1,7 +1,7 @@
 <template>
-  <span class="file-icon">
+  <el-icon :size="16" style="margin-right: 5px">
     <component :is="map[type]" />
-  </span>
+  </el-icon>
 </template>
 
 <script setup>

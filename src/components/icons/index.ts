@@ -12,20 +12,22 @@ import Svg from "./Svg.vue";
 import Txt from "./Txt.vue";
 import Typescript from "./Typescript.vue";
 import Video from "./Video.vue";
+import Oss from "./Oss.vue";
 
 export {
-    VueIcon,
-    Css,
-    Html,
-    Js,
-    File,
-    Json,
-    Jsx,
-    Markdown,
-    Pic,
-    Scss,
-    Svg,
-    Txt,
-    Typescript,
-    Video
+  VueIcon,
+  Css,
+  Html,
+  Js,
+  File,
+  Json,
+  Jsx,
+  Markdown,
+  Oss,
+  Pic,
+  Scss,
+  Svg,
+  Txt,
+  Typescript,
+  Video,
 };

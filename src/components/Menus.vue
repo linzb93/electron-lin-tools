@@ -53,6 +53,7 @@
 <script setup>
 import { ElMessage } from "element-plus";
 import { Refresh, Iphone, HomeFilled } from "@element-plus/icons-vue";
+import { Oss } from "./icons";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
 import request from "@/plugins/request";
@@ -69,7 +70,7 @@ const list = [
   {
     title: "阿里OSS",
     to: "/oss",
-    icon: Refresh,
+    icon: Oss,
   },
   {
     title: "iPhone同步",

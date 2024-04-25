@@ -14,9 +14,12 @@ export const config = {
 
 try {
   fs.accessSync(tempPath);
-  fs.accessSync(serverStaticPath);
 } catch (error) {
   fs.mkdirSync(tempPath);
+}
+try {
+  fs.accessSync(serverStaticPath);
+} catch (error) {
   fs.mkdirSync(serverStaticPath);
 }
 (() => {
