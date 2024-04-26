@@ -1,5 +1,5 @@
 import path from "node:path";
-import { dialog } from "electron";
+import pMap from "p-map";
 import OSS, { OssConfig } from "ali-oss";
 import { omit } from "lodash-es";
 import db from "../plugins/database";
@@ -7,6 +7,7 @@ import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 import { Request, Database } from "../types/api";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
 export default class extends Controller {
   constructor() {
@@ -29,6 +30,7 @@ export default class extends Controller {
     return {
       success: true,
       client: new OSS(ossobj),
+      domain: match.domain,
     };
   }
 
@@ -70,7 +72,7 @@ export default class extends Controller {
     if (!projectRes.success) {
       return projectRes.response;
     }
-    const { client } = projectRes;
+    const { client, domain } = projectRes;
     const result = await client.listV2({
       prefix: config.prefix,
       delimiter: "/",
@@ -81,6 +83,7 @@ export default class extends Controller {
       .map((obj) => ({
         ...obj,
         name: obj.name.split("/").slice(-1)[0],
+        url: obj.url.replace(/^https?:\/\/[^\/]+/, domain),
       }));
     return {
       list: result.prefixes
@@ -97,13 +100,19 @@ export default class extends Controller {
   // 删除文件
   @Route("oss-delete-file")
   async deleteFile(req: Request) {
-    const { id, file } = req.params;
+    const { id, file, files } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
     }
     const { client } = projectRes;
-    await client.delete(file);
+    if (files) {
+      await pMap(files, (file: string) => client.delete(file), {
+        concurrency: 4,
+      });
+    } else {
+      await client.delete(file);
+    }
     return {
       message: "success",
     };
@@ -127,26 +136,43 @@ export default class extends Controller {
   // 上传目录
   @Route("oss-upload")
   async upload(req: Request) {
-    const { id, path: uploadPath } = req.params;
+    const { id, path: uploadPath, files } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
     }
     const { client } = projectRes;
-    const result = await dialog.showOpenDialog({
-      properties: ["openFile"],
-    });
-    if (result.canceled) {
-      return {
-        message: "cancel",
-      };
-    }
-    const resp = await client.put(
-      `${uploadPath}${path.basename(result.filePaths[0])}`,
-      result.filePaths[0]
+    await Promise.all(
+      files.map((file: string) =>
+        client.put(`${uploadPath}${path.basename(file)}`, file)
+      )
     );
     return {
-      message: resp.name,
+      message: "success",
+    };
+  }
+
+  // CSS代码
+  @Route("oss-get-css")
+  async getCss() {
+    await db.read();
+    const { css } = db.data as Database;
+    return {
+      message: "success",
+      ...css,
+    };
+  }
+  @Route("oss-save-csss")
+  async saveCss(req: Request) {
+    const { params } = req;
+    await db.read();
+    (db.data as Database).css = {
+      pixio: params.pixio,
+      platform: params.platform,
+      template: params.template,
+    };
+    return {
+      message: "success",
     };
   }
 }

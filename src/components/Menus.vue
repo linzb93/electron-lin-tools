@@ -85,7 +85,12 @@ const list = [
   },
 ];
 const menuList = list.filter((item) => !item.hide);
-const isActive = (menu) => route.path.startsWith(menu.to);
+const isActive = (menu) => {
+  if (route.path === "/") {
+    return menu.to === "/";
+  }
+  return route.path.startsWith(menu.to) && menu.to !== "/";
+};
 
 // 同步
 const syncing = shallowRef(false);
@@ -122,14 +127,6 @@ const save = () => {
 };
 </script>
 <style lang="scss" scoped>
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 .btn-refresh {
   font-size: 16px;
   color: #fff;

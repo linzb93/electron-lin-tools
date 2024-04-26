@@ -1,10 +1,9 @@
 <template>
   <el-drawer
-    class="progress-drawer"
     title="上传进度"
-    :size="300"
+    size="50%"
+    style="width: 800px; left: auto"
     :model-value="visible"
-    :modal="false"
     direction="btt"
     @close="close"
     @closed="closed"
@@ -12,16 +11,26 @@
     <div class="ctrl-bar flexalign-center">
       <el-button
         type="primary"
-        size="small"
-        @click="copy(list.value.map((item) => item.url))"
+        @click="
+          copy(
+            list
+              .map(
+                (item) =>
+                  `${ossStore.platform.domain}/${props.path}${item.name}`
+              )
+              .join('\n')
+          )
+        "
         >复制全部</el-button
       >
     </div>
     <el-table :data="list" :border="false">
-      <el-table-column>
+      <el-table-column label="状态">
         <template #default="scope">
-          <div class="status"></div>
-          <img class="thumb" :src="scope.row.url" />
+          <div class="loading" v-if="!scope.row.success"></div>
+          <el-icon color="#67C23A" :size="16" v-else>
+            <check />
+          </el-icon>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
@@ -34,10 +43,17 @@
             @confirm="redo(scope.row)"
           >
             <template #reference>
-              <el-link type="primary">撤销</el-link>
+              <el-link type="primary" :underline="false">撤销</el-link>
             </template>
           </el-popconfirm>
-          <el-link type="primary" @click="copy(scope.row.url)">复制</el-link>
+          <el-link
+            type="primary"
+            :underline="false"
+            @click="
+              copy(`${ossStore.platform.domain}/${props.path}${scope.row.name}`)
+            "
+            >复制</el-link
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -47,21 +63,55 @@
 <script setup>
 import { ref, watch } from "vue";
 import { ElMessage } from "element-plus";
+import { Check } from "@element-plus/icons-vue";
 import request from "@/plugins/request";
 import { copy } from "@/plugins/util";
+import { cloneDeep } from "lodash-es";
+import { useRoute } from "vue-router";
+import { useOssStore } from "../store";
+
+const route = useRoute();
+const ossStore = useOssStore();
 const props = defineProps({
   visible: Boolean,
+  uploadList: Array,
+  path: String,
 });
 const emit = defineEmits(["update:visible", "refresh"]);
+
 const list = ref([]);
-watch(props, ({ visible }) => {});
+
+const startUpload = async () => {
+  await request("oss-upload", {
+    id: Number(route.query.id),
+    path: props.path,
+    files: list.value.map((item) => item.path),
+  });
+  ElMessage.success("上传成功");
+  emit("refresh");
+  list.value = list.value.map((item) => ({ ...item, success: true }));
+};
+watch(props, ({ visible }) => {
+  if (!visible) {
+    return;
+  }
+  list.value = cloneDeep(
+    props.uploadList.map((item) => ({
+      ...item,
+      success: false,
+    }))
+  );
+  startUpload();
+});
 
 // 撤销
 const redo = async (item) => {
-  await request("", {
-    file: item.url,
+  await request("oss-delete-file", {
+    id: Number(route.query.id),
+    file: `${props.path}${item.name}`,
   });
   ElMessage.success("撤销成功");
+  list.value = list.value.filter((file) => file.name !== item.name);
   emit("refresh");
 };
 const close = () => {
@@ -71,10 +121,16 @@ const closed = () => {
   list.value = [];
 };
 </script>
-<style lang="scss" scoped>
-.progress-drawer {
-  width: 700px;
-  left: auto;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+<style scoped lang="scss">
+.el-link + .el-link {
+  margin-left: 10px;
+}
+.loading {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #409eff;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: rotate 1s linear infinite;
 }
 </style>

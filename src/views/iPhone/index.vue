@@ -3,7 +3,6 @@
   <div
     class="drop-box"
     :class="{ active: active }"
-    id="drop-area"
     @dragover.prevent="active = true"
     @dragleave="active = false"
     @drop="dropFile"
@@ -114,7 +113,12 @@ const startDrag = async (url) => {
       bottom: 0;
       right: 0;
       z-index: 2;
-      background: rgba(255, 255, 0, 0.4);
+      content: "";
+      background: rgb(64, 158, 255, 0.4);
+    }
+    & > p {
+      position: relative;
+      z-index: 3;
     }
   }
   .center {

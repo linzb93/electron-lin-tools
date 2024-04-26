@@ -9,8 +9,12 @@
     </el-table-column>
     <el-table-column label="操作">
       <template #default="scope">
-        <el-link type="primary" @click="jump(scope.row)">进入</el-link>
-        <el-link type="primary" @click="edit(scope.row)">编辑</el-link>
+        <el-link type="primary" :underline="false" @click="jump(scope.row)"
+          >进入</el-link
+        >
+        <el-link type="primary" :underline="false" @click="edit(scope.row)"
+          >编辑</el-link
+        >
       </template>
     </el-table-column>
   </el-table>
@@ -51,8 +55,9 @@ import { ref, shallowRef, onMounted } from "vue";
 import request from "@/plugins/request";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { useOssStore } from "./store";
 const router = useRouter();
-
+const ossStore = useOssStore();
 const list = ref([]);
 const getList = async () => {
   const data = await request("oss-get-project-list");
@@ -87,6 +92,7 @@ const getPlatformName = (type) => {
   return "";
 };
 const jump = (item) => {
+  ossStore.platform = item;
   router.push({
     path: "/oss/detail/",
     query: {

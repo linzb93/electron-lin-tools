@@ -1,5 +1,6 @@
 import { join, basename } from "node:path";
 import fs from "node:fs";
+import fsp from "node:fs/promises";
 import { clipboard, dialog } from "electron";
 import { createClient } from "webdav";
 import pMap from "p-map";
@@ -102,6 +103,30 @@ export default class extends Controller {
     }
     return {
       path: result.filePaths[0],
+    };
+  }
+  @Route("get-selected-file")
+  async selectFile(multiSelections?: boolean) {
+    const result = await dialog.showOpenDialog({
+      properties: multiSelections
+        ? ["openFile", "multiSelections"]
+        : ["openFile"],
+    });
+    if (result.canceled) {
+      return {
+        path: "",
+      };
+    }
+    const paths = await pMap(result.filePaths, async (file) => {
+      const stats = await fsp.stat(file);
+      return {
+        path: file,
+        size: stats.size,
+        name: basename(file),
+      };
+    });
+    return {
+      paths,
     };
   }
   // 同步

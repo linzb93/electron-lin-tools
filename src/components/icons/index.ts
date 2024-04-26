@@ -1,6 +1,7 @@
 import VueIcon from "./VueIcon.vue";
 import Css from "./Css.vue";
 import File from "./File.vue";
+import Font from "./Font.vue";
 import Html from "./Html.vue";
 import Js from "./Js.vue";
 import Json from "./Json.vue";
@@ -13,13 +14,19 @@ import Txt from "./Txt.vue";
 import Typescript from "./Typescript.vue";
 import Video from "./Video.vue";
 import Oss from "./Oss.vue";
-
+import Zip from "./Zip.vue";
+import Mp3 from "./Mp3.vue";
+import Excel from "./Excel.vue";
+import App from "./App.vue";
 export {
+  App,
   VueIcon,
   Css,
   Html,
   Js,
+  Excel,
   File,
+  Font,
   Json,
   Jsx,
   Markdown,
@@ -28,6 +35,8 @@ export {
   Scss,
   Svg,
   Txt,
+  Zip,
+  Mp3,
   Typescript,
   Video,
 };

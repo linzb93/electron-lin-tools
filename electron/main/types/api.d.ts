@@ -18,10 +18,16 @@ export interface Database {
     id: number;
     platform?: string;
     name?: string;
+    domain?: string;
   }[];
+  css: {
+    pixio: 1 | 2;
+    platform: 1 | 2;
+    template: string;
+  };
   ipc: string;
   sync: {
     user: string;
     password: string;
-  }
+  };
 }
