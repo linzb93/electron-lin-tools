@@ -11,7 +11,7 @@
     <div class="flexalign-center">
       <el-button type="primary" @click="createDir">创建文件夹</el-button>
       <el-button type="primary" @click="upload">上传文件</el-button>
-      <el-button type="primary" @click="getList">刷新</el-button>
+      <el-button type="primary" @click="visible.setting = true">设置</el-button>
       <template v-if="selected.length">
         <el-button type="danger" @click="deleteMulti">批量删除</el-button>
         <el-button type="primary" @click="downloadMulti">批量下载</el-button>
@@ -114,7 +114,10 @@
     :path="fullPath"
     @refresh="getList"
   />
-  <css-popup v-model:visible="visible.css" :url="previewUrl" />
+  <setting-dialog
+    v-model:visible="visible.setting"
+    @submit="(data) => (setting = data)"
+  />
   <el-dialog v-model="visible.preview" title="图片预览" width="420px">
     <div class="center">
       <img :src="previewUrl" class="img-preview" />
@@ -135,7 +138,7 @@ import FileTypeIcon from "@/components/FileTypeIcon.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import ProgressDrawer from "./components/Progress.vue";
 import MsgBoxFileList from "./components/FileList.vue";
-import CssPopup from "./components/CssPopup.vue";
+import SettingDialog from "./components/Setting.vue";
 
 const route = useRoute();
 
@@ -147,7 +150,7 @@ const fullPath = computed(() =>
 const visible = shallowReactive({
   progress: false,
   preview: false,
-  css: false,
+  setting: false,
 });
 const loading = shallowRef(true);
 loading.value = true;
@@ -348,9 +351,25 @@ const dropFile = async (event) => {
   }
 };
 
+const setting = shallowRef({
+  pixel: 2,
+  platform: 1,
+});
 const getCss = (item) => {
-  previewUrl.value = item.url;
-  visible.css = true;
+  const img = new Image();
+  img.src = item.url;
+  img.onload = function () {
+    const { width, height } = this;
+    const widthData = setting.pixel === 2 ? parseInt(width / 2) : width;
+    const heightData = setting.pixel === 2 ? parseInt(height / 2) : height;
+    const text = `width: ${
+      setting.platform === 1 ? `rem(${widthData})` : `${widthData}px`
+    };
+height: ${setting.platform === 1 ? `rem(${heightData})` : `${heightData}px`};
+background-image: url(${item.url});
+background-size: 100% 100%;`;
+    copy(text);
+  };
 };
 </script>
 <style lang="scss" scoped>

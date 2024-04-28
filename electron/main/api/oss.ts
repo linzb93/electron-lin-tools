@@ -7,7 +7,6 @@ import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 import { Request, Database } from "../types/api";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
 export default class extends Controller {
   constructor() {
@@ -16,7 +15,9 @@ export default class extends Controller {
   // 查找对应的用户信息
   private async findClient(id: number) {
     await db.read();
-    const match = (db.data as Database).oss.find((item) => item.id === id);
+    const match = (db.data as Database).oss.accounts.find(
+      (item) => item.id === id
+    );
     if (!match) {
       return {
         success: false,
@@ -39,8 +40,10 @@ export default class extends Controller {
   async create(req: Request) {
     await db.read();
     const data = db.data as Database;
-    const id = data.oss.length ? Number(data.oss.at(-1).id + 1) : 1;
-    data.oss.push({
+    const id = data.oss.accounts.length
+      ? Number(data.oss.accounts.at(-1).id + 1)
+      : 1;
+    data.oss.accounts.push({
       ...req.params,
       id,
     });
@@ -52,14 +55,23 @@ export default class extends Controller {
 
   // 移除用户
   @Route("oss-remove-account")
-  async removeAccount(req: Request) {}
+  async removeAccount(req: Request) {
+    const { id } = req.params;
+    await db.read();
+    let { accounts } = (db.data as Database).oss;
+    accounts = accounts.filter((acc) => acc.id !== id);
+    await db.write();
+    return {
+      message: "success",
+    };
+  }
 
   // 获取用户列表
   @Route("oss-get-project-list")
   async getProjectList() {
     await db.read();
     return {
-      list: (db.data as Database).oss,
+      list: (db.data as Database).oss.accounts,
     };
   }
 
@@ -153,23 +165,22 @@ export default class extends Controller {
   }
 
   // CSS代码
-  @Route("oss-get-css")
-  async getCss() {
+  @Route("oss-get-setting")
+  async getSetting() {
     await db.read();
-    const { css } = db.data as Database;
+    const { setting } = (db.data as Database).oss;
     return {
       message: "success",
-      ...css,
+      setting,
     };
   }
-  @Route("oss-save-csss")
-  async saveCss(req: Request) {
+  @Route("oss-save-setting")
+  async saveSetting(req: Request) {
     const { params } = req;
     await db.read();
-    (db.data as Database).css = {
-      pixio: params.pixio,
+    (db.data as Database).oss.setting = {
+      pixel: params.pixel,
       platform: params.platform,
-      template: params.template,
     };
     return {
       message: "success",

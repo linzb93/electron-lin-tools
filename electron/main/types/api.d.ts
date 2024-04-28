@@ -15,11 +15,17 @@ export interface Database {
     serveUrl: string;
   }[];
   oss: {
-    id: number;
-    platform?: string;
-    name?: string;
-    domain?: string;
-  }[];
+    accounts: {
+      id: number;
+      platform?: string;
+      name?: string;
+      domain?: string;
+    }[];
+    setting: {
+      pixel: 1 | 2;
+      platform: 1 | 2;
+    };
+  };
   css: {
     pixio: 1 | 2;
     platform: 1 | 2;
