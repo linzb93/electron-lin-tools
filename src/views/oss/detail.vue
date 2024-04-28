@@ -114,7 +114,7 @@
     :path="fullPath"
     @refresh="getList"
   />
-  <css-popup v-model:visible="visible.css" />
+  <css-popup v-model:visible="visible.css" :url="previewUrl" />
   <el-dialog v-model="visible.preview" title="图片预览" width="420px">
     <div class="center">
       <img :src="previewUrl" class="img-preview" />
@@ -348,7 +348,8 @@ const dropFile = async (event) => {
   }
 };
 
-const getCss = () => {
+const getCss = (item) => {
+  previewUrl.value = item.url;
   visible.css = true;
 };
 </script>
