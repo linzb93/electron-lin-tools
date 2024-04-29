@@ -5,6 +5,7 @@ declare module "ali-oss" {
     accessKeySecret: string;
     bucket: string;
     timeout: number;
+    id: number;
   }
   interface OSSObject {
     objects: {

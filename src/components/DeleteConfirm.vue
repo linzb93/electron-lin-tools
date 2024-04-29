@@ -16,7 +16,9 @@
       </div>
     </div>
     <template #reference>
-      <el-link type="danger" :underline="false" class="ml10">删除</el-link>
+      <el-link type="danger" :underline="false" class="ml10">{{
+        deleteText
+      }}</el-link>
     </template>
   </el-popover>
 </template>
@@ -32,6 +34,10 @@ export default {
     confirmButtonText: {
       type: String,
       default: "确定",
+    },
+    deleteText: {
+      type: String,
+      default: "删除",
     },
   },
   data() {

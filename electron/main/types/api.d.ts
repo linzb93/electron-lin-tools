@@ -20,6 +20,7 @@ export interface Database {
       platform?: string;
       name?: string;
       domain?: string;
+      shortcut?: string;
     }[];
     setting: {
       pixel: 1 | 2;

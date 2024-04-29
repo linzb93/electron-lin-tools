@@ -37,16 +37,26 @@ export default class extends Controller {
 
   // 添加用户，目前仅支持阿里OSS
   @Route("oss-create")
-  async create(req: Request) {
+  async create(req: Request<OssConfig>) {
     await db.read();
     const data = db.data as Database;
-    const id = data.oss.accounts.length
-      ? Number(data.oss.accounts.at(-1).id + 1)
-      : 1;
-    data.oss.accounts.push({
-      ...req.params,
-      id,
-    });
+    if (req.params.id) {
+      // 是编辑
+      const index = data.oss.accounts.findIndex(
+        (acc) => acc.id === req.params.id
+      );
+      if (index > -1) {
+        data.oss.accounts[index] = req.params;
+      }
+    } else {
+      const id = data.oss.accounts.length
+        ? Number(data.oss.accounts.at(-1).id + 1)
+        : 1;
+      data.oss.accounts.push({
+        ...req.params,
+        id,
+      });
+    }
     await db.write();
     return {
       message: "ok",
@@ -59,7 +69,8 @@ export default class extends Controller {
     const { id } = req.params;
     await db.read();
     let { accounts } = (db.data as Database).oss;
-    accounts = accounts.filter((acc) => acc.id !== id);
+    const index = accounts.findIndex((acc) => acc.id === id);
+    accounts.splice(index, 1);
     await db.write();
     return {
       message: "success",
@@ -145,7 +156,7 @@ export default class extends Controller {
     };
   }
 
-  // 上传目录
+  // 上传文件
   @Route("oss-upload")
   async upload(req: Request) {
     const { id, path: uploadPath, files } = req.params;
@@ -184,6 +195,15 @@ export default class extends Controller {
     };
     return {
       message: "success",
+    };
+  }
+  @Route("oss-get-shortcut")
+  async getShortcut(req: Request) {
+    const { params } = req;
+    await db.read();
+    const { accounts } = (db.data as Database).oss;
+    return {
+      result: accounts.find((acc) => acc.id === params.id).shortcut,
     };
   }
 }

@@ -167,7 +167,11 @@ const getList = async () => {
   fileList.value = data.list;
   scrollTo(0, 800);
 };
-onMounted(() => {
+onMounted(async () => {
+  const { result } = await request("oss-get-shortcut", {
+    id: Number(route.query.id),
+  });
+  pathList.value.push(result);
   getList();
 });
 
@@ -351,7 +355,7 @@ const dropFile = async (event) => {
   }
 };
 
-const setting = shallowRef({
+const setting = ref({
   pixel: 2,
   platform: 1,
 });
@@ -360,12 +364,16 @@ const getCss = (item) => {
   img.src = item.url;
   img.onload = function () {
     const { width, height } = this;
-    const widthData = setting.pixel === 2 ? parseInt(width / 2) : width;
-    const heightData = setting.pixel === 2 ? parseInt(height / 2) : height;
+    console.log(setting.value);
+    const widthData = setting.value.pixel === 2 ? parseInt(width / 2) : width;
+    const heightData =
+      setting.value.pixel === 2 ? parseInt(height / 2) : height;
     const text = `width: ${
-      setting.platform === 1 ? `rem(${widthData})` : `${widthData}px`
+      setting.value.platform === 1 ? `rem(${widthData})` : `${widthData}px`
     };
-height: ${setting.platform === 1 ? `rem(${heightData})` : `${heightData}px`};
+height: ${
+      setting.value.platform === 1 ? `rem(${heightData})` : `${heightData}px`
+    };
 background-image: url(${item.url});
 background-size: 100% 100%;`;
     copy(text);

@@ -15,6 +15,7 @@
         <el-link type="primary" :underline="false" @click="edit(scope.row)"
           >编辑</el-link
         >
+        <delete-confirm delete-text="移除" @confirm="remove(scope.row)" />
       </template>
     </el-table-column>
   </el-table>
@@ -43,6 +44,9 @@
       <el-form-item label="domain">
         <el-input v-model="form.domain" />
       </el-form-item>
+      <el-form-item label="快捷入口">
+        <el-input v-model="form.shortcut" />
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button type="primary" @click="submit">提交</el-button>
@@ -54,6 +58,7 @@
 import { ref, shallowRef, onMounted } from "vue";
 import request from "@/plugins/request";
 import { ElMessage } from "element-plus";
+import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useRouter } from "vue-router";
 import { useOssStore } from "./store";
 const router = useRouter();
@@ -81,7 +86,7 @@ const close = () => {
 };
 const submit = async () => {
   await request("oss-create", form.value);
-  ElMessage.success("添加成功");
+  ElMessage.success(form.value.id ? "编辑成功" : "添加成功");
   close();
   getList();
 };
@@ -99,6 +104,13 @@ const jump = (item) => {
       id: item.id,
     },
   });
+};
+const remove = async (item) => {
+  await request("oss-remove-account", {
+    id: item.id,
+  });
+  ElMessage.success("移除成功");
+  getList();
 };
 </script>
 <style lang="scss" scoped>

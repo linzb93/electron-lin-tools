@@ -26,14 +26,14 @@
 </template>
 
 <script setup>
-import { shallowRef } from "vue";
+import { ref } from "vue";
 import request from "@/plugins/request";
 import { ElMessage } from "element-plus";
 const props = defineProps({
   visible: Boolean,
 });
 const emit = defineEmits(["update:visible", "submit"]);
-const form = shallowRef({
+const form = ref({
   pixel: 2,
   platform: 1,
 });
@@ -49,6 +49,7 @@ const save = async () => {
   await request("oss-save-setting", form.value);
   ElMessage.success("保存成功");
   emit("submit", form.value);
+  close();
 };
 const close = () => {
   emit("update:visible", false);
