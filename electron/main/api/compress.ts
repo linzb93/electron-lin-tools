@@ -2,7 +2,7 @@ import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
 import sharp from "sharp";
 import pMap from "p-map";
-import { Request, Database } from "../types/api";
+import { Request } from "../types/api";
 // import { HTTP_STATUS } from "../plugins/constant";
 
 export default class extends Controller {

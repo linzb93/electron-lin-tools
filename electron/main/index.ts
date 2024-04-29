@@ -77,10 +77,8 @@ app.whenReady().then(async () => {
       );
     // 托盘
     let tray = new Tray(
-      nativeImage.createFromDataURL(
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEKADAAQAAAABAAAAEAAAAAA0VXHyAAACeUlEQVQ4EX1TS2gUQRB93T3Tu4lRVkEleFEQIYkBUURRBEEkCB725NUvRqNeAiqevahIArkoEuMH1IMi6EGRiCAmQoiCqCGGqLj+4gZWZI3ZzK/bqtmd7B40xRymu+pVvX5VJUDWtGdqO4Teb43fSEfDd3OYFFJPwPqXR6829Ivm3aVtVjqPIJSCDefA1biEA9goEiZscwzMYUqpTFSqiaj+Wkv/Iv6qlwggVVrFWAu7xNpo1hkQibByZHBdCtBU0K+552DGMNYRkLPoGR/Y2CzhB8Drj5Sf1Dh/SGPgrUEub/BrChj7YpByy/UYK5PSJQ/Y0qpwqTOFlcskAkq7aIHAulUK418NNrUo9B1nn4BHBRIjcgCDt65R6Dmm0XUnwO2nIRS9u2U5JSLq778ZvPpgML9e4NrJNPae8zD+nZ6mAOn5Bm3rFbo7NM7cDHDlYRhTjIj+5tUSIzmD4jTgUvDp6z7uPQ/RdyKF1hWc3ECyUIszAmktMPGTZKlw0/TODU0KA28qEhEjFvdHwSIzTyDTIMBFnHRK4sbjEGFg0XNU41Svj/uDYazD0oUCw+8iOFTdJ4E7sg7ad7po757B4IiiohKxBmkN3HoSkjgWZw/quAvcvkLR4vOkjbtxJOti3w5K0OVhaNSgvo7mjhkkajLg7rMI056Pwm+LXWsdvBgz4Na6FPWJ2sjgYbrj2MQcys+Cx8aO/pflNxf/BDGYey6p2Q+GIggKZLaJMZYGSUwKQXRoPNl46thy+bKcqjIpyX3ZS6NNGBqkvCMhL1hrskLxo6rLRI7/Gy0TjTJNobgYsy+vs3vAmKCxdrT/lYFpS+nSOge9vM5/AfpxBUcmBSWXAAAAAElFTkSuQmCC"
-      )
-    ); // 用图片路径打包后会显示不了
+      nativeImage.createFromPath(join(publicPath, "logo_16x16.png"))
+    );
     const contextMenu = Menu.buildFromTemplate([
       { label: "打开窗口", click: createWindow },
       { label: "退出", click: app.quit },

@@ -1,5 +1,5 @@
 import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { app } from "electron";
 import cachedir from "cachedir";
 
 export const HTTP_STATUS = {
@@ -23,7 +23,4 @@ export const HTTP_STATUS = {
 export const root = cachedir("electron-lin-tools");
 export const tempPath = join(root, ".temp");
 export const serverStaticPath = join(root, "pages");
-export const publicPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../public"
-);
+export const publicPath = join(app.getAppPath(), "./public");
