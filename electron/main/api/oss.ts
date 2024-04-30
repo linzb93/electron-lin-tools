@@ -123,18 +123,18 @@ export default class extends Controller {
   // 删除文件
   @Route("oss-delete-file")
   async deleteFile(req: Request) {
-    const { id, file, files } = req.params;
+    const { id, path, paths } = req.params;
     const projectRes = await this.findClient(id);
     if (!projectRes.success) {
       return projectRes.response;
     }
     const { client } = projectRes;
-    if (files) {
-      await pMap(files, (file: string) => client.delete(file), {
+    if (paths) {
+      await pMap(paths, (path: string) => client.delete(path), {
         concurrency: 4,
       });
     } else {
-      await client.delete(file);
+      await client.delete(path);
     }
     return {
       message: "success",

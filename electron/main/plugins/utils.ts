@@ -30,6 +30,8 @@ export const mainPost = ({ method, data, listener = true }: {method: string; dat
         }
       };
       ipcMain.on("main-post-receive", handler);
+    } else {
+      resolve(null);
     }
     win && win.webContents.send("main-post", {
       requestId: uid,

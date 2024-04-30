@@ -32,7 +32,7 @@ try {
   app.use(bodyParser.json({ limit: "5mb" }));
   app.use(cors());
   app.use(config.static, express.static(tempPath)); // 存放临时文件
-  app.use(config.server, express.static(serverStaticPath)); // 存放前端打包页面
+  app.use(config.server, express.static(serverStaticPath)); // 存放前端Vue项目打包页面
 
   app.use("/iPhone-sync", iPhoneRouter);
 

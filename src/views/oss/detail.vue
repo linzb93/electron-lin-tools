@@ -17,7 +17,7 @@
         <el-button type="primary" @click="downloadMulti">批量下载</el-button>
       </template>
       <div class="path ml20 flexalign-center">
-        <template v-if="pathList.length">
+        <template v-if="breadcrumb.length">
           <el-icon @click="clickPath(-1)" class="curp" :size="16">
             <home-filled />
           </el-icon>
@@ -27,7 +27,7 @@
         </template>
         <div
           class="path-item flexalign-center curp"
-          v-for="(item, index) in pathList"
+          v-for="(item, index) in breadcrumb"
           :key="item"
           @click="clickPath(index)"
         >
@@ -35,14 +35,14 @@
             <folder />
           </el-icon>
           <span class="path-name">{{ item }}</span>
-          <el-icon v-if="index < pathList.length - 1">
+          <el-icon v-if="index < breadcrumb.length - 1">
             <arrow-right />
           </el-icon>
         </div>
       </div>
     </div>
     <el-table
-      :data="fileList"
+      :data="tableList"
       v-loading="loading"
       @selection-change="handleSelectionChange"
     >
@@ -142,10 +142,10 @@ import SettingDialog from "./components/Setting.vue";
 
 const route = useRoute();
 
-const fileList = shallowRef([]);
-const pathList = ref([]);
+const tableList = shallowRef([]);
+const breadcrumb = ref([]);
 const fullPath = computed(() =>
-  pathList.value.map((item) => `${item}/`).join("")
+  breadcrumb.value.map((item) => `${item}/`).join("")
 );
 const visible = shallowReactive({
   progress: false,
@@ -164,28 +164,28 @@ const getList = async () => {
     },
   });
   loading.value = false;
-  fileList.value = data.list;
+  tableList.value = data.list;
   scrollTo(0, 800);
 };
 onMounted(async () => {
   const { result } = await request("oss-get-shortcut", {
     id: Number(route.query.id),
   });
-  pathList.value.push(result);
+  breadcrumb.value.push(result);
   getList();
 });
 
 // 点击面包屑
 const clickPath = (index) => {
-  pathList.value = pathList.value.slice(0, index + 1);
+  breadcrumb.value = breadcrumb.value.slice(0, index + 1);
   getList();
 };
 
 // 多选
 const selected = ref([]);
-const handleSelectionChange = (val) => {
-  if (val.every((item) => item.type !== "dir")) {
-    selected.value = val;
+const handleSelectionChange = (selection) => {
+  if (selection.every((item) => item.type !== "dir")) {
+    selected.value = selection;
   }
 };
 
@@ -199,7 +199,7 @@ const del = async (item) => {
   const name = item.type === "dir" ? `${item.name}/` : item.name;
   await request("oss-delete-file", {
     id: Number(route.query.id),
-    file: `${fullPath.value}${name}`,
+    path: `${fullPath.value}${name}`,
   });
   ElMessage.success("删除成功");
   getList();
@@ -217,7 +217,7 @@ const deleteMulti = () => {
   }).then(async () => {
     await request("oss-delete-file", {
       id: Number(route.query.id),
-      files: selected.value.map((item) => `${fullPath.value}${item.name}`),
+      paths: selected.value.map((item) => `${fullPath.value}${item.name}`),
     });
     ElMessage.success("删除成功");
     selected.value = [];
@@ -240,7 +240,7 @@ const jumpInner = (item) => {
     }
     return;
   }
-  pathList.value.push(item.name);
+  breadcrumb.value.push(item.name);
   getList();
 };
 
@@ -273,7 +273,7 @@ const createDir = () => {
         return;
       }
       if (
-        fileList.value.some(
+        tableList.value.some(
           (file) => file.type === "dir" && file.name === value
         )
       ) {
@@ -313,7 +313,7 @@ const dropFile = async (event) => {
   const resolveList = await new Promise((resolve) => {
     // 过滤重名文件，其他正常上传
     const duplicateFiles = upOriginList.filter((item) =>
-      fileList.value.find((sub) => sub.name === item.name)
+      tableList.value.find((sub) => sub.name === item.name)
     );
     if (duplicateFiles.length) {
       ElMessageBox({
@@ -364,7 +364,6 @@ const getCss = (item) => {
   img.src = item.url;
   img.onload = function () {
     const { width, height } = this;
-    console.log(setting.value);
     const widthData = setting.value.pixel === 2 ? parseInt(width / 2) : width;
     const heightData =
       setting.value.pixel === 2 ? parseInt(height / 2) : height;
