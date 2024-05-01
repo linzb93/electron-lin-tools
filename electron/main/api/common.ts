@@ -1,7 +1,7 @@
 import { join, basename } from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
-import { clipboard, dialog } from "electron";
+import { shell, clipboard, dialog } from "electron";
 import { createClient } from "webdav";
 import pMap from "p-map";
 import download from "download";
@@ -78,14 +78,14 @@ export default class extends Controller {
   }
 
   @Route("change-window-size")
-  changeWindowSize(
+  async changeWindowSize(
     req: Request<{
       width: number;
       height: number;
     }>
   ) {
     const { width, height } = req.params;
-    const win = getMainWindow();
+    const win = await getMainWindow();
     win.setSize(width, height);
     return {
       message: "ok",
@@ -153,6 +153,14 @@ export default class extends Controller {
       password: params.password,
     };
     await db.write();
+    return {
+      success: true,
+    };
+  }
+  @Route("open-in-browser")
+  openInBrowser(req: Request) {
+    const { url } = req.params;
+    shell.openExternal(url);
     return {
       success: true,
     };

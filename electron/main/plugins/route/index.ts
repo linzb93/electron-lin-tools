@@ -3,6 +3,7 @@ import chalk from "chalk";
 import CommonController from "../../api/common";
 import OSSController from "../../api/oss";
 import VueController from "../../api/vue";
+import SettingController from "../../api/setting";
 import { IpcController } from "../ipc";
 import { getApiList } from "./decorators";
 import wrapResponse from "../wrapResponse";
@@ -12,6 +13,7 @@ import logger from "../logger";
 
 export default () => {
   new CommonController();
+  new SettingController();
   new IpcController();
   new OSSController();
   new VueController();

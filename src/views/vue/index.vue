@@ -101,24 +101,27 @@
 </template>
 
 <script setup>
-import { ref, shallowRef } from "vue";
+import { ref, shallowRef, onMounted, computed } from "vue";
 import request from "@/plugins/request";
-import { handleMainPost } from "../../plugins/util";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { ArrowDown } from "@element-plus/icons-vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+import { useGlobalStore } from "@/store";
 
-const isDisconnect = shallowRef(false); // 是否与ipc断联
-handleMainPost("ipc-is-connect", (ret) => {
-  isDisconnect.value = ret;
-});
+const globalStore = useGlobalStore();
+const isDisconnect = computed(() => !globalStore.ipcIsConnect); // 是否与ipc断联
+
+// 获取列表
 const list = ref([]);
 const getList = async () => {
   const res = await request("vue-get-list");
   list.value = res.list;
 };
-getList();
+onMounted(() => {
+  getList();
+});
 
+// 添加/编辑项目
 const form = ref({
   name: "",
   path: "",
@@ -132,6 +135,7 @@ const rules = {
 const formRef = ref(null);
 const visible = shallowRef(false);
 const isEdit = shallowRef(false);
+
 // 添加应用
 const add = async () => {
   visible.value = true;
@@ -151,18 +155,13 @@ const submit = () => {
     getList();
   });
 };
-// ipc
-const inputIpc = () => {
-  ElMessageBox.prompt("请输入ipc服务的名称", "", {}).then(async ({ value }) => {
-    await request("save-ipc", {
-      name: value,
-    });
-    ElMessage.success("保存成功");
-  });
-};
 
 // 启动服务
 const serve = async (item) => {
+  if (!isDisconnect.value) {
+    ElMessage.error("请先启动ipc服务");
+    return;
+  }
   ElMessage({
     type: "info",
     message: "正在启动项目",
@@ -193,6 +192,10 @@ const kill = async (item) => {
 
 // 打包
 const build = async (item) => {
+  if (!isDisconnect.value) {
+    ElMessage.error("请先启动ipc服务");
+    return;
+  }
   ElMessage({
     type: "info",
     message: "正在打包项目",
@@ -215,6 +218,10 @@ const handleMore = async (item, command) => {
   if (command === "copy") {
     await request("copy", item.serveUrl);
   } else if (command === "build-serve") {
+    if (!isDisconnect.value) {
+      ElMessage.error("请先启动ipc服务");
+      return;
+    }
     await request("vue-build-serve", {
       path: item.path,
     });

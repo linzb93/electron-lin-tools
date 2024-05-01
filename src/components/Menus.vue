@@ -1,9 +1,12 @@
 <template>
   <div class="menu-list full-height">
-    <div class="flexpack-end">
+    <div class="top-btn flexpack-end">
+      <router-link to="/setting"
+        ><el-icon class="sub-btn curp" title="设置"><Setting /></el-icon
+      ></router-link>
       <el-icon
         @click="startSync"
-        class="btn-refresh curp"
+        class="sub-btn curp"
         title="同步"
         :class="{ loading: syncing }"
       >
@@ -52,7 +55,7 @@
 
 <script setup>
 import { ElMessage } from "element-plus";
-import { Refresh, Iphone, HomeFilled } from "@element-plus/icons-vue";
+import { Refresh, Iphone, HomeFilled, Setting } from "@element-plus/icons-vue";
 import { Oss } from "./icons";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
@@ -127,10 +130,13 @@ const save = () => {
 };
 </script>
 <style lang="scss" scoped>
-.btn-refresh {
-  font-size: 16px;
-  color: #fff;
+.top-btn {
   margin: 0 10px 10px 0;
+  .sub-btn {
+    font-size: 16px;
+    color: #fff;
+    margin-left: 10px;
+  }
 }
 .loading {
   animation: rotate 1.2s linear infinite;

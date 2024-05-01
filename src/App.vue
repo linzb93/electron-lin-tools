@@ -8,6 +8,10 @@
 </template>
 <script setup>
 import Menus from "./components/Menus.vue";
+import { useGlobalStore } from "@/store";
+
+const globalStore = useGlobalStore();
+globalStore.listenIpcConnected();
 </script>
 <style scoped>
 .cont {

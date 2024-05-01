@@ -174,6 +174,13 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
-export function getMainWindow() {
-  return win;
+export async function getMainWindow(): Promise<BrowserWindow> {
+  return new Promise((resolve) => {
+    const timer = setInterval(() => {
+      if (win) {
+        clearInterval(timer);
+        resolve(win);
+      }
+    }, 300);
+  });
 }

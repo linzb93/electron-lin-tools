@@ -118,10 +118,21 @@
     v-model:visible="visible.setting"
     @submit="(data) => (setting = data)"
   />
-  <el-dialog v-model="visible.preview" title="图片预览" width="420px">
+  <el-dialog v-model="visible.preview" title="图片预览" :width="`450px`">
     <div class="center">
       <img :src="previewUrl" class="img-preview" />
     </div>
+    <template #footer>
+      <el-button
+        type="primary"
+        @click="
+          request('open-in-browser', {
+            url: previewUrl,
+          })
+        "
+        >在浏览器打开</el-button
+      >
+    </template>
   </el-dialog>
 </template>
 
@@ -171,7 +182,9 @@ onMounted(async () => {
   const { result } = await request("oss-get-shortcut", {
     id: Number(route.query.id),
   });
-  breadcrumb.value.push(result);
+  if (result) {
+    breadcrumb.value.push(result);
+  }
   getList();
 });
 

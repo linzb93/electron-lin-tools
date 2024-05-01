@@ -14,23 +14,27 @@ const routes = [
     component: () => import("./views/oss/detail.vue"),
   },
   {
-    path: '/iPhone',
+    path: "/iPhone",
     component: () => import("./views/iPhone/index.vue"),
     meta: {
-      hide: process.platform === 'darwin'
-    }
+      hide: process.platform === "darwin",
+    },
   },
   {
-    path: '/vue',
+    path: "/vue",
     component: () => import("./views/vue/index.vue"),
   },
   {
-    path: '/img-compress',
+    path: "/img-compress",
     component: () => import("./views/img-compress/index.vue"),
   },
-]
+  {
+    path: "/setting",
+    component: () => import("./views/setting/index.vue"),
+  },
+];
 
 export default createRouter({
   history: createWebHashHistory(),
-  routes: routes.filter(route => !route.meta?.hide),
+  routes: routes.filter((route) => !route.meta?.hide),
 });

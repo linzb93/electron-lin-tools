@@ -1,4 +1,3 @@
-// stores/counter.js
 import { defineStore } from "pinia";
 
 export const useOssStore = defineStore("oss", {

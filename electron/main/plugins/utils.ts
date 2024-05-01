@@ -17,12 +17,21 @@ export const uuid = (len = 36) => {
   return arr.join("");
 };
 
-export const mainPost = ({ method, data, listener = true }: {method: string; data:any; listener?:boolean}) =>
-  new Promise((resolve) => {
-    const win = getMainWindow();
+export const mainPost = ({
+  method,
+  data,
+  listener = true,
+}: {
+  method: string;
+  data: any;
+  listener?: boolean;
+}) =>
+  new Promise(async (resolve) => {
+    const win = await getMainWindow();
     const uid = uuid();
+    console.log(method);
     if (listener) {
-      const handler = (_:any, dataStr: string) => {
+      const handler = (_: any, dataStr: string) => {
         const dataObj = JSON.parse(dataStr);
         if (dataObj.requestId === uid && dataObj.method === method) {
           ipcMain.off("main-post-receive", handler);
@@ -33,9 +42,10 @@ export const mainPost = ({ method, data, listener = true }: {method: string; dat
     } else {
       resolve(null);
     }
-    win && win.webContents.send("main-post", {
-      requestId: uid,
-      method,
-      data,
-    });
+    win &&
+      win.webContents.send("main-post", {
+        requestId: uid,
+        method,
+        data,
+      });
   });
