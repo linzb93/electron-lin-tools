@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { handleMainPost } from "./plugins/util";
+import request from "./plugins/request";
 
 export const useGlobalStore = defineStore("oss", {
   state: () => ({
@@ -11,9 +12,10 @@ export const useGlobalStore = defineStore("oss", {
       this.setting = payload;
     },
     listenIpcConnected() {
-      handleMainPost("ipc-is-connected", (ret) => {
+      handleMainPost("ipc-is-connect", (ret: boolean) => {
         this.ipcIsConnect = ret;
       });
+      request("ipc-connect", {});
     },
   },
 });

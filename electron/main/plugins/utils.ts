@@ -29,7 +29,6 @@ export const mainPost = ({
   new Promise(async (resolve) => {
     const win = await getMainWindow();
     const uid = uuid();
-    console.log(method);
     if (listener) {
       const handler = (_: any, dataStr: string) => {
         const dataObj = JSON.parse(dataStr);
@@ -47,5 +46,6 @@ export const mainPost = ({
         requestId: uid,
         method,
         data,
+        listener
       });
   });

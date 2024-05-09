@@ -1,8 +1,6 @@
 import { basename, join } from "node:path";
-import ipc from "node-ipc";
 import fs from "node:fs/promises";
 import killPort from "kill-port";
-import { execaCommand as execa } from "execa";
 import db from "../plugins/database";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
@@ -45,15 +43,10 @@ export default class extends Controller {
   async build(req: Request) {
     // ipc可以用，后面逻辑有空再写。
     const { path } = req.params;
-    if (isMac) {
-      await execa(`nvm exec 14 npm run build`, {
-        cwd: path,
-      });
-    } else {
-      await ipcInvoke("vue-build", {
-        cwd: path,
-      });
-    }
+    await ipcInvoke("vue-build", {
+      cwd: path,
+    });
+    console.log("build success");
     return {
       message: "vue-build",
     };
@@ -63,32 +56,24 @@ export default class extends Controller {
   @Route("vue-start")
   async start(req: Request) {
     const { path } = req.params;
-    if (isMac) {
-      await execa(`nvm exec 14 npm run serve`, {
-        cwd: path,
-      });
-    } else {
-      await ipcInvoke("vue-serve", {
-        cwd: path,
-      });
-    }
+    const response = await ipcInvoke("vue-serve", {
+      cwd: path,
+    });
+    console.log('vue serve success');
+    const {message} = response as any;
+    const reg = /(\d{1,3}\.){3}\d{1,3}:\d{4}/;
+    const arr = message.match(reg);
     return {
       message: "vue-start",
+      ip: arr[0]
     };
   }
   @Route("vue-build-serve")
   async buildServe(req: Request) {
     const { path } = req.params;
-    if (isMac) {
-      await execa(`nvm exec 14 npm run build`, {
-        cwd: path,
-      });
-    } else {
-      ipc.of.node14.emit("vue-action", {
-        action: "build",
-        path,
-      });
-    }
+    const response = await ipcInvoke("vue-serve", {
+      cwd: path,
+    });
     await fs.copyFile(join(path, "dist"), join(root, "./server"));
     return {
       message: "success",

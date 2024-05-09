@@ -23,7 +23,7 @@ watch(isConnected, (value) => {
 });
 
 ipc.config.id = "electron-lin-tools";
-ipc.config.retry = 10000;
+ipc.config.retry = 3000;
 ipc.config.silent = true;
 
 export class IpcController extends Controller {
@@ -33,6 +33,9 @@ export class IpcController extends Controller {
     await db.read();
     (db.data as Database).ipc = name;
     await db.write();
+    return {
+      message: "success",
+    };
   }
   @Route("ipc-connect")
   async connect() {
@@ -75,7 +78,7 @@ export const ipcInvoke = (action: string, request: any) =>
     function listener(response: IpcResponse) {
       if (response.requestId === requestId) {
         ipc.of[serverIpcId].off("message", listener);
-        resolve(response.params);
+        resolve(response);
       }
     }
     ipc.of[serverIpcId].on("response", listener);

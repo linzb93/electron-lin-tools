@@ -8,7 +8,7 @@ interface Params {
 export default (raw: Params) => {
   return {
     code: raw ? raw.code || 200 : 200,
-    message: raw.message,
+    message: raw ? raw.message : "",
     result: omit(raw, ["code", "message"]),
   };
 };

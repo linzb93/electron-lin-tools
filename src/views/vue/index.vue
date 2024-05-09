@@ -27,7 +27,7 @@
           <el-link
             :underline="false"
             type="primary"
-            @click="building(scope.row)"
+            @click="serve(scope.row)"
             v-if="!scope.row.serveUrl"
             >启动服务</el-link
           >
@@ -158,7 +158,7 @@ const submit = () => {
 
 // 启动服务
 const serve = async (item) => {
-  if (!isDisconnect.value) {
+  if (isDisconnect.value) {
     ElMessage.error("请先启动ipc服务");
     return;
   }
@@ -169,7 +169,7 @@ const serve = async (item) => {
   });
   item.status = 1;
   try {
-    const { port } = await request("vue-serve", {
+    const { port } = await request("vue-start", {
       path: item.path,
     });
     ElMessage.success("启动成功");
@@ -177,6 +177,7 @@ const serve = async (item) => {
     item.status = 2;
   } catch (error) {
     ElMessage.success("启动失败");
+    item.port = 0;
     console.log(error);
   }
 };
@@ -192,7 +193,7 @@ const kill = async (item) => {
 
 // 打包
 const build = async (item) => {
-  if (!isDisconnect.value) {
+  if (isDisconnect.value) {
     ElMessage.error("请先启动ipc服务");
     return;
   }
@@ -206,6 +207,7 @@ const build = async (item) => {
     await request("vue-build", {
       path: item.path,
     });
+    item.status = 2;
     ElMessage.success("打包成功");
   } catch (error) {
     ElMessage.success("打包失败");
@@ -259,6 +261,9 @@ const building = () => {
 }
 .active {
   background-color: #67c23a;
+}
+.starting {
+  background: pink;
 }
 .nothing {
   background-color: #ccc;
