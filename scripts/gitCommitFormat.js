@@ -1,5 +1,5 @@
-const fs = require("fs");
-const chalk = require("chalk");
+import fs from "node:fs";
+import chalk from "chalk";
 
 const commitMap = [
   {
