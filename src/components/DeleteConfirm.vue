@@ -24,36 +24,29 @@
 </template>
 
 <script>
-export default {
-  components: {},
-  props: {
-    title: {
-      type: String,
-      default: "确认删除？",
-    },
-    confirmButtonText: {
-      type: String,
-      default: "确定",
-    },
-    deleteText: {
-      type: String,
-      default: "删除",
-    },
+import { shallowRef } from "vue";
+const props = defineProps({
+  title: {
+    type: String,
+    default: "确认删除？",
   },
-  data() {
-    return {
-      visible: false,
-    };
+  confirmButtonText: {
+    type: String,
+    default: "确定",
   },
-  methods: {
-    onCancel() {
-      this.visible = false;
-    },
-    onConfirm() {
-      this.visible = false;
-      this.$emit("confirm");
-    },
+  deleteText: {
+    type: String,
+    default: "删除",
   },
+});
+const emit = defineEmits(["confirm"]);
+const visible = shallowRef(false);
+const onCancel = () => {
+  visible.value = false;
+};
+const onConfirm = () => {
+  visible.value = false;
+  emit("confirm");
 };
 </script>
 <style lang="scss" scoped>
