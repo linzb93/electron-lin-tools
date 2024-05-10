@@ -11,6 +11,12 @@ export const useGlobalStore = defineStore("oss", {
     saveSetting(payload: any) {
       this.setting = payload;
     },
+    async getSetting() {
+      if ((this.setting as any).ipc) {
+        return this.setting;
+      }
+      this.setting = await request('get-setting', {});
+    },
     listenIpcConnected() {
       handleMainPost("ipc-is-connect", (ret: boolean) => {
         this.ipcIsConnect = ret;

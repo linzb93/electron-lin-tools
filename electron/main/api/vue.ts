@@ -1,4 +1,3 @@
-import { net } from 'electron'
 import { basename, join } from "node:path";
 import fs from "node:fs/promises";
 import killPort from "kill-port";
@@ -29,11 +28,16 @@ export default class extends Controller {
     const data = req.params;
     await db.read();
     const list = (db.data as Database).vue;
+    const configFileContent = await fs.readFile(join(data.path, 'vue.config.js'), 'utf8');
+    const prefixLine = configFileContent.split('\n').find(line => line.includes('publicPath'));
+    const publicPath = prefixLine.match(/\/pages\/\w+\//)[0];
     list.push({
       serveUrl: "",
       path: data.path,
       name: data.name || basename(data.path),
-      appKey: data.appKey
+      appKey: data.appKey,
+      platform: data.platform,
+      publicPath
     });
     await db.write();
     return {
@@ -60,22 +64,12 @@ export default class extends Controller {
   private async getToken(proj: VueElementType) {
     await db.read();
     const { apiPrefix } = (db.data as Database).oa;
-    const response = await net.fetch(`${apiPrefix}/occ/order/getOrderInfoList`, {
-      method: 'post',
-      body: JSON.stringify({
-        pageSize: 1,
-        pageIndex: 1,
-        version: 1,
-        minPrice: 0,
-        platform: proj.platform,
-        param: '15983528161',
-        serviceName: proj.serviceName
-      })
+    const response  = await request.post(`${apiPrefix}/occ/order/replaceUserLogin`, {
+        appKey: proj.appKey,
+      memberId: '15983528161',
+      platform: proj.platform
     });
-    if (response.ok) {
-      const body = await response.json();
-      // return {}
-    }
+    return response.result;
   }
 
   // 启动项目

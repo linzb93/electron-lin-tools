@@ -15,7 +15,7 @@ export interface Database {
     serveUrl: string;
     appKey: string;
     platform?: string;
-    serviceName?: string;
+    publicPath?: string;
   }[];
   oss: {
     accounts: {

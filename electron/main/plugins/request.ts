@@ -1,13 +1,15 @@
 import { net } from 'electron';
 
 interface Body {
-    data: {}
+    data: {
+        [key:string]: any
+    }
 }
 
 const methods = ['get', 'post'];
 type RequestParams = Body & {
     url: string;
-    method: string;
+    method: 'get' | 'post';
 }
 
 function httpRequest(param: RequestParams) {
@@ -26,18 +28,23 @@ function httpRequest(param: RequestParams) {
     });
 }
 
-function request(param: RequestParams) {
+function request(param: RequestParams): Promise<any> {
     return httpRequest(param);
 }
 
-methods.forEach(method => {
-    request[method] = function (url: string, param: Body) {
-        return httpRequest({
-            url,
-            method,
-            ...param
-        });
-    }
-})
+request.get = function (url: string, param: Body['data']): Promise<any> {
+    return httpRequest({
+        url,
+        method: 'get',
+        data: param
+    });
+};
+request.post = function (url: string, param: Body['data']): Promise<any> {
+    return httpRequest({
+        url,
+        method: 'post',
+        data: param
+    });
+};
 
 export default request;

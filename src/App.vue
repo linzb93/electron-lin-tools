@@ -11,6 +11,7 @@ import Menus from "./components/Menus.vue";
 import { useGlobalStore } from "@/store";
 
 const globalStore = useGlobalStore();
+globalStore.getSetting();
 globalStore.listenIpcConnected();
 </script>
 <style scoped>

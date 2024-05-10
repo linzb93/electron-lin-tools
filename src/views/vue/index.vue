@@ -33,7 +33,7 @@
           >
           <el-link
             :underline="false"
-            type="warn"
+            type="warning"
             @click="kill(scope.row)"
             v-else
             >关闭服务</el-link
@@ -96,6 +96,12 @@
           >选择</el-button
         >
       </el-form-item>
+      <el-form-item label="appKey" prop="appKey">
+        <el-input v-model="form.appKey" />
+      </el-form-item>
+      <el-form-item label="平台" prop="platform">
+        <el-input v-model="form.platform" />
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button type="primary" @click="submit">提交</el-button>
@@ -110,6 +116,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { ArrowDown } from "@element-plus/icons-vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useGlobalStore } from "@/store";
+import qrcode from "qrcode";
 
 const globalStore = useGlobalStore();
 const isDisconnect = computed(() => !globalStore.ipcIsConnect); // 是否与ipc断联
@@ -128,6 +135,8 @@ onMounted(() => {
 const form = ref({
   name: "",
   path: "",
+  appKey: "",
+  platform: "",
 });
 const rules = {
   path: {
@@ -233,6 +242,15 @@ const handleMore = async (item, command) => {
     });
     ElMessage.success("启动成功");
     getList();
+  } else if (command === "copy-qr") {
+    const base64Qr = await qrcode.toDataURL(
+      `${item.serveUrl}${item.publicPath}/#/login?code=${item.token}`
+    );
+    await request("copy-image", {
+      url: base64Qr,
+      type: "base64",
+    });
+    ElMessage.success("复制成功");
   } else {
     building();
   }
