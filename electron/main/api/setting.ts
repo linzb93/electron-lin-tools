@@ -11,6 +11,7 @@ export default class extends Controller {
     const data = db.data as Database;
     return {
       ipc: data.ipc,
+      oaApiPrefix: data.oa.apiPrefix,
       user: data.sync ? data.sync.user : "",
       password: data.sync ? data.sync.password : "",
     };
@@ -21,6 +22,7 @@ export default class extends Controller {
     await db.read();
     const data = db.data as Database;
     data.ipc = params.ipc;
+    data.oa.apiPrefix = params.oaApiPrefix;
     data.sync = {
       user: params.user,
       password: params.password,

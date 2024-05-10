@@ -105,9 +105,8 @@ app.whenReady().then(async () => {
             };
             dialog.showMessageBox({
               title: "关于我们",
-              message: `${
-                pkg.version
-              }\n @copyright ${new Date().getFullYear()} linzb93`,
+              message: `${pkg.version
+                }\n @copyright ${new Date().getFullYear()} linzb93`,
             });
           },
         },

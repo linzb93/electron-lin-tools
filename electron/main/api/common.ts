@@ -1,7 +1,7 @@
 import { join, basename } from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
-import { shell, clipboard, dialog } from "electron";
+import { shell, clipboard, dialog, nativeImage } from "electron";
 import { createClient } from "webdav";
 import pMap from "p-map";
 import download from "download";
@@ -164,5 +164,20 @@ export default class extends Controller {
     return {
       success: true,
     };
+  }
+  @Route('copy-image')
+  copyImage(req: Request) {
+    const { url, type } = req.params;
+    if (type === 'base64') {
+      const buf = Buffer.from(url);
+      const img = nativeImage.createFromBuffer(buf);
+      clipboard.writeImage(img);
+      return {
+        success: true
+      }
+    }
+    return {
+      success: false
+    }
   }
 }

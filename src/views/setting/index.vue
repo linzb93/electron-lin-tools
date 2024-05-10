@@ -10,6 +10,9 @@
     <el-form-item label="IPC">
       <el-input v-model="form.ipc" placeholder="请输入连接的服务端IPC名称" />
     </el-form-item>
+    <el-form-item label="oa api">
+      <el-input v-model="form.oaApiPrefix" placeholder="请输入OA的api前缀" />
+    </el-form-item>
     <el-form-item>
       <template #label>
         <div class="flex-start">

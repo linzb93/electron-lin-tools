@@ -13,6 +13,9 @@ export interface Database {
     name: string;
     path: string;
     serveUrl: string;
+    appKey: string;
+    platform?: string;
+    serviceName?: string;
   }[];
   oss: {
     accounts: {
@@ -37,4 +40,7 @@ export interface Database {
     user: string;
     password: string;
   };
+  oa: {
+    apiPrefix: string;
+  }
 }

@@ -56,6 +56,9 @@
                   >打包后启动服务</el-dropdown-item
                 >
                 <el-dropdown-item command="copy">复制服务地址</el-dropdown-item>
+                <el-dropdown-item command="copy-qr"
+                  >生成二维码</el-dropdown-item
+                >
                 <el-dropdown-item command="serve-test"
                   >打包测试环境</el-dropdown-item
                 >
@@ -169,11 +172,12 @@ const serve = async (item) => {
   });
   item.status = 1;
   try {
-    const { port } = await request("vue-start", {
+    const { address } = await request("vue-start", {
       path: item.path,
     });
     ElMessage.success("启动成功");
-    item.port = port;
+    item.port = address.slice(-4);
+    item.serveUrl = address;
     item.status = 2;
   } catch (error) {
     ElMessage.success("启动失败");
