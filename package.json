@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
-    "@types/download": "^8.0.5",
     "@types/express": "^4.17.21",
     "@types/kill-port": "^2.0.3",
     "@types/lowdb": "^1.0.15",
@@ -47,8 +46,6 @@
     "body-parser": "^1.20.2",
     "cachedir": "^2.4.0",
     "cors": "^2.8.5",
-    "del": "^7.1.0",
-    "download": "^8.0.0",
     "electron-is-dev": "^3.0.1",
     "electron-unhandled": "^4.0.1",
     "execa": "^8.0.1",

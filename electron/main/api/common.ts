@@ -1,10 +1,10 @@
 import { join, basename } from "node:path";
+import http from 'node:http';
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { shell, clipboard, dialog, nativeImage } from "electron";
 import { createClient } from "webdav";
 import pMap from "p-map";
-import download from "download";
 import { getMainWindow } from "..";
 import Controller from "../plugins/route/Controller";
 import { Route } from "../plugins/route/decorators";
@@ -46,11 +46,12 @@ export default class extends Controller {
         req.params,
         (url: string) =>
           new Promise((resolve) => {
-            download(url)
-              .pipe(
-                fs.createWriteStream(join(result.filePaths[0], basename(url)))
-              )
-              .on("finish", resolve);
+            http.get(url, resp => {
+              if (resp.statusCode === 200) {
+                resp.pipe(fs.createWriteStream(join(result.filePaths[0], basename(url))))
+                .on("finish", resolve);
+              }
+            });
           }),
         { concurrency: 4 }
       );
@@ -67,9 +68,14 @@ export default class extends Controller {
       return {};
     }
     await new Promise((resolve) => {
-      download(url)
-        .pipe(fs.createWriteStream(result.filePath))
-        .on("finish", resolve);
+      http.get(url, (resp) => {
+        if (resp.statusCode === 200) {
+          resp.pipe(
+            fs.createWriteStream(result.filePath)
+          )
+          .on('finish', resolve);
+        }
+      });
     });
     return {
       code: HTTP_STATUS.SUCCESS,
