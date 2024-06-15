@@ -193,6 +193,7 @@ export default class extends Controller {
       pixel: params.pixel,
       platform: params.platform,
     };
+    await db.write();
     return {
       message: "success",
     };

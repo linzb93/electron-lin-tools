@@ -101,7 +101,7 @@ app.whenReady().then(async () => {
           label: "about",
           click: async () => {
             const pkg = {
-              version: "v1.1.0",
+              version: "v1.3.1",
             };
             dialog.showMessageBox({
               title: "关于我们",

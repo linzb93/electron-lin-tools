@@ -11,7 +11,7 @@ export const useGlobalStore = defineStore("oss", {
       this.setting = payload;
     },
     listenIpcConnected() {
-      handleMainPost("ipc-is-connected", (ret) => {
+      handleMainPost("ipc-is-connected", (ret: boolean) => {
         this.ipcIsConnect = ret;
       });
     },

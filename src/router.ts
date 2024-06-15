@@ -25,10 +25,6 @@ const routes = [
     component: () => import("./views/vue/index.vue"),
   },
   {
-    path: "/img-compress",
-    component: () => import("./views/img-compress/index.vue"),
-  },
-  {
     path: "/setting",
     component: () => import("./views/setting/index.vue"),
   },

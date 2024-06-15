@@ -23,7 +23,7 @@
   </el-popover>
 </template>
 
-<script>
+<script setup>
 import { shallowRef } from "vue";
 const props = defineProps({
   title: {
