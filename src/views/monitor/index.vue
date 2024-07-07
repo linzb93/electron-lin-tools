@@ -3,12 +3,15 @@
     <div>
       <el-button type="primary" @click="add">添加</el-button>
     </div>
-    <el-form>
+    <el-form label-suffix="：">
       <el-form-item label="选择应用">
-        <el-checkbox-group v-model="appList">
-          <el-checkbox v-for="app in form.apps" :key="app.id" :label="app.id">{{
-            app.title
-          }}</el-checkbox>
+        <el-checkbox-group v-model="apps">
+          <el-checkbox
+            v-for="app in form.apps"
+            :key="app.siteId"
+            :label="app.siteId"
+            >{{ app.title }}</el-checkbox
+          >
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="选择日期">
@@ -42,16 +45,14 @@
       </div>
     </div>
   </div>
-  <el-dialog
-    v-model="visible.apps"
-    :title="`${isEditMode ? '编辑' : '添加'}应用`"
-    width="400px"
-  >
-    <el-checkbox-group v-model="selectedApps">
-      <el-checkbox v-for="app in apps" :key="app.id" :label="app.id">{{
-        app.name
-      }}</el-checkbox>
-    </el-checkbox-group>
+  <el-dialog v-model="visible.apps" title="编辑应用" width="400px">
+    <div class="app-list">
+      <el-checkbox-group v-model="selectedApps">
+        <div v-for="app in apps" :key="app.siteId">
+          <el-checkbox :label="app.siteId">{{ app.name }}</el-checkbox>
+        </div>
+      </el-checkbox-group>
+    </div>
     <template #footer>
       <el-button @click="visible.apps = false">关闭</el-button>
       <el-button @click="save" type="primary">保存</el-button>
@@ -64,30 +65,54 @@ import axios from "axios";
 import dayjs from "dayjs";
 import request from "@/plugins/request";
 import { omit } from "lodash-es";
-import { reactive, shallowReactive, ref, shallowRef } from "vue";
-import Qa from "@/components/Qa";
+import { ElMessage } from "element-plus";
+import { reactive, shallowReactive, ref, shallowRef, onMounted } from "vue";
+import Qa from "@/components/Qa.vue";
 
 const service = axios.create({
-  baseURL: "",
+  baseURL: "https://api.diankeduo.cn/zhili/dataanaly",
+});
+service.interceptors.response.use((response) => {
+  return response.data.result;
 });
 const visible = shallowReactive({
   apps: false,
   code: false,
 });
 
-const add = () => {};
+const add = () => {
+  if (apps.value.length) {
+    return;
+  }
+  loadApps();
+  visible.apps = true;
+};
+const selectedApps = ref([]);
 // 保存
-const save = () => {};
+const save = async () => {
+  await request("monitor-save-apps", selectedApps);
+  ElMessage.success("保存成功");
+  visible.apps = false;
+  getSelectedApps();
+};
+
+const getSelectedApps = async () => {
+  const data = await request("monitor-get-apps");
+  form.apps = data;
+};
+onMounted(() => {
+  getSelectedApps();
+});
 
 const apps = ref([]);
 const loadApps = () => {
   service
-    .post("", {
+    .post("/siteInfo/getSiteInfo", {
       pageSize: 100,
       pageIndex: 1,
     })
     .then((res) => {
-      const { list } = res.data.result;
+      const { list } = res;
       apps.value = list;
     });
 };
@@ -118,4 +143,9 @@ const focusError = (row) => {
   // TODO:取错误定位前200个字符，后100个字符。去掉无用的代码，然后格式化，定位改成用箭头指示。
 };
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.app-list {
+  max-height: 700px;
+  overflow: auto;
+}
+</style>

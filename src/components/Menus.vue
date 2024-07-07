@@ -55,7 +55,13 @@
 
 <script setup>
 import { ElMessage } from "element-plus";
-import { Refresh, Iphone, HomeFilled, Setting } from "@element-plus/icons-vue";
+import {
+  Refresh,
+  Iphone,
+  HomeFilled,
+  Setting,
+  View,
+} from "@element-plus/icons-vue";
 import { Oss } from "./icons";
 import { VueIcon } from "./icons/index";
 import { useRoute } from "vue-router";
@@ -79,7 +85,11 @@ const list = [
     title: "iPhone同步",
     to: "/iPhone",
     icon: Iphone,
-    hide: process.platform === "darwin",
+  },
+  {
+    title: "监控系统",
+    to: "/monitor",
+    icon: View,
   },
   {
     title: "Vue项目管理",

@@ -42,5 +42,9 @@ export interface Database {
   };
   oa: {
     apiPrefix: string;
-  }
+  };
+  monitor: {
+    siteId: string;
+    name: string;
+  }[];
 }
