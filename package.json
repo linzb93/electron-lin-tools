@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "ali-oss": "^6.20.0",
+    "axios": "^1.7.2",
     "body-parser": "^1.20.2",
     "cachedir": "^2.4.0",
     "cors": "^2.8.5",

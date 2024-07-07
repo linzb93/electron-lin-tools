@@ -23,9 +23,6 @@ try {
   fs.mkdirSync(serverStaticPath);
 }
 (() => {
-  if (process.platform === "darwin") {
-    return;
-  }
   const app = express();
 
   app.use(bodyParser.urlencoded({ extended: false }));

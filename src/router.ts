@@ -16,17 +16,14 @@ const routes = [
   {
     path: "/iPhone",
     component: () => import("./views/iPhone/index.vue"),
-    meta: {
-      hide: process.platform === "darwin",
-    },
   },
   {
     path: "/vue",
     component: () => import("./views/vue/index.vue"),
   },
   {
-    path: "/img-compress",
-    component: () => import("./views/img-compress/index.vue"),
+    path: "/monitor",
+    component: () => import("./views/monitor/index.vue"),
   },
   {
     path: "/setting",
@@ -36,5 +33,5 @@ const routes = [
 
 export default createRouter({
   history: createWebHashHistory(),
-  routes: routes.filter((route) => !route.meta?.hide),
+  routes,
 });
