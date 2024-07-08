@@ -1,21 +1,24 @@
 <template>
   <div>
     <div>
-      <el-button type="primary" @click="add">添加</el-button>
+      <el-button type="primary" @click="visible.apps = true"
+        >管理应用</el-button
+      >
     </div>
-    <el-form label-suffix="：">
+    <el-form label-suffix="：" class="mt20">
       <el-form-item label="选择应用">
-        <el-checkbox-group v-model="apps">
+        <el-checkbox-group v-model="form.selected" v-if="apps.length">
           <el-checkbox
-            v-for="app in form.apps"
+            v-for="app in apps"
             :key="app.siteId"
             :label="app.siteId"
             >{{ app.title }}</el-checkbox
           >
         </el-checkbox-group>
+        <p v-else>无</p>
       </el-form-item>
       <el-form-item label="选择日期">
-        <el-radio-group v-model="form.dateValue">
+        <el-radio-group v-model="form.dateValue" @change="changeDateRange">
           <el-radio-button :label="0">今日</el-radio-button>
           <el-radio-button :label="1"
             >昨日<qa
@@ -24,77 +27,53 @@
               :content="yesterdayInfo.content"
           /></el-radio-button>
           <el-radio-button :label="2">近7日</el-radio-button>
-          <el-radio-button :label="3">自定义</el-radio-button>
-          <el-date-picker v-model="form.range"></el-date-picker>
+          <el-radio-button :label="3" class="date-picker-wrap">
+            <span>自定义</span>
+            <el-date-picker
+              ref="customerDatePicker"
+              v-model="form.range"
+              placeholder="请选择日期"
+              :class="{ above: form.dateValue === 3 }"
+            ></el-date-picker>
+          </el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-button type="primary" class="ml10" @click="generate">生成</el-button>
+      <el-button type="primary" @click="generate">生成</el-button>
     </el-form>
-    <div class="mt20">
-      <div v-for="panel in panels" :key="panel.id">
-        <h2>{{ panel.title }}</h2>
-        <el-table :data="panel.data">
-          <el-table-column>
-            <template #default="scope">
-              <el-button size="small" @click="focusError(scope.row)"
-                >定位错误</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
+    <div v-for="panel in panels" :key="panel.id" class="mt30">
+      <h2>{{ panel.title }}</h2>
+      <el-table :data="panel.data" class="mt20">
+        <el-table-column label="错误信息" prop="content" />
+        <el-table-column label="发生页面" prop="url" />
+        <el-table-column label="浏览量" prop="errorCount" />
+        <el-table-column label="影响客户数" prop="numberOfAffectedUsers" />
+        <el-table-column label="操作">
+          <template #default="scope">
+            <el-button size="small" @click="focusError(scope.row, panel.siteId)"
+              >定位错误</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
-  <el-dialog v-model="visible.apps" title="编辑应用" width="400px">
-    <div class="app-list">
-      <el-checkbox-group v-model="selectedApps">
-        <div v-for="app in apps" :key="app.siteId">
-          <el-checkbox :label="app.siteId">{{ app.name }}</el-checkbox>
-        </div>
-      </el-checkbox-group>
-    </div>
-    <template #footer>
-      <el-button @click="visible.apps = false">关闭</el-button>
-      <el-button @click="save" type="primary">保存</el-button>
-    </template>
-  </el-dialog>
+  <app-manage v-model:visible="visible.apps" @confirm="getSelectedApps()" />
 </template>
 
 <script setup>
-import axios from "axios";
 import dayjs from "dayjs";
 import request from "@/plugins/request";
-import { omit } from "lodash-es";
+import { pick } from "lodash-es";
 import { ElMessage } from "element-plus";
-import { reactive, shallowReactive, ref, shallowRef, onMounted } from "vue";
+import { reactive, shallowReactive, ref, onMounted } from "vue";
+import { service } from "./utils";
 import Qa from "@/components/Qa.vue";
+import AppManage from "./components/AppManage.vue";
 
-const service = axios.create({
-  baseURL: "https://api.diankeduo.cn/zhili/dataanaly",
-});
-service.interceptors.response.use((response) => {
-  return response.data.result;
-});
 const visible = shallowReactive({
   apps: false,
   code: false,
 });
-
-const add = () => {
-  if (apps.value.length) {
-    return;
-  }
-  loadApps();
-  visible.apps = true;
-};
-const selectedApps = ref([]);
-// 保存
-const save = async () => {
-  await request("monitor-save-apps", selectedApps);
-  ElMessage.success("保存成功");
-  visible.apps = false;
-  getSelectedApps();
-};
 
 const getSelectedApps = async () => {
   const data = await request("monitor-get-apps");
@@ -105,47 +84,88 @@ onMounted(() => {
 });
 
 const apps = ref([]);
-const loadApps = () => {
-  service
-    .post("/siteInfo/getSiteInfo", {
-      pageSize: 100,
-      pageIndex: 1,
-    })
-    .then((res) => {
-      const { list } = res;
-      apps.value = list;
-    });
-};
 const form = reactive({
-  apps: [],
+  selected: [],
   dateValue: 0,
-  startDate: "",
+  beginDate: "",
   endDate: "",
   range: [],
 });
+const customerDatePicker = ref(null);
+const changeDateRange = (value) => {
+  if (value === 3) {
+    customerDatePicker.value.focus();
+  } else {
+    customerDatePicker.value.blur();
+  }
+};
+
+const panels = ref([]);
+const generate = async () => {
+  if (!form.selected.length) {
+    ElMessage.error("请至少选择一个应用");
+    return;
+  }
+  if (form.dateValue === 3) {
+    form.beginDate = dayjs(form.range[0]).format("YYYY-MM-DD");
+    form.endDate = dayjs(form.range[1]).format("YYYY-MM-DD");
+  }
+  const pMap = form.selected.map((app) =>
+    service.post("/data/analysis/jsErrorCount", {
+      beginTime: `${form.beginDate} 00:00:00`,
+      endTime: `${form.endDate} 23:59:59`,
+      orderKey: "errorCount",
+      orderByAsc: false,
+      pageIndex: 1,
+      pageSize: 100,
+      siteId: app.siteId,
+      type: ["eventError", "consoleError"],
+      visitType: 0,
+    })
+  );
+  panels.value = await Promise.all(pMap);
+};
+const focusError = async (row, siteId) => {
+  const res = await service.post("/data/analysis/getVisitInfo", {
+    ...pick(row, ["content", "url"]),
+    beginTime: `${form.beginDate} 00:00:00`,
+    endTime: `${form.endDate} 23:59:59`,
+    pageIndex: 1,
+    pageSize: 1,
+    siteId,
+    type: ["eventError", "consoleError"],
+  });
+  const target = res.list[0];
+  // visible.code = true;
+  // TODO:取错误定位前200个字符，后100个字符。去掉无用的代码，然后格式化，定位改成用箭头指示。
+};
+
 const yesterdayInfo = {
   is: dayjs().day() === 1,
   content: `获取的是${dayjs().subtract(3, "d").format("YYYY-MM-DD")}~${dayjs()
     .subtract(1, "d")
     .format("YYYY-MM-DD")}的报告`,
 };
-const panels = ref([]);
-const generate = () => {
-  const pMap = form.apps.value.map((app) => {
-    return service.post("/", {});
-  });
-  Promise.all(pMap).then((resList) => {
-    panels.value = resList;
-  });
-};
-const focusError = (row) => {
-  visible.code = true;
-  // TODO:取错误定位前200个字符，后100个字符。去掉无用的代码，然后格式化，定位改成用箭头指示。
-};
 </script>
 <style scoped lang="scss">
-.app-list {
-  max-height: 700px;
-  overflow: auto;
+.date-picker-wrap {
+  position: relative !important;
+  :deep(.el-date-editor) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 0;
+    z-index: -1;
+    padding: 0;
+    .el-input__inner {
+      padding: 0;
+    }
+  }
+}
+.above {
+  z-index: 1 !important;
+  width: 100% !important;
+  cursor: pointer;
 }
 </style>

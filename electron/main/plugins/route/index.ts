@@ -3,6 +3,7 @@ import chalk from "chalk";
 import CommonController from "../../api/common";
 import OSSController from "../../api/oss";
 import VueController from "../../api/vue";
+import MonitorController from "../../api/monitor";
 import SettingController from "../../api/setting";
 import { IpcController } from "../ipc";
 import { getApiList } from "./decorators";
@@ -17,6 +18,7 @@ export default () => {
   new IpcController();
   new OSSController();
   new VueController();
+  new MonitorController();
 
   ipcMain.handle("api", async (event, requestStr: string) => {
     const request = JSON.parse(requestStr) as Request;

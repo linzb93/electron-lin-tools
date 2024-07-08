@@ -1,5 +1,5 @@
 import request from "./request";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 export const sleep = (time: number) =>
   new Promise((resolve) => {
     setTimeout(() => resolve(null), time);
@@ -22,7 +22,7 @@ export const download = async (url: string) => {
 export const handleMainPost = (receiveMethod: string, callback: Function) => {
   window.ipcRenderer.on(
     "main-post",
-    async (evt, { requestId, method, data, listener }) => {
+    async (_, { requestId, method, data, listener }) => {
       console.groupCollapsed(
         `收到来自主进程发起的请求：%c${receiveMethod}`,
         "color:orange"
@@ -45,4 +45,31 @@ export const handleMainPost = (receiveMethod: string, callback: Function) => {
       }
     }
   );
+};
+
+// 当所有请求都解决时，才隐藏loading。
+let counter = 0;
+let instance:any = null;
+export const loading = {
+  open(text?:string) {
+    counter++;
+    if (counter > 0) {
+      instance = ElLoading.service({ background: "transparent", text });
+    }
+  },
+  close() {
+    if (counter <= 0) {
+      return;
+    }
+    if (counter > 0) {
+      counter--;
+    }
+    if (counter === 0 && instance && typeof instance.close === "function") {
+      instance.close();
+      instance = null;
+    }
+  },
+  isComplete() {
+    return counter === 0;
+  },
 };
