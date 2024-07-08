@@ -62,4 +62,10 @@ const save = () => {
   });
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+h1 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #212121;
+}
+</style>
