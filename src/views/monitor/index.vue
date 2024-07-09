@@ -11,32 +11,35 @@
           <el-checkbox
             v-for="app in apps"
             :key="app.siteId"
-            :label="app.siteId"
-            >{{ app.title }}</el-checkbox
+            :value="app.siteId"
+            >{{ app.name }}</el-checkbox
           >
         </el-checkbox-group>
         <p v-else>无</p>
       </el-form-item>
       <el-form-item label="选择日期">
-        <el-radio-group v-model="form.dateValue" @change="changeDateRange">
-          <el-radio-button :label="0">今日</el-radio-button>
-          <el-radio-button :label="1"
+        <el-radio-group v-model="form.dateValue" @change="radioChange">
+          <el-radio-button :value="0">今日</el-radio-button>
+          <el-radio-button :value="1"
             >昨日<qa
               class="ml10"
               v-if="yesterdayInfo.is"
               :content="yesterdayInfo.content"
           /></el-radio-button>
-          <el-radio-button :label="2">近7日</el-radio-button>
-          <el-radio-button :label="3" class="date-picker-wrap">
+          <el-radio-button :value="2">近7日</el-radio-button>
+          <el-radio-button :value="3" class="date-picker-wrap">
             <span>自定义</span>
             <el-date-picker
               ref="customerDatePicker"
               v-model="form.range"
+              @change="changeDate"
+              type="daterange"
               placeholder="请选择日期"
-              :class="{ above: form.dateValue === 3 }"
+              class="above"
             ></el-date-picker>
           </el-radio-button>
         </el-radio-group>
+        <span class="ml10">{{ dateRange }}</span>
       </el-form-item>
       <el-button type="primary" @click="generate">生成</el-button>
     </el-form>
@@ -57,15 +60,15 @@
       </el-table>
     </div>
   </div>
-  <app-manage v-model:visible="visible.apps" @confirm="getSelectedApps()" />
+  <app-manage v-model:visible="visible.apps" @confirm="resetSelectedApps" />
 </template>
 
 <script setup>
+import { reactive, shallowReactive, ref, onMounted, computed } from "vue";
 import dayjs from "dayjs";
-import request from "@/plugins/request";
 import { pick } from "lodash-es";
 import { ElMessage } from "element-plus";
-import { reactive, shallowReactive, ref, onMounted } from "vue";
+import request from "@/plugins/request";
 import { service } from "./utils";
 import Qa from "@/components/Qa.vue";
 import AppManage from "./components/AppManage.vue";
@@ -77,27 +80,53 @@ const visible = shallowReactive({
 
 const getSelectedApps = async () => {
   const data = await request("monitor-get-apps");
-  form.apps = data;
+  apps.value = data.list;
 };
 onMounted(() => {
   getSelectedApps();
 });
 
+const resetSelectedApps = () => {
+  form.selected = [];
+  getSelectedApps();
+};
+
 const apps = ref([]);
 const form = reactive({
   selected: [],
   dateValue: 0,
-  beginDate: "",
-  endDate: "",
+  beginDate: dayjs().format("YYYY-MM-DD"),
+  endDate: dayjs().format("YYYY-MM-DD"),
   range: [],
 });
+
+const dateRange = computed(() => {
+  if (form.beginDate === form.endDate) {
+    return form.beginDate;
+  }
+  return `${form.beginDate}~${form.endDate}`;
+});
+
 const customerDatePicker = ref(null);
-const changeDateRange = (value) => {
+const radioChange = (value) => {
   if (value === 3) {
     customerDatePicker.value.focus();
   } else {
-    customerDatePicker.value.blur();
+    typeof customerDatePicker.value.blur === "function" &&
+      customerDatePicker.value.blur();
+    const map = [
+      [0, 0],
+      [1, 1],
+      [7, 0],
+    ];
+    form.beginDate = dayjs().subtract(map[value][0], "d").format("YYYY-MM-DD");
+    form.endDate = dayjs().subtract(map[value][1], "d").format("YYYY-MM-DD");
   }
+};
+const changeDate = (range) => {
+  form.beginDate = dayjs(range[0]).format("YYYY-MM-DD");
+  form.endDate = dayjs(range[1]).format("YYYY-MM-DD");
+  console.log(form.dateValue);
 };
 
 const panels = ref([]);
@@ -105,10 +134,6 @@ const generate = async () => {
   if (!form.selected.length) {
     ElMessage.error("请至少选择一个应用");
     return;
-  }
-  if (form.dateValue === 3) {
-    form.beginDate = dayjs(form.range[0]).format("YYYY-MM-DD");
-    form.endDate = dayjs(form.range[1]).format("YYYY-MM-DD");
   }
   const pMap = form.selected.map((app) =>
     service.post("/data/analysis/jsErrorCount", {
