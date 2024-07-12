@@ -18,6 +18,12 @@
           <el-radio :value="2">PC端</el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item label="预览模式">
+        <el-radio-group v-model="form.previewType">
+          <el-radio :value="1">无</el-radio>
+          <el-radio :value="2">缩略图</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button type="primary" @click="save">保存</el-button>
@@ -36,6 +42,7 @@ const emit = defineEmits(["update:visible", "submit"]);
 const form = ref({
   pixel: 2,
   platform: 1,
+  previewType: 1
 });
 
 const getSetting = async () => {

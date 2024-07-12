@@ -1,7 +1,7 @@
 <template>
-  <span ref="menuContainer">
+  <div class="full-height" ref="menuContainer">
     <slot />
-  </span>
+  </div>
   <ul
     class="context-menu"
     ref="contextMenu"
@@ -51,7 +51,6 @@ const showContextMenu = () => {
 const handleClick = (menu) => {
   typeof menu.onClick === "function" && menu.onClick();
   visible.value = false;
-  //   destroy();
 };
 const pos = useMouse();
 let pageX = shallowRef(0);
@@ -77,11 +76,6 @@ onUnmounted(() => {
   document.removeEventListener("contextmenu", onContextMenu);
   document.removeEventListener("click", onLeaveContext);
 });
-const destroy = () => {
-  if (contextMenu.value && contextMenu.value.parentNode) {
-    contextMenu.value.parentNode.removeChild(contextMenu.value);
-  }
-};
 </script>
 <style lang="scss" scoped>
 .context-menu {

@@ -41,7 +41,8 @@
         </div>
       </div>
     </div>
-    <context-menu
+    <div class="other-wrap">
+      <context-menu
       :menus="[
         {
           title: '创建文件夹',
@@ -55,6 +56,7 @@
         :data="tableList"
         v-loading="loading"
         @selection-change="handleSelectionChange"
+        v-if="setting.previewType === 1"
       >
         <el-table-column type="selection" width="55" />
         <el-table-column label="名称">
@@ -116,7 +118,18 @@
           </template>
         </el-table-column>
       </el-table>
+      <ul class="image-preview-list">
+        <li v-for="item in tableList" :key="item.id">
+          <div class="img-wrap">
+            <img class="preview-img" v-if="scope.row.type === 'image'" />
+          </div>
+          <h3>{{ item.name }}</h3>
+        </li>
+      </ul>
     </context-menu>
+    </div>
+    
+    
   </div>
 
   <progress-drawer
@@ -383,6 +396,7 @@ const dropFile = async (event) => {
 const setting = ref({
   pixel: 2,
   platform: 1,
+  previewType: 1
 });
 const getCss = (item) => {
   const img = new Image();
@@ -419,6 +433,13 @@ background-size: 100% 100%;`;
   &:hover {
     color: #409eff;
   }
+}
+.other-wrap {
+  position: absolute;
+  top: 42px;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
 }
 .wrap {
   min-height: 100%;

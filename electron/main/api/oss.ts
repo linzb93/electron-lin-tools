@@ -192,6 +192,7 @@ export default class extends Controller {
     (db.data as Database).oss.setting = {
       pixel: params.pixel,
       platform: params.platform,
+      previewType: params.previewType
     };
     await db.write();
     return {
