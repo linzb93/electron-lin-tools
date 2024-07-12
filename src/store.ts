@@ -18,7 +18,7 @@ export const useGlobalStore = defineStore("oss", {
       this.setting = await request('get-setting', {});
     },
     listenIpcConnected() {
-      handleMainPost("ipc-is-connect", (ret: boolean) => {
+      handleMainPost("ipc-is-connected", (ret: boolean) => {
         this.ipcIsConnect = ret;
       });
       request("ipc-connect", {});

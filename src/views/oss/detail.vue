@@ -41,71 +41,82 @@
         </div>
       </div>
     </div>
-    <el-table
-      :data="tableList"
-      v-loading="loading"
-      @selection-change="handleSelectionChange"
+    <context-menu
+      :menus="[
+        {
+          title: '创建文件夹',
+          onClick() {
+            createDir();
+          },
+        },
+      ]"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column label="名称">
-        <template #default="scope">
-          <div class="flexalign-center">
-            <el-icon
-              v-if="scope.row.type === 'dir'"
-              :size="16"
-              style="margin-right: 5px"
-            >
-              <folder />
-            </el-icon>
-            <file-type-icon :type="getExtName(scope.row.name)" v-else />
-            <span class="file-name" @click="jumpInner(scope.row)">{{
-              scope.row.name
-            }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="类型/大小">
-        <template #default="scope">
-          <template v-if="scope.row.type === 'dir'">目录</template>
-          <template v-else>{{ getSize(scope.row) }}</template>
-        </template>
-      </el-table-column>
-      <el-table-column label="最后修改时间">
-        <template #default="scope">
-          {{
-            scope.row.type === "dir"
-              ? ""
-              : dayjs(scope.row.lastModified).format("YYYY-MM-DD HH:mm:ss")
-          }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template #default="scope">
-          <template v-if="scope.row.type !== 'dir'">
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="copy(scope.row.url)"
-              >获取地址</el-link
-            >
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="download(scope.row.url)"
-              >下载</el-link
-            >
-            <el-link
-              type="primary"
-              :underline="false"
-              v-if="isPic(scope.row)"
-              @click="getCss(scope.row)"
-              >复制样式</el-link
-            >
+      <el-table
+        :data="tableList"
+        v-loading="loading"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" />
+        <el-table-column label="名称">
+          <template #default="scope">
+            <div class="flexalign-center">
+              <el-icon
+                v-if="scope.row.type === 'dir'"
+                :size="16"
+                style="margin-right: 5px"
+              >
+                <folder />
+              </el-icon>
+              <file-type-icon :type="getExtName(scope.row.name)" v-else />
+              <span class="file-name" @click="jumpInner(scope.row)">{{
+                scope.row.name
+              }}</span>
+            </div>
           </template>
-          <delete-confirm @confirm="del(scope.row)"></delete-confirm>
-        </template>
-      </el-table-column>
-    </el-table>
+        </el-table-column>
+        <el-table-column label="类型/大小">
+          <template #default="scope">
+            <template v-if="scope.row.type === 'dir'">目录</template>
+            <template v-else>{{ getSize(scope.row) }}</template>
+          </template>
+        </el-table-column>
+        <el-table-column label="最后修改时间">
+          <template #default="scope">
+            {{
+              scope.row.type === "dir"
+                ? ""
+                : dayjs(scope.row.lastModified).format("YYYY-MM-DD HH:mm:ss")
+            }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <template v-if="scope.row.type !== 'dir'">
+              <el-link
+                type="primary"
+                :underline="false"
+                @click="copy(scope.row.url)"
+                >获取地址</el-link
+              >
+              <el-link
+                type="primary"
+                :underline="false"
+                @click="download(scope.row.url)"
+                >下载</el-link
+              >
+              <el-link
+                type="primary"
+                :underline="false"
+                v-if="isPic(scope.row)"
+                @click="getCss(scope.row)"
+                >复制样式</el-link
+              >
+            </template>
+            <delete-confirm @confirm="del(scope.row)"></delete-confirm>
+          </template>
+        </el-table-column>
+      </el-table>
+    </context-menu>
   </div>
 
   <progress-drawer
@@ -147,6 +158,7 @@ import request from "@/plugins/request";
 import { copy, download } from "@/plugins/util";
 import FileTypeIcon from "@/components/FileTypeIcon.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+import ContextMenu from "@/components/ContextMenu.vue";
 import ProgressDrawer from "./components/Progress.vue";
 import MsgBoxFileList from "./components/FileList.vue";
 import SettingDialog from "./components/Setting.vue";
