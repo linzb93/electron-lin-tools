@@ -43,36 +43,44 @@
       </el-form-item>
       <el-button type="primary" @click="generate">生成</el-button>
     </el-form>
-    <div v-for="panel in panels" :key="panel.id" class="mt30">
+    <div>
+      <div v-for="panel in panels" :key="panel.id" class="panel-wrap mt30">
       <h2>{{ panel.title }}</h2>
       <el-table :data="panel.data" class="mt20">
-        <el-table-column label="错误信息" prop="content" />
+        <el-table-column label="错误信息">
+          <template #default="scope">
+            <p :style="{color: renderContentColor(scope.row)}">{{ scope.row.content }}</p>
+          </template>
+        </el-table-column>
         <el-table-column label="发生页面" prop="url" />
-        <el-table-column label="浏览量" prop="errorCount" />
-        <el-table-column label="影响客户数" prop="numberOfAffectedUsers" />
+        <el-table-column label="浏览量" prop="errorCount" width="100" />
+        <el-table-column label="影响客户数" prop="numberOfAffectedUsers" width="100" />
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" @click="focusError(scope.row, panel.siteId)"
-              >定位错误</el-button
+            <el-link type="primary" :underline="false" @click="focusError(scope.row, panel.siteId)"
+              >定位错误</el-link
             >
           </template>
         </el-table-column>
       </el-table>
     </div>
+    </div>
   </div>
   <app-manage v-model:visible="visible.apps" @confirm="resetSelectedApps" />
+  <code-beautify v-model:visible="visible.code" :path="targetPath" />
 </template>
 
 <script setup>
-import { reactive, shallowReactive, ref, onMounted, computed } from "vue";
+import { reactive, shallowRef, shallowReactive, ref, onMounted, computed } from "vue";
 import dayjs from "dayjs";
 import { pick } from "lodash-es";
+import pMap from "p-map";
 import { ElMessage } from "element-plus";
 import request from "@/plugins/request";
 import { service } from "./utils";
 import Qa from "@/components/Qa.vue";
 import AppManage from "./components/AppManage.vue";
-
+import CodeBeautify from './components/CodeBeautify.vue';
 const visible = shallowReactive({
   apps: false,
   code: false,
@@ -135,21 +143,48 @@ const generate = async () => {
     ElMessage.error("请至少选择一个应用");
     return;
   }
-  const pMap = form.selected.map((app) =>
-    service.post("/data/analysis/jsErrorCount", {
+  const promiseList = form.selected.map((siteId) => {
+    return {
+      siteId,
+      title: getAppName(siteId),
+      action: () => service.post("/data/analysis/jsErrorCount", {
       beginTime: `${form.beginDate} 00:00:00`,
       endTime: `${form.endDate} 23:59:59`,
       orderKey: "errorCount",
       orderByAsc: false,
       pageIndex: 1,
       pageSize: 100,
-      siteId: app.siteId,
+      siteId,
       type: ["eventError", "consoleError"],
       visitType: 0,
     })
-  );
-  panels.value = await Promise.all(pMap);
+    }
+  })
+  const data = await pMap(promiseList, async (item) => {
+    const result = await item.action();
+    return {
+      siteId: item.siteId,
+      title: item.title,
+      data:result.list
+    }
+  });
+  panels.value = data;
 };
+const getAppName = id => {
+  const match = apps.value.find(item => item.siteId === id);
+  return match ? match.name : '';
+}
+const renderContentColor = row => {
+  const {content} = row;
+  if (content.startsWith('Cannot read properties of undefined')) {
+    return '#F56C6C';
+  }
+  if (content.startsWith('Loading chunk')) {
+    return '#e1e1e1'
+  }
+  return '';
+}
+const targetPath = shallowRef('');
 const focusError = async (row, siteId) => {
   const res = await service.post("/data/analysis/getVisitInfo", {
     ...pick(row, ["content", "url"]),
@@ -161,7 +196,12 @@ const focusError = async (row, siteId) => {
     type: ["eventError", "consoleError"],
   });
   const target = res.list[0];
-  // visible.code = true;
+  const {errorMsg} = target;
+  const match = errorMsg.match(/(http.+)\)/);
+  if (match && match[1]) {
+    visible.code = true;
+    targetPath.value = match[1];
+  }
   // TODO:取错误定位前200个字符，后100个字符。去掉无用的代码，然后格式化，定位改成用箭头指示。
 };
 
@@ -192,5 +232,11 @@ const yesterdayInfo = {
   z-index: 1 !important;
   width: 100% !important;
   cursor: pointer;
+}
+.panel-wrap {
+  h2 {
+    font-size: 20px;
+    font-weight: bold;
+  }
 }
 </style>

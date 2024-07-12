@@ -4,6 +4,7 @@ import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { shell, clipboard, dialog, nativeImage } from "electron";
 import { createClient } from "webdav";
+import axios from "axios";
 import pMap from "p-map";
 import { getMainWindow } from "..";
 import Controller from "../plugins/route/Controller";
@@ -184,6 +185,30 @@ export default class extends Controller {
     }
     return {
       success: false
+    }
+  }
+  @Route('fetch-api-cross-origin')
+  async fetchApi(req: Request<{
+    url: string;
+    data: any;
+    method: string;
+  }>) {
+    const {params} = req;
+    try {
+      const response = await axios({
+        method: params.method || 'get',
+        url: params.url,
+        data: params.data || {}
+      });
+      return {
+        success:true,
+        result: response.data
+      };
+    } catch (error) {
+      return {
+        success:false,
+        message: error.message
+      }
     }
   }
 }

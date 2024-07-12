@@ -11,5 +11,8 @@ service.interceptors.request.use(config => {
   service.interceptors.response.use((response) => {
     loading.close();
     return response.data.result;
+  }, (e) => {
+    loading.close();
+    return Promise.reject(e);
   });
   
