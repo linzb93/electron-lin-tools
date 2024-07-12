@@ -19,12 +19,12 @@
         :key="menu.title"
         :class="{ active: isActive(menu) }"
       >
-        <router-link :to="menu.to" class="flexalign-center">
+        <div class="flexalign-center" @click="jump(menu)">
           <el-icon class="pre-icon">
             <component :is="menu.icon" />
           </el-icon>
           <span>{{ menu.title }}</span>
-        </router-link>
+        </div>
       </li>
     </ul>
   </div>
@@ -64,11 +64,12 @@ import {
 } from "@element-plus/icons-vue";
 import { Oss } from "./icons";
 import { VueIcon } from "./icons/index";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import request from "@/plugins/request";
 import { shallowReactive, ref, shallowRef } from "vue";
 
 const route = useRoute();
+const router = useRouter();
 
 const list = [
   {
@@ -95,6 +96,7 @@ const list = [
     title: "Vue项目管理",
     to: "/vue",
     icon: VueIcon,
+    unpublished:true,
   },
 ];
 const menuList = list.filter((item) => !item.hide);
@@ -126,6 +128,13 @@ const startSync = async () => {
   }
   syncing.value = false;
 };
+const jump = item => {
+  if (item.unpublished) {
+    ElMessage.warning('正在开发中，敬请期待');
+    return;
+  }
+  router.push(item.to);
+}
 const save = () => {
   accountRef.value.validate(async (isValid) => {
     if (!isValid) {

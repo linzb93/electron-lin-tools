@@ -5,8 +5,11 @@
         >管理应用</el-button
       >
     </div>
-    <el-form label-suffix="：" class="mt20">
+    <el-form label-width="110px" label-suffix="：" class="mt20">
       <el-form-item label="选择应用">
+        <template #label>
+          <el-checkbox :model-value="isSelectAll" @input="selectAll" label="选择应用："></el-checkbox>
+        </template>
         <el-checkbox-group v-model="form.selected" v-if="apps.length">
           <el-checkbox
             v-for="app in apps"
@@ -134,8 +137,18 @@ const radioChange = (value) => {
 const changeDate = (range) => {
   form.beginDate = dayjs(range[0]).format("YYYY-MM-DD");
   form.endDate = dayjs(range[1]).format("YYYY-MM-DD");
-  console.log(form.dateValue);
 };
+
+const isSelectAll = computed(() => {
+  return form.selected.length === apps.value.length;
+});
+const selectAll = () => {
+  if (form.selected.length < apps.value.length) {
+    form.selected = apps.value.map(item => item.siteId);
+  } else {
+    form.selected = [];
+  }
+ };
 
 const panels = ref([]);
 const generate = async () => {

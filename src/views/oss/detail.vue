@@ -396,6 +396,9 @@ background-size: 100% 100%;`;
 .el-link + .el-link {
   margin-left: 10px;
 }
+.path {
+  white-space: nowrap;
+}
 .path-name {
   margin-left: 4px;
 }
