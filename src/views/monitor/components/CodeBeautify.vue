@@ -1,67 +1,87 @@
 <template>
-<el-dialog :model-value="visible" width="400px" title="错误定位" @close="close" @closed="closed">
+  <el-dialog
+    :model-value="visible"
+    width="400px"
+    title="错误定位"
+    @close="close"
+    @closed="closed"
+  >
     <div class="code-wrap" v-if="loaded">
-        <span>{{ codePre }}</span>
-        <em class="cursor">|</em>
-        <span>{{ codeNext }}</span>
+      <span>{{ code.pre }}</span>
+      <em class="pre-emp-code">{{ code.preEmp }}</em>
+      <em class="emphasize-code">{{ code.emphasize }}</em>
+      <span>{{ code.next }}</span>
     </div>
-</el-dialog>
+  </el-dialog>
 </template>
 
 <script setup>
-import { shallowRef, watch } from 'vue';
-import request from '@/plugins/request';
+import { shallowRef, watch, reactive } from "vue";
+import request from "@/plugins/request";
 const props = defineProps({
-    visible: Boolean,
-    path: String,
+  visible: Boolean,
+  path: String,
 });
-const emit = defineEmits(['update:visible']);
-const close = () => emit('update:visible');
-const closed = () => {};
+const emit = defineEmits(["update:visible"]);
 
 const loaded = shallowRef(false);
-const codePre = shallowRef('');
-const codeNext = shallowRef('');
-watch(props, async ({visible}) => {
-    if (!visible) {
-        return;
-    }
-    let row = 0;
-    let column = 0;
-    const realPath = props.path.replace(/\:\d+\:\d+/, (match) => {
-        const seg = match.split(':');
-        row = Number(seg[1]);
-        column = Number(seg[2]);
-        return '';
-    });
-    const {result:code} = await request('fetch-api-cross-origin', {
-        url: realPath,
-    });
-    const splitedCode = code.split('\n');
-    codePre.value = splitedCode[row - 1].slice(column - 100, column - 1);
-    codeNext.value = splitedCode[row - 1].slice(column -1, column + 100);
-    loaded.value = true;
-})
+const code = reactive({
+  pre: "",
+  preEmp: "",
+  emphasize: "",
+  next: "",
+});
+watch(props, async ({ visible }) => {
+  if (!visible) {
+    return;
+  }
+  let row = 0;
+  let column = 0;
+  const realPath = props.path.replace(/\:\d+\:\d+/, (match) => {
+    const seg = match.split(":");
+    row = Number(seg[1]);
+    column = Number(seg[2]);
+    return "";
+  });
+  const { result } = await request("fetch-api-cross-origin", {
+    url: realPath,
+  });
+  const splitedCode = result.split("\n");
+  const preCode = splitedCode[row - 1].slice(column - 100, column - 1);
+  const match1 = preCode.match(/[a-zA-Z0-9]+\.$/);
+  if (match1) {
+    code.preEmp = match1[0];
+  }
+  code.pre = preCode.slice(0, -code.preEmp.length);
+  const nextCode = splitedCode[row - 1].slice(column - 1, column + 100);
+  const match2 = nextCode.match(/^[a-zA-Z0-9]+/);
+  if (match2) {
+    code.emphasize = match2[0];
+  }
+  code.next = nextCode.slice(match2[0].length);
+  loaded.value = true;
+});
+
+const close = () => emit("update:visible");
+const closed = () => {
+  code.pre = "";
+  code.emphasize = "";
+  code.preEmp = "";
+  code.next = "";
+};
 </script>
 <style lang="scss" scoped>
-@keyframes fadeIn{
-    29% {
-        opacity: 0;
-    }
-    30%,to {
-        opacity: 1;
-    }
-}
 .code-wrap {
-    background: #222;
-    padding: 10px;
-    border-radius: 2px;
-    color: #fff;
-    word-break: break-all;
-    .cursor {
-        opacity: 0;
-        animation: fadeIn 1.2s linear infinite;
-        color: #F56C6C;
-    }
+  background: #222;
+  padding: 10px;
+  border-radius: 2px;
+  color: #fff;
+  word-break: break-all;
+}
+.pre-emp-code {
+  color: #e6a23c;
+}
+.emphasize-code {
+  color: #f56c6c;
 }
 </style>

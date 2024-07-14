@@ -1,9 +1,5 @@
 import request from "./request";
 import { ElMessage, ElLoading } from "element-plus";
-export const sleep = (time: number) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(null), time);
-  });
 
 export const copy = (text: string) => {
   request("copy", text);
@@ -35,13 +31,13 @@ export const handleMainPost = (receiveMethod: string, callback: Function) => {
       const ret = await callback(data);
       if (listener) {
         window.ipcRenderer.send(
-            "main-post-receive",
-            JSON.stringify({
-              requestId,
-              method,
-              data: ret,
-            })
-          );
+          "main-post-receive",
+          JSON.stringify({
+            requestId,
+            method,
+            data: ret,
+          })
+        );
       }
     }
   );
@@ -49,9 +45,9 @@ export const handleMainPost = (receiveMethod: string, callback: Function) => {
 
 // 当所有请求都解决时，才隐藏loading。
 let counter = 0;
-let instance:any = null;
+let instance: any = null;
 export const loading = {
-  open(text?:string) {
+  open(text?: string) {
     counter++;
     if (counter > 0) {
       instance = ElLoading.service({ background: "transparent", text });

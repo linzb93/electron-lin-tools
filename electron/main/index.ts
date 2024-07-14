@@ -101,12 +101,13 @@ app.whenReady().then(async () => {
           label: "about",
           click: async () => {
             const pkg = {
-              version: "v1.3.1",
+              version: "v1.5.0",
             };
             dialog.showMessageBox({
               title: "关于我们",
-              message: `${pkg.version
-                }\n @copyright ${new Date().getFullYear()} linzb93`,
+              message: `${
+                pkg.version
+              }\n @copyright ${new Date().getFullYear()} linzb93`,
             });
           },
         },

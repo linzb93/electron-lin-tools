@@ -8,7 +8,11 @@
     <el-form label-width="110px" label-suffix="：" class="mt20">
       <el-form-item label="选择应用">
         <template #label>
-          <el-checkbox :model-value="isSelectAll" @input="selectAll" label="选择应用："></el-checkbox>
+          <el-checkbox
+            :model-value="isSelectAll"
+            @input="selectAll"
+            label="选择应用："
+          ></el-checkbox>
         </template>
         <el-checkbox-group v-model="form.selected" v-if="apps.length">
           <el-checkbox
@@ -32,6 +36,7 @@
           <el-radio-button :value="2">近7日</el-radio-button>
           <el-radio-button :value="3" class="date-picker-wrap">
             <span>自定义</span>
+            <em class="contact-layer"></em>
             <el-date-picker
               ref="customerDatePicker"
               v-model="form.range"
@@ -48,25 +53,34 @@
     </el-form>
     <div>
       <div v-for="panel in panels" :key="panel.id" class="panel-wrap mt30">
-      <h2>{{ panel.title }}</h2>
-      <el-table :data="panel.data" class="mt20">
-        <el-table-column label="错误信息">
-          <template #default="scope">
-            <p :style="{color: renderContentColor(scope.row)}">{{ scope.row.content }}</p>
-          </template>
-        </el-table-column>
-        <el-table-column label="发生页面" prop="url" />
-        <el-table-column label="浏览量" prop="errorCount" width="100" />
-        <el-table-column label="影响客户数" prop="numberOfAffectedUsers" width="100" />
-        <el-table-column label="操作">
-          <template #default="scope">
-            <el-link type="primary" :underline="false" @click="focusError(scope.row, panel.siteId)"
-              >定位错误</el-link
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
+        <h2>{{ panel.title }}</h2>
+        <el-table :data="panel.data" class="mt20">
+          <el-table-column label="错误信息">
+            <template #default="scope">
+              <p :style="{ color: renderContentColor(scope.row) }">
+                {{ scope.row.content }}
+              </p>
+            </template>
+          </el-table-column>
+          <el-table-column label="发生页面" prop="url" />
+          <el-table-column label="浏览量" prop="errorCount" width="100" />
+          <el-table-column
+            label="影响客户数"
+            prop="numberOfAffectedUsers"
+            width="100"
+          />
+          <el-table-column label="操作">
+            <template #default="scope">
+              <el-link
+                type="primary"
+                :underline="false"
+                @click="focusError(scope.row, panel.siteId)"
+                >定位错误</el-link
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
   </div>
   <app-manage v-model:visible="visible.apps" @confirm="resetSelectedApps" />
@@ -74,7 +88,14 @@
 </template>
 
 <script setup>
-import { reactive, shallowRef, shallowReactive, ref, onMounted, computed } from "vue";
+import {
+  reactive,
+  shallowRef,
+  shallowReactive,
+  ref,
+  onMounted,
+  computed,
+} from "vue";
 import dayjs from "dayjs";
 import { pick } from "lodash-es";
 import pMap from "p-map";
@@ -83,7 +104,7 @@ import request from "@/plugins/request";
 import { service } from "./utils";
 import Qa from "@/components/Qa.vue";
 import AppManage from "./components/AppManage.vue";
-import CodeBeautify from './components/CodeBeautify.vue';
+import CodeBeautify from "./components/CodeBeautify.vue";
 const visible = shallowReactive({
   apps: false,
   code: false,
@@ -144,11 +165,11 @@ const isSelectAll = computed(() => {
 });
 const selectAll = () => {
   if (form.selected.length < apps.value.length) {
-    form.selected = apps.value.map(item => item.siteId);
+    form.selected = apps.value.map((item) => item.siteId);
   } else {
     form.selected = [];
   }
- };
+};
 
 const panels = ref([]);
 const generate = async () => {
@@ -160,44 +181,45 @@ const generate = async () => {
     return {
       siteId,
       title: getAppName(siteId),
-      action: () => service.post("/data/analysis/jsErrorCount", {
-      beginTime: `${form.beginDate} 00:00:00`,
-      endTime: `${form.endDate} 23:59:59`,
-      orderKey: "errorCount",
-      orderByAsc: false,
-      pageIndex: 1,
-      pageSize: 100,
-      siteId,
-      type: ["eventError", "consoleError"],
-      visitType: 0,
-    })
-    }
-  })
+      action: () =>
+        service.post("/data/analysis/jsErrorCount", {
+          beginTime: `${form.beginDate} 00:00:00`,
+          endTime: `${form.endDate} 23:59:59`,
+          orderKey: "errorCount",
+          orderByAsc: false,
+          pageIndex: 1,
+          pageSize: 100,
+          siteId,
+          type: ["eventError", "consoleError"],
+          visitType: 0,
+        }),
+    };
+  });
   const data = await pMap(promiseList, async (item) => {
     const result = await item.action();
     return {
       siteId: item.siteId,
       title: item.title,
-      data:result.list
-    }
+      data: result.list,
+    };
   });
   panels.value = data;
 };
-const getAppName = id => {
-  const match = apps.value.find(item => item.siteId === id);
-  return match ? match.name : '';
-}
-const renderContentColor = row => {
-  const {content} = row;
-  if (content.startsWith('Cannot read properties of undefined')) {
-    return '#F56C6C';
+const getAppName = (id) => {
+  const match = apps.value.find((item) => item.siteId === id);
+  return match ? match.name : "";
+};
+const renderContentColor = (row) => {
+  const { content } = row;
+  if (content.startsWith("Cannot read properties of undefined")) {
+    return "#F56C6C";
   }
-  if (content.startsWith('Loading chunk')) {
-    return '#e1e1e1'
+  if (content.startsWith("Loading chunk")) {
+    return "#e1e1e1";
   }
-  return '';
-}
-const targetPath = shallowRef('');
+  return "";
+};
+const targetPath = shallowRef("");
 const focusError = async (row, siteId) => {
   const res = await service.post("/data/analysis/getVisitInfo", {
     ...pick(row, ["content", "url"]),
@@ -209,8 +231,8 @@ const focusError = async (row, siteId) => {
     type: ["eventError", "consoleError"],
   });
   const target = res.list[0];
-  const {errorMsg} = target;
-  const match = errorMsg.match(/(http.+)\)/);
+  const { errorMsg } = target;
+  const match = errorMsg.match(/(http.+\.js\:\d+\:\d+)/);
   if (match && match[1]) {
     visible.code = true;
     targetPath.value = match[1];
@@ -241,7 +263,7 @@ const yesterdayInfo = {
     }
   }
 }
-.above {
+:deep(.above) {
   z-index: 1 !important;
   width: 100% !important;
   cursor: pointer;

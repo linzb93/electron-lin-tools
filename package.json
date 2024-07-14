@@ -1,6 +1,6 @@
 {
   "name": "electron-lin-tools",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "main": "dist-electron/main/index.js",
   "description": "自用Electron开发的效率工具",
   "author": "linzb93",
@@ -17,7 +17,8 @@
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "build:web": "vue-tsc --noEmit && vite build",
     "build:app": "electron-builder",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build-icon": "electron-icns ./public/logo.png"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -29,6 +30,7 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
+    "electron-icns": "^3.6.3",
     "element-plus": "^2.6.3",
     "husky": "^9.0.11",
     "lodash-es": "^4.17.21",
@@ -43,6 +45,7 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "@linzb93/utils": "^0.0.14",
     "ali-oss": "^6.20.0",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",

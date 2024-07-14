@@ -1,5 +1,5 @@
 import { join, basename } from "node:path";
-import http from 'node:http';
+import http from "node:http";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { shell, clipboard, dialog, nativeImage } from "electron";
@@ -47,10 +47,15 @@ export default class extends Controller {
         req.params,
         (url: string) =>
           new Promise((resolve) => {
-            http.get(url, resp => {
+            http.get(url, (resp) => {
               if (resp.statusCode === 200) {
-                resp.pipe(fs.createWriteStream(join(result.filePaths[0], basename(url))))
-                .on("finish", resolve);
+                resp
+                  .pipe(
+                    fs.createWriteStream(
+                      join(result.filePaths[0], basename(url))
+                    )
+                  )
+                  .on("finish", resolve);
               }
             });
           }),
@@ -71,10 +76,9 @@ export default class extends Controller {
     await new Promise((resolve) => {
       http.get(url, (resp) => {
         if (resp.statusCode === 200) {
-          resp.pipe(
-            fs.createWriteStream(result.filePath)
-          )
-          .on('finish', resolve);
+          resp
+            .pipe(fs.createWriteStream(result.filePath))
+            .on("finish", resolve);
         }
       });
     });
@@ -121,7 +125,7 @@ export default class extends Controller {
     });
     if (result.canceled) {
       return {
-        path: "",
+        paths: "",
       };
     }
     const paths = await pMap(result.filePaths, async (file) => {
@@ -172,43 +176,45 @@ export default class extends Controller {
       success: true,
     };
   }
-  @Route('copy-image')
+  @Route("copy-image")
   copyImage(req: Request) {
     const { url, type } = req.params;
-    if (type === 'base64') {
+    if (type === "base64") {
       const buf = Buffer.from(url);
       const img = nativeImage.createFromBuffer(buf);
       clipboard.writeImage(img);
       return {
-        success: true
-      }
+        success: true,
+      };
     }
     return {
-      success: false
-    }
+      success: false,
+    };
   }
-  @Route('fetch-api-cross-origin')
-  async fetchApi(req: Request<{
-    url: string;
-    data: any;
-    method: string;
-  }>) {
-    const {params} = req;
+  @Route("fetch-api-cross-origin")
+  async fetchApi(
+    req: Request<{
+      url: string;
+      data: any;
+      method: string;
+    }>
+  ) {
+    const { params } = req;
     try {
       const response = await axios({
-        method: params.method || 'get',
+        method: params.method || "get",
         url: params.url,
-        data: params.data || {}
+        data: params.data || {},
       });
       return {
-        success:true,
-        result: response.data
+        success: true,
+        result: response.data,
       };
     } catch (error) {
       return {
-        success:false,
-        message: error.message
-      }
+        success: false,
+        message: error.message,
+      };
     }
   }
 }

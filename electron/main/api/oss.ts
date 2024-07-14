@@ -101,6 +101,10 @@ export default class extends Controller {
       delimiter: "/",
       "max-keys": 100,
     });
+    /**
+     * objects会返回目录下所有的文件和目录，根据size字段判断是不是目录
+     * prefixes只会返回目录
+     */
     const objects = result.objects
       .filter((obj) => obj.size > 0)
       .map((obj) => ({
@@ -111,11 +115,11 @@ export default class extends Controller {
     return {
       list: result.prefixes
         ? result.prefixes
-          .map((subDir) => ({
-            name: subDir.replace(/\/$/, "").split("/").slice(-1)[0],
-            type: "dir",
-          }))
-          .concat(objects)
+            .map((subDir) => ({
+              name: subDir.replace(/\/$/, "").split("/").slice(-1)[0],
+              type: "dir",
+            }))
+            .concat(objects)
         : objects,
     };
   }
@@ -192,7 +196,7 @@ export default class extends Controller {
     (db.data as Database).oss.setting = {
       pixel: params.pixel,
       platform: params.platform,
-      previewType: params.previewType
+      previewType: params.previewType,
     };
     await db.write();
     return {
