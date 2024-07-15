@@ -117,22 +117,4 @@ const remove = async (item) => {
 .el-link + .el-link {
   margin-left: 10px;
 }
-ul {
-  margin-top: 30px;
-}
-li {
-  margin-left: 30px;
-  padding: 0 10px;
-  width: 120px;
-  height: 30px;
-  border-radius: 4px;
-  line-height: 30px;
-  border: 1px solid #999;
-  font-size: 18px;
-  color: #333;
-  cursor: pointer;
-  &:first-child {
-    margin-left: 0;
-  }
-}
 </style>
