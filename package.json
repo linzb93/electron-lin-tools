@@ -1,6 +1,6 @@
 {
   "name": "electron-lin-tools",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "main": "dist-electron/main/index.js",
   "description": "自用Electron开发的效率工具",
   "author": "linzb93",

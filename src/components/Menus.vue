@@ -61,6 +61,7 @@ import {
   HomeFilled,
   Setting,
   View,
+  Clock,
 } from "@element-plus/icons-vue";
 import { Oss } from "./icons";
 import { VueIcon } from "./icons/index";
@@ -93,10 +94,16 @@ const list = [
     icon: View,
   },
   {
+    title: "定时任务管理",
+    to: "/schedule",
+    icon: Clock,
+    unpublished: true,
+  },
+  {
     title: "Vue项目管理",
     to: "/vue",
     icon: VueIcon,
-    unpublished:true,
+    unpublished: true,
   },
 ];
 const menuList = list.filter((item) => !item.hide);
@@ -128,13 +135,13 @@ const startSync = async () => {
   }
   syncing.value = false;
 };
-const jump = item => {
+const jump = (item) => {
   if (item.unpublished) {
-    ElMessage.warning('正在开发中，敬请期待');
+    ElMessage.warning("正在开发中，敬请期待");
     return;
   }
   router.push(item.to);
-}
+};
 const save = () => {
   accountRef.value.validate(async (isValid) => {
     if (!isValid) {

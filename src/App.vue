@@ -9,10 +9,13 @@
 <script setup>
 import Menus from "./components/Menus.vue";
 import { useGlobalStore } from "@/store";
+import { startScheduler } from "@/views/schedule/utils";
 
 const globalStore = useGlobalStore();
 globalStore.getSetting();
 globalStore.listenIpcConnected();
+
+startScheduler();
 </script>
 <style scoped>
 .cont {
