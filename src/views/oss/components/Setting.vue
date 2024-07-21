@@ -42,7 +42,7 @@ const emit = defineEmits(["update:visible", "submit"]);
 const form = ref({
   pixel: 2,
   platform: 1,
-  previewType: 1
+  previewType: 1,
 });
 
 const getSetting = async () => {

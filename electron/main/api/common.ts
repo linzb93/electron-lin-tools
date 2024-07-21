@@ -7,34 +7,24 @@ import { createClient } from "webdav";
 import axios from "axios";
 import pMap from "p-map";
 import { getMainWindow } from "..";
-import Controller from "../plugins/route/Controller";
-import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS, root } from "../plugins/constant";
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
+import { Application } from "../ipc-router";
 
-export default class extends Controller {
-  private syncClient = null;
-  constructor() {
-    super();
-    this.init();
-  }
-  private async init() {
-    await db.read();
-    const account = (db.data as Database).sync;
-    this.syncClient = createClient("", account);
-  }
-  @Route("copy")
-  doCopy(req: Request<string>) {
+export default async (app: Application) => {
+  await db.read();
+  const account = (db.data as Database).sync;
+  const syncClient = createClient("", account);
+  app.handle("copy", (req: Request<string>) => {
     const text = req.params;
     clipboard.writeText(text);
     return {
       code: HTTP_STATUS.SUCCESS,
       message: "复制成功",
     };
-  }
-  @Route("download")
-  async download(req: Request<string | string[]>) {
+  });
+  app.handle("download", async (req: Request<string | string[]>) => {
     if (Array.isArray(req.params)) {
       // 下载多份文件
       const result = await dialog.showOpenDialog({
@@ -86,24 +76,24 @@ export default class extends Controller {
       code: HTTP_STATUS.SUCCESS,
       message: "下载成功",
     };
-  }
-
-  @Route("change-window-size")
-  async changeWindowSize(
-    req: Request<{
-      width: number;
-      height: number;
-    }>
-  ) {
-    const { width, height } = req.params;
-    const win = await getMainWindow();
-    win.setSize(width, height);
-    return {
-      message: "ok",
-    };
-  }
-  @Route("get-selected-path")
-  async selectPath() {
+  });
+  app.handle(
+    "change-window-size",
+    async (
+      req: Request<{
+        width: number;
+        height: number;
+      }>
+    ) => {
+      const { width, height } = req.params;
+      const win = await getMainWindow();
+      win.setSize(width, height);
+      return {
+        message: "ok",
+      };
+    }
+  );
+  app.handle("get-selected-path", async () => {
     const result = await dialog.showOpenDialog({
       properties: ["openDirectory"],
     });
@@ -115,9 +105,11 @@ export default class extends Controller {
     return {
       path: result.filePaths[0],
     };
-  }
-  @Route("get-selected-file")
-  async selectFile(multiSelections?: boolean) {
+  });
+  app.handle("get-selected-file", async (req: Request) => {
+    const {
+      params: { multiSelections },
+    } = req;
     const result = await dialog.showOpenDialog({
       properties: multiSelections
         ? ["openFile", "multiSelections"]
@@ -139,45 +131,40 @@ export default class extends Controller {
     return {
       paths,
     };
-  }
+  });
   // 同步
-  @Route("sync")
-  async sync() {
+  app.handle("sync", () => {
     fs.createReadStream(join(root, "sync.json")).pipe(
-      this.syncClient.createWriteStream("electron-lin-tools/sync.json")
+      syncClient.createWriteStream("electron-lin-tools/sync.json")
     );
     return {
       success: true,
     };
-  }
+  });
   // 登录
-  async login(
-    req: Request<{
-      user: string;
-      password: string;
-    }>
-  ) {
-    const { params } = req;
-    await db.read();
-    (db.data as Database).sync = {
-      user: params.user,
-      password: params.password,
-    };
-    await db.write();
-    return {
-      success: true,
-    };
-  }
-  @Route("open-in-browser")
-  openInBrowser(req: Request) {
+  // async login(
+  //   req: Request<{
+  //     user: string;
+  //     password: string;
+  //   }>
+  // ) {
+  //   const { params } = req;
+  //   await db.read();
+  //   (db.data as Database).sync = {
+  //     user: params.user,
+  //     password: params.password,
+  //   };
+  //   await db.write();
+  //   return {
+  //     success: true,
+  //   };
+  // }
+  app.handle("open-in-browser", (req: Request) => {
     const { url } = req.params;
     shell.openExternal(url);
-    return {
-      success: true,
-    };
-  }
-  @Route("copy-image")
-  copyImage(req: Request) {
+    return null;
+  });
+  app.handle("copy-image", (req: Request) => {
     const { url, type } = req.params;
     if (type === "base64") {
       const buf = Buffer.from(url);
@@ -190,31 +177,33 @@ export default class extends Controller {
     return {
       success: false,
     };
-  }
-  @Route("fetch-api-cross-origin")
-  async fetchApi(
-    req: Request<{
-      url: string;
-      data: any;
-      method: string;
-    }>
-  ) {
-    const { params } = req;
-    try {
-      const response = await axios({
-        method: params.method || "get",
-        url: params.url,
-        data: params.data || {},
-      });
-      return {
-        success: true,
-        result: response.data,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+  });
+  app.handle(
+    "fetch-api-cross-origin",
+    async (
+      req: Request<{
+        url: string;
+        data: any;
+        method: string;
+      }>
+    ) => {
+      const { params } = req;
+      try {
+        const response = await axios({
+          method: params.method || "get",
+          url: params.url,
+          data: params.data || {},
+        });
+        return {
+          success: true,
+          result: response.data,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
     }
-  }
-}
+  );
+};

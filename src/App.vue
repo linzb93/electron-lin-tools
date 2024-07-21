@@ -12,8 +12,8 @@ import { useGlobalStore } from "@/store";
 import { startScheduler } from "@/views/schedule/utils";
 
 const globalStore = useGlobalStore();
-globalStore.getSetting();
-globalStore.listenIpcConnected();
+// globalStore.getSetting();
+// globalStore.listenIpcConnected();
 
 startScheduler();
 </script>

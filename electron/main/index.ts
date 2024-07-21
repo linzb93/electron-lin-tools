@@ -11,7 +11,7 @@ import {
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
-import registerRoute from "./plugins/route";
+import registerRoute from "./plugins/router";
 import { root, publicPath } from "./plugins/constant";
 import unhandled from "electron-unhandled";
 unhandled();

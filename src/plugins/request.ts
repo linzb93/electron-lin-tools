@@ -5,10 +5,10 @@ interface Option {
 }
 export default async (path: string, params: any, options?: Option) => {
   const res = await window.ipcRenderer.invoke(
-    "api",
+    "ipc-router-api",
     JSON.stringify({
       path,
-      params,
+      data: params,
     })
   );
   if (options?.delay) {

@@ -202,11 +202,11 @@ const getList = async () => {
   scrollTo(0, 800);
 };
 onMounted(async () => {
-  const { result } = await request("oss-get-shortcut", {
+  const { shortcut } = await request("oss-get-shortcut", {
     id: Number(route.query.id),
   });
-  if (result) {
-    breadcrumb.value.push(result);
+  if (shortcut) {
+    breadcrumb.value.push(shortcut);
   }
   getList();
 });
