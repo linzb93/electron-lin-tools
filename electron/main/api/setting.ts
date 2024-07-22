@@ -1,37 +1,35 @@
 import { Route } from "../ipc-router";
-import db from "../plugins/database";
-import { Request, Database } from "../types/api";
+import sql from "../plugins/sql";
+import { Request } from "../types/api";
 // import { HTTP_STATUS } from "../plugins/constant";
 
 const route = Route();
 
 route.handle("get", async () => {
-  await db.read();
-  const data = db.data as Database;
-  return {
-    ipc: data.ipc,
-    oaApiPrefix: data.oa ? data.oa.apiPrefix : "",
-    user: data.sync ? data.sync.user : "",
-    password: data.sync ? data.sync.password : "",
-  };
+  const result = await sql(db => ({
+    ipc: db.ipc,
+    oaApiPrefix: db.oa ? db.oa.apiPrefix : "",
+    user: db.sync ? db.sync.user : "",
+    password: db.sync ? db.sync.password : "",
+  }))
+  return result;
 });
 route.handle("save", async (req: Request) => {
   const { params } = req;
-  await db.read();
-  const data = db.data as Database;
-  data.ipc = params.ipc;
-  if (data.oa) {
-    data.oa.apiPrefix = params.oaApiPrefix;
-  } else {
-    data.oa = {
-      apiPrefix: params.oaApiPrefix,
+  await sql(db => {
+    db.ipc = params.ipc;
+    if (db.oa) {
+      db.oa.apiPrefix = params.oaApiPrefix;
+    } else {
+      db.oa = {
+        apiPrefix: params.oaApiPrefix,
+      };
+    }
+    db.sync = {
+      user: params.user,
+      password: params.password,
     };
-  }
-  data.sync = {
-    user: params.user,
-    password: params.password,
-  };
-  await db.write();
+  })
   return null;
 });
 

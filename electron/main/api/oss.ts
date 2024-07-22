@@ -6,11 +6,14 @@ import { omit } from "lodash-es";
 import db from "../plugins/database";
 import { HTTP_STATUS } from "../plugins/constant";
 import { Request, Database } from "../types/api";
+import sql from "../plugins/sql";
+
 const route = Route();
 
+// 根据id查找对应的OSS客户端
 async function findClient(id: number) {
-  await db.read();
-  const match = (db.data as Database).oss.accounts.find(
+  const accounts = await sql(db => db.oss.accounts);
+  const match = accounts.find(
     (item) => item.id === id
   );
   if (!match) {
@@ -27,6 +30,7 @@ async function findClient(id: number) {
   };
 }
 
+// 获取已添加的客户端列表
 route.handle("get-project-list", async () => {
   await db.read();
   return {
@@ -34,7 +38,7 @@ route.handle("get-project-list", async () => {
   };
 });
 
-// 添加用户，目前仅支持阿里OSS
+// 添加客户端，目前仅支持阿里OSS
 route.handle("create", async (req: Request<OssConfig>) => {
   await db.read();
   const data = db.data as Database;
@@ -61,7 +65,7 @@ route.handle("create", async (req: Request<OssConfig>) => {
   };
 });
 
-// 移除用户
+// 移除客户端
 route.handle("remove-account", async (req: Request) => {
   const { id } = req.params;
   await db.read();
@@ -71,14 +75,6 @@ route.handle("remove-account", async (req: Request) => {
   await db.write();
   return {
     code: 200,
-  };
-});
-
-// 获取用户列表
-route.handle("get-project-list", async () => {
-  await db.read();
-  return {
-    list: (db.data as Database).oss.accounts,
   };
 });
 
@@ -118,6 +114,7 @@ route.handle("get-oss-list", async (req: Request) => {
       : objects,
   };
 });
+
 // 删除文件
 route.handle("delete-file", async (req: Request) => {
   const { id, path, paths } = req.params;
@@ -135,6 +132,7 @@ route.handle("delete-file", async (req: Request) => {
   }
   return null;
 });
+
 // 创建目录
 route.handle("create-directory", async (req: Request) => {
   const { id, path: uploadPath, name } = req.params;
@@ -163,7 +161,7 @@ route.handle("upload", async (req: Request) => {
   return null;
 });
 
-// CSS代码设置
+// 读取CSS代码设置
 route.handle("get-setting", async () => {
   await db.read();
   const { setting } = (db.data as Database).oss;
@@ -171,6 +169,7 @@ route.handle("get-setting", async () => {
     setting,
   };
 });
+// 修改CSS代码设置
 route.handle("save-setting", async (req: Request) => {
   const { params } = req;
   await db.read();
@@ -182,6 +181,7 @@ route.handle("save-setting", async (req: Request) => {
   await db.write();
   return null;
 });
+// 获取项目前缀，快捷使用
 route.handle("get-shortcut", async (req: Request) => {
   const { params } = req;
   await db.read();
