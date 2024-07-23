@@ -22,7 +22,7 @@ try {
 }
 const db = new Low(new JSONFile(dbPath), {});
 
-export default async function sql(callback: (data: Database) => any) {
+export default async function sql<T>(callback: (data: Database) => T): Promise<T> {
     await db.read();
     const data = db.data as unknown as Database;
     let result: any;
