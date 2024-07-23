@@ -1,8 +1,10 @@
 import axios from "axios";
 import { loading } from "@/plugins/util";
+import {useGlobalStore} from '@/store';
+const store = useGlobalStore();
 
 export const service = axios.create({
-    baseURL: "https://api.diankeduo.cn/zhili/dataanaly",
+    baseURL: `${(store.setting as any).oaApiPrefix}/dataanaly`,
   });
 service.interceptors.request.use(config => {
     loading.open();
