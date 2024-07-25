@@ -3,6 +3,7 @@ import http from "node:http";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { shell, clipboard, dialog, nativeImage } from "electron";
+import { Application } from "@linzb93/event-router";
 import { createClient } from "webdav";
 import axios from "axios";
 import pMap from "p-map";
@@ -10,13 +11,12 @@ import { getMainWindow } from "..";
 import { HTTP_STATUS, root } from "../plugins/constant";
 import db from "../plugins/database";
 import { Request, Database } from "../types/api";
-import { Application } from "../ipc-router";
 
 export default async (app: Application) => {
   await db.read();
   const account = (db.data as Database).sync;
   const syncClient = createClient("", account);
-  app.handle("copy", (req: Request<string>) => {
+  app.handle("copy", async (req: Request<string>) => {
     const text = req.params;
     clipboard.writeText(text);
     return {
@@ -133,7 +133,7 @@ export default async (app: Application) => {
     };
   });
   // 同步
-  app.handle("sync", () => {
+  app.handle("sync", async () => {
     fs.createReadStream(join(root, "sync.json")).pipe(
       syncClient.createWriteStream("electron-lin-tools/sync.json")
     );
@@ -164,7 +164,7 @@ export default async (app: Application) => {
     shell.openExternal(url);
     return null;
   });
-  app.handle("copy-image", (req: Request) => {
+  app.handle("copy-image", async (req: Request) => {
     const { url, type } = req.params;
     if (type === "base64") {
       const buf = Buffer.from(url);

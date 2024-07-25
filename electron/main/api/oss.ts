@@ -1,4 +1,4 @@
-import { Route } from "../ipc-router";
+import { Route } from "@linzb93/event-router";
 import path from "node:path";
 import pMap from "p-map";
 import OSS, { OssConfig } from "ali-oss";
@@ -12,10 +12,8 @@ const route = Route();
 
 // 根据id查找对应的OSS客户端
 async function findClient(id: number) {
-  const accounts = await sql(db => db.oss.accounts);
-  const match = accounts.find(
-    (item) => item.id === id
-  );
+  const accounts = await sql((db) => db.oss.accounts);
+  const match = accounts.find((item) => item.id === id);
   if (!match) {
     return {
       code: HTTP_STATUS.BAD_REQUEST,
