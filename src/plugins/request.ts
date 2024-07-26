@@ -1,16 +1,18 @@
 import { unref, isReactive } from "vue";
 import { sleep } from "@linzb93/utils";
+import { createClient } from "@linzb93/event-router";
 interface Option {
   delay: number;
 }
+
+const request = createClient({
+  invoke(name, data) {
+    return window.ipcRenderer.invoke(name, JSON.stringify(data));
+  },
+});
+
 export default async (path: string, params: any, options?: Option) => {
-  const res = await window.ipcRenderer.invoke(
-    "ipc-router-api",
-    JSON.stringify({
-      path,
-      data: params,
-    })
-  );
+  const res = await request(path, params);
   if (options?.delay) {
     await sleep(options.delay);
   }

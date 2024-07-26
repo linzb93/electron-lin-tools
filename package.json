@@ -45,6 +45,7 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "@linzb93/event-router": "file:../event-router/packages/core",
     "@linzb93/utils": "^0.0.14",
     "ali-oss": "^6.20.0",
     "axios": "^1.7.2",
