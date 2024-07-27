@@ -5,7 +5,7 @@
     @dragover.prevent="active = true"
     @drop="dropFile"
   >
-    <div class="layer" @keyup="active = false">
+    <div class="layer flex-center" @keyup="active = false">
       <p class="tips">请将需要上传的文件拖拽至此</p>
     </div>
     <div class="flexalign-center">
@@ -435,20 +435,20 @@ const getCss = (item) => {
   position: relative;
   &.active {
     .layer {
-      display: block;
+      display: flex;
       position: absolute;
       left: 0;
       top: 0;
       bottom: 0;
       right: 0;
-      z-index: 2;
-      background: rgb(64, 158, 255, 0.4);
+      z-index: 4;
+      background: rgba(255, 255, 100, 0.7);
     }
     .tips {
       display: block;
       text-align: center;
-      padding-top: 30px;
-      font-size: 16px;
+      font-size: 20px;
+      font-weight: bold;
     }
   }
   .layer {

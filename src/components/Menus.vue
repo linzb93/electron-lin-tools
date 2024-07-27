@@ -97,7 +97,6 @@ const list = [
     title: "定时任务管理",
     to: "/schedule",
     icon: Clock,
-    unpublished: true,
   },
   {
     title: "Vue项目管理",
