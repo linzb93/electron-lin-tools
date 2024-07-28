@@ -48,4 +48,17 @@ export interface Database {
     siteId: string;
     name: string;
   }[];
+  schedule: {
+    git: {
+      dirs: string[];
+      period: 1 | 2,
+    },
+    monitor: {
+      file: string;
+      timeAfterPublish: number;
+      timeNextDay: number;
+      weekDay: number;
+      timeEveryWeek: string;
+    }
+  }
 }

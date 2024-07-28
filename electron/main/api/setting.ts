@@ -1,7 +1,6 @@
 import { Route } from "@linzb93/event-router";
 import sql from "../plugins/sql";
 import { Request } from "../types/api";
-// import { HTTP_STATUS } from "../plugins/constant";
 
 const route = Route();
 
@@ -14,7 +13,12 @@ route.handle("get", async () => {
   }));
   return result;
 });
-route.handle("save", async (req: Request) => {
+route.handle("save", async (req: Request<{
+  oaApiPrefix: string;
+  ipc:string;
+  user: string;
+  password: string;
+}>) => {
   const { params } = req;
   await sql((db) => {
     db.ipc = params.ipc;

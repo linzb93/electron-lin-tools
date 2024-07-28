@@ -34,7 +34,7 @@
     </el-form-item>
     <h2>监控系统提醒</h2>
     <el-form-item label="选择监听文件">
-      <el-input class="input-large" />
+      <el-input class="input-large" v-model="monitor.file" />
     </el-form-item>
     <el-form-item label="监听规则">
       <div class="monitor-con">
@@ -79,10 +79,18 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, reactive, shallowReactive } from "vue";
+import { ref, onMounted } from "vue";
 import SelectDirs from "./components/SelectDirs.vue";
 import { ElMessage } from "element-plus";
-const gitForm = shallowReactive({
+import request from "@/plugins/request";
+
+onMounted(async () => {
+  const setting = await request("schedule-get");
+  gitForm.value = setting.git;
+  monitorForm.value = setting.monitor;
+});
+
+const gitForm = ref({
   dirs: [],
   period: 1,
 });
@@ -102,7 +110,8 @@ const makeRange = (start, end) => {
 };
 
 // 监控
-const monitorForm = shallowReactive({
+const monitorForm = ref({
+  file: '',
   timeAfterPublish: 1,
   timeNextDay: 9,
   weekDay: 1,
@@ -111,8 +120,8 @@ const monitorForm = shallowReactive({
 
 const save = async () => {
   await request("schedule-save", {
-    ...gitForm,
-    ...monitorForm,
+    git: gitForm.value,
+    monitor: monitorForm.value,
   });
   ElMessage.success("保存成功");
 };

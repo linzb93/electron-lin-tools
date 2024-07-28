@@ -9,12 +9,11 @@ import axios from "axios";
 import pMap from "p-map";
 import { getMainWindow } from "..";
 import { HTTP_STATUS, root } from "../plugins/constant";
-import db from "../plugins/database";
-import { Request, Database } from "../types/api";
+import { Request } from "../types/api";
+import sql from "../plugins/sql";
 
 export default async (app: Application) => {
-  await db.read();
-  const account = (db.data as Database).sync;
+  const account = await sql(db => db.sync);
   const syncClient = createClient("", account);
   app.handle("copy", async (req: Request<string>) => {
     const text = req.params;
@@ -106,7 +105,7 @@ export default async (app: Application) => {
       path: result.filePaths[0],
     };
   });
-  app.handle("get-selected-file", async (req: Request) => {
+  app.handle("get-selected-file", async (req: Request<{multiSelections: boolean}>) => {
     const {
       params: { multiSelections },
     } = req;
@@ -159,12 +158,12 @@ export default async (app: Application) => {
   //     success: true,
   //   };
   // }
-  app.handle("open-in-browser", (req: Request) => {
+  app.handle("open-in-browser", (req: Request<{url: string}>) => {
     const { url } = req.params;
     shell.openExternal(url);
     return null;
   });
-  app.handle("copy-image", async (req: Request) => {
+  app.handle("copy-image", async (req: Request<{url: string;type: string;}>) => {
     const { url, type } = req.params;
     if (type === "base64") {
       const buf = Buffer.from(url);
