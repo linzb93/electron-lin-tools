@@ -52,14 +52,15 @@ export interface Database {
     inited: boolean;
     git: {
       dirs: string[];
-      period: 1 | 2,
-    },
+      period: 1 | 2;
+      weeks: number[];
+    };
     monitor: {
       file: string;
       timeAfterPublish: number;
       timeNextDay: number;
       weekDay: number;
       timeEveryWeek: string;
-    }
-  }
+    };
+  };
 }

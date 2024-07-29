@@ -33,7 +33,9 @@
       />
     </el-form-item>
     <h2>监控系统提醒</h2>
-    <el-alert type="warning" :closeable="false">监控系统提醒功能目前还未开发</el-alert>
+    <el-alert type="warning" :closeable="false"
+      >监控系统提醒功能目前还未开发</el-alert
+    >
     <el-form-item label="选择监听文件">
       <p>{{ monitor.file }}</p>
       <el-button type="primary" @click="selectFile">添加文件</el-button>
@@ -95,6 +97,7 @@ onMounted(async () => {
 const gitForm = ref({
   dirs: [],
   period: 1,
+  weeks: [5],
 });
 const weeks = [
   { title: "星期一", id: 1 },
@@ -113,16 +116,16 @@ const makeRange = (start, end) => {
 
 // 监控
 const monitorForm = ref({
-  file: '',
+  file: "",
   timeAfterPublish: 1,
   timeNextDay: 9,
   weekDay: 1,
   timeEveryWeek: "",
 });
 const selectFile = async () => {
-  const file = await request('get-selected-file');
+  const file = await request("get-selected-file");
   monitorForm.value.file = file;
-}
+};
 
 const save = async () => {
   await request("schedule-save", {
