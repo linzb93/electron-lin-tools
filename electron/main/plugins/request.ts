@@ -6,7 +6,6 @@ interface Body {
     }
 }
 
-const methods = ['get', 'post'];
 type RequestParams = Body & {
     url: string;
     method: 'get' | 'post';

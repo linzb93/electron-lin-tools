@@ -1,5 +1,5 @@
-import isDev from "electron-is-dev";
 import fs from "node:fs";
+import isDev from "electron-is-dev";
 import dayjs from "dayjs";
 import { join } from "node:path";
 import { root } from "./constant";

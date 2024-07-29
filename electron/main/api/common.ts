@@ -92,13 +92,23 @@ export default async (app: Application) => {
       };
     }
   );
-  app.handle("get-selected-path", async () => {
+  app.handle("get-selected-path", async (req: Request<{multiSelections: boolean}>) => {
+    const {
+      params: { multiSelections },
+    } = req;
     const result = await dialog.showOpenDialog({
-      properties: ["openDirectory"],
+      properties: multiSelections
+      ? ["openDirectory", "multiSelections"]
+      : ["openDirectory"],
     });
     if (result.canceled) {
       return {
         path: "",
+      };
+    }
+    if (multiSelections) {
+      return {
+        paths: result.filePaths,
       };
     }
     return {

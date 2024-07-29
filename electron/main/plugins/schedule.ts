@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
+import fsp from 'node:fs/promises';
 import sql from "./sql";
 import { tempPath } from "./constant";
-import fsp from 'node:fs/promises';
 (async () => {
   await sql(async db => {
     const { lastModifiedTime } = db;

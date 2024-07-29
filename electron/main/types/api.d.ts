@@ -49,6 +49,7 @@ export interface Database {
     name: string;
   }[];
   schedule: {
+    inited: boolean;
     git: {
       dirs: string[];
       period: 1 | 2,

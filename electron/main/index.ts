@@ -1,3 +1,5 @@
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   app,
   BrowserWindow,
@@ -8,16 +10,14 @@ import {
   nativeImage,
   dialog,
 } from "electron";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
+import unhandled from "electron-unhandled";
 import registerRoute from "./plugins/router";
 import { root, publicPath } from "./plugins/constant";
-import unhandled from "electron-unhandled";
-unhandled();
 import "./plugins/server";
 import "./plugins/schedule";
 
+unhandled();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 

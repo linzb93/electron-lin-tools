@@ -6,7 +6,6 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, reactive, shallowReactive } from "vue";
 import request from "@/plugins/request";
 
 const props = defineProps({
@@ -17,6 +16,11 @@ const props = defineProps({
 });
 const emit = defineEmits(["input"]);
 
-const selectDirs = () => {};
+const selectDirs = async () => {
+  const {paths} = await request('get-selected-path', {
+    multiSelections: true
+  });
+  emit('input', paths);
+};
 </script>
 <style lang="scss" scoped></style>

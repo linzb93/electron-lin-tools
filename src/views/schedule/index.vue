@@ -33,8 +33,10 @@
       />
     </el-form-item>
     <h2>监控系统提醒</h2>
+    <el-alert type="warning" :closeable="false">监控系统提醒功能目前还未开发</el-alert>
     <el-form-item label="选择监听文件">
-      <el-input class="input-large" v-model="monitor.file" />
+      <p>{{ monitor.file }}</p>
+      <el-button type="primary" @click="selectFile">添加文件</el-button>
     </el-form-item>
     <el-form-item label="监听规则">
       <div class="monitor-con">
@@ -117,6 +119,10 @@ const monitorForm = ref({
   weekDay: 1,
   timeEveryWeek: "",
 });
+const selectFile = async () => {
+  const file = await request('get-selected-file');
+  monitorForm.value.file = file;
+}
 
 const save = async () => {
   await request("schedule-save", {

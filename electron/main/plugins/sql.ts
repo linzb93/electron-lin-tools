@@ -4,6 +4,7 @@ import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 import { root } from "./constant";
 import { Database } from "../types/api";
+
 const dbPath = join(root, "app.json");
 try {
     fs.accessSync(dbPath);

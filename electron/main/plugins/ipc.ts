@@ -3,7 +3,7 @@ import sql from "./sql";
 import { Route } from "@linzb93/event-router";
 import { shallowRef } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
-import { Database, Request } from "../types/api";
+import { Request } from "../types/api";
 import { mainPost, uuid } from "./utils";
 
 interface IpcResponse {

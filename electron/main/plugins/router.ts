@@ -3,6 +3,7 @@ import { createServer } from "@linzb93/event-router";
 import oss from "../api/oss";
 import monitor from "../api/monitor";
 import setting from "../api/setting";
+import schedule from '../api/schedule';
 import commonFn from "../api/common";
 
 export default () => {
@@ -16,5 +17,6 @@ export default () => {
   app.use("oss", oss);
   app.use("monitor", monitor);
   app.use("setting", setting);
+  app.use("schedule", schedule);
   commonFn(app);
 };

@@ -15,7 +15,10 @@ route.handle(
   async (req: Request<Database['schedule']>) => {
     const { params } = req;
     await sql((db) => {
-      db.schedule = params;
+      db.schedule = {
+        ...params,
+        inited: true,
+      };
     });
     return null;
   }

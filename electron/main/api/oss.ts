@@ -1,5 +1,5 @@
-import { Route } from "@linzb93/event-router";
 import path from "node:path";
+import { Route } from "@linzb93/event-router";
 import pMap from "p-map";
 import OSS, { OssConfig } from "ali-oss";
 import { omit } from "lodash-es";
