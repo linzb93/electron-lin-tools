@@ -8,6 +8,7 @@ import { tempPath } from "./constant";
 import { onShutDown } from "./utils";
 import gitUtil from "./git";
 import { mainPost } from "./utils";
+import { getMainWindow } from "..";
 
 (async () => {
   await sql(async (db) => {
@@ -22,7 +23,7 @@ import { mainPost } from "./utils";
     }
     db.lastModifiedTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
     // 定时任务
-    if (!schedule.inited) {
+    if (!schedule || !schedule.inited) {
       return;
     }
     const { git } = schedule;
@@ -54,10 +55,14 @@ import { mainPost } from "./utils";
         body: "Git项目扫描完成，请查看结果",
       });
       notice.show();
-      mainPost({
-        method: "show-git-scan-result",
-        data: result,
-        listener: false,
+      notice.on('click', async () => {
+        const win = await getMainWindow();
+        win.focus();
+        mainPost({
+          method: "show-git-scan-result",
+          data: result,
+          listener: false,
+        });
       });
     });
   });

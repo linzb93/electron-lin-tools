@@ -53,12 +53,11 @@ export const mainPost = ({
   });
 
 export const onShutDown = (callback: Function) => {
+  const shutDownTime = '18:00';
   const timer = setInterval(() => {
-    if (timejs(dayjs().format("HH:mm:ss")).isAfter("18:00")) {
-      clearInterval(timer);
+    if (timejs(dayjs().format("HH:mm:ss")).isAfter(shutDownTime)) {
       callback();
+      clearInterval(timer);
     }
   }, 1000 * 60);
 };
-
-export const pFlatten = async function (list: any[], (item) => Promise<any>) {}

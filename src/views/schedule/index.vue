@@ -6,8 +6,8 @@
     </el-form-item>
     <el-form-item label="选择提醒周期">
       <el-radio-group v-model="gitForm.period">
-        <el-radio :label="1">每天</el-radio>
-        <el-radio :label="2">
+        <el-radio :value="1">每天</el-radio>
+        <el-radio :value="2">
           <span>每周</span>
           <el-select
             multiple
@@ -33,11 +33,11 @@
       />
     </el-form-item>
     <h2>监控系统提醒</h2>
-    <el-alert type="warning" :closeable="false"
+    <el-alert type="warning" class="mb20" :closable="false"
       >监控系统提醒功能目前还未开发</el-alert
     >
     <el-form-item label="选择监听文件">
-      <p>{{ monitor.file }}</p>
+      <p>{{ monitorForm.file }}</p>
       <el-button type="primary" @click="selectFile">添加文件</el-button>
     </el-form-item>
     <el-form-item label="监听规则">
@@ -90,6 +90,9 @@ import request from "@/plugins/request";
 
 onMounted(async () => {
   const setting = await request("schedule-get");
+  if (!setting) {
+    return;
+  }
   gitForm.value = setting.git;
   monitorForm.value = setting.monitor;
 });
