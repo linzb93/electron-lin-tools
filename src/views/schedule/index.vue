@@ -2,7 +2,7 @@
   <el-form label-suffix="：">
     <h2>Git项目同步检查</h2>
     <el-form-item label="选择项目">
-      <select-dirs v-model="gitForm.dirs" />
+      <select-dirs v-model:dirs="gitForm.dirs" />
     </el-form-item>
     <el-form-item label="选择提醒周期">
       <el-radio-group v-model="gitForm.period">
@@ -25,15 +25,8 @@
         </el-radio>
       </el-radio-group>
     </el-form-item>
-    <el-form-item label="选择提醒时间">
-      <el-time-picker
-        v-model="gitForm.time"
-        class="input-medium mr10"
-        :disabled-hours="() => makeRange(0, 16).concat(makeRange(18, 23))"
-      />
-    </el-form-item>
     <h2>监控系统提醒</h2>
-    <el-alert type="warning" class="mb20" :closable="false"
+    <el-alert type="warning" class="mb20" show-icon :closable="false"
       >监控系统提醒功能目前还未开发</el-alert
     >
     <el-form-item label="选择监听文件">
@@ -44,8 +37,8 @@
       <div class="monitor-con">
         <p>
           项目发布后<el-input-number
-            class="input-medium mx10"
             v-model="monitorForm.timeAfterPublish"
+            class="input-medium mx10"
             :min="1"
             :max="3"
           />小时
@@ -72,7 +65,7 @@
             class="input-medium mx10"
             v-model="monitorForm.timeEveryWeek"
           />
-          <span>遍历所有监控应用。</span>
+          <span class="ml10">遍历所有监控应用。</span>
         </p>
       </div>
     </el-form-item>
@@ -149,7 +142,7 @@ h2 {
   width: 200px;
 }
 .input-medium {
-  width: 130px;
+  width: 130px !important;
 }
 .monitor-con {
   p {

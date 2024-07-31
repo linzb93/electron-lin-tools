@@ -1,5 +1,5 @@
-import request from "./request";
 import { ElMessage, ElLoading } from "element-plus";
+import request from "./request";
 
 export const copy = (text: string) => {
   request("copy", text);

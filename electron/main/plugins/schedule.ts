@@ -1,8 +1,8 @@
+import fsp from "node:fs/promises";
 import { Notification } from "electron";
 import dayjs from "dayjs";
 import pMap from "p-map";
 import pReduce from "p-reduce";
-import fsp from "node:fs/promises";
 import sql from "./sql";
 import { tempPath } from "./constant";
 import { onShutDown } from "./utils";
@@ -35,7 +35,7 @@ import { getMainWindow } from "..";
       const allDirs = await pReduce(
         git.dirs,
         async (acc, dir) => {
-          const dirs = await fsp.readdir(dir);
+          const dirs = await fsp.readdir(dir.path);
           return acc.concat(dirs);
         },
         []
@@ -57,7 +57,7 @@ import { getMainWindow } from "..";
       notice.show();
       notice.on('click', async () => {
         const win = await getMainWindow();
-        win.focus();
+        win.show();
         mainPost({
           method: "show-git-scan-result",
           data: result,

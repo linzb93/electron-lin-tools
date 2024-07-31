@@ -16,9 +16,10 @@
       </div>
     </div>
     <template #reference>
-      <el-link type="danger" :underline="false" class="ml10">{{
+      <el-link v-if="!hasSlot" type="danger" :underline="false" class="ml10">{{
         deleteText
       }}</el-link>
+      <slot name="icon" v-else />
     </template>
   </el-popover>
 </template>
@@ -37,6 +38,10 @@ const props = defineProps({
   deleteText: {
     type: String,
     default: "删除",
+  },
+  hasSlot: {
+    type: Boolean,
+    default: false,
   },
 });
 const emit = defineEmits(["confirm"]);

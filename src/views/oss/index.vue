@@ -56,13 +56,15 @@
 
 <script setup>
 import { ref, shallowRef, onMounted } from "vue";
-import request from "@/plugins/request";
-import { ElMessage } from "element-plus";
-import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import request from "@/plugins/request";
+import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useOssStore } from "./store";
+
 const router = useRouter();
 const ossStore = useOssStore();
+
 const list = ref([]);
 const getList = async () => {
   const data = await request("oss-get-project-list");

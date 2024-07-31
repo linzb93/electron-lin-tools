@@ -1,26 +1,100 @@
 <template>
-  <ul v-if="props.value.length">
-    <li v-for="item in props.value" :key="item">{{ item }}</li>
-  </ul>
-  <el-button type="primary" @click="selectDirs">添加目录</el-button>
+  <div>
+    <ul>
+      <li v-for="item in props.dirs" :key="item.path" class="flexalign-center">
+        <span class="path"
+          >{{ item.path }}<em class="ml10"> ({{ item.name }})</em></span
+        >
+        <el-icon :size="14" class="curp ml10" @click="edit(item)"
+          ><EditPen
+        /></el-icon>
+        <delete-confirm has-slot @confirm="onDelete(item)">
+          <template #icon>
+            <el-icon :size="14" class="curp ml10"><Delete /></el-icon>
+          </template>
+        </delete-confirm>
+      </li>
+    </ul>
+    <el-button type="primary" @click="selectDirs">添加目录</el-button>
+  </div>
+  <el-dialog v-model="visible" title="修改项目信息" width="300">
+    <p>路径：{{ currentItem.path }}</p>
+    <p>名称：<el-input v-model="currentItem.name" style="width: 200px" /></p>
+    <template #footer>
+      <el-button @click="visible = false">关闭</el-button>
+      <el-button @click="save" type="primary">保存</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
+import { ref, shallowRef } from "vue";
+import { clone } from "lodash-es";
+import { ElMessage } from "element-plus";
+import { EditPen, Delete } from "@element-plus/icons-vue";
 import request from "@/plugins/request";
-
+import path from "@/plugins/path";
+import DeleteConfirm from "@/components/DeleteConfirm.vue";
 const props = defineProps({
-  value: {
+  dirs: {
     type: Array,
-    default: () => [],
+    default: () => {
+      return [];
+    },
   },
 });
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:dirs"]);
 
+// 编辑
+const currentItem = ref({});
+const visible = shallowRef(false);
+const edit = (item) => {
+  currentItem.value = clone(item);
+  visible.value = true;
+};
+// 保存
+const save = () => {
+  emit(
+    "update:dirs",
+    props.dirs.map((dir) => {
+      if (dir.path === currentItem.value.path) {
+        return {
+          path: dir.path,
+          name: currentItem.value.name,
+        };
+      }
+      return dir;
+    })
+  );
+  ElMessage.success("保存成功");
+  visible.value = false;
+};
+
+// 删除
+const onDelete = (item) => {
+  emit(
+    "update:dirs",
+    props.dirs.filter((dir) => dir.path !== item.path)
+  );
+  ElMessage.success("删除成功");
+};
 const selectDirs = async () => {
-  const {paths} = await request('get-selected-path', {
-    multiSelections: true
+  const { paths } = await request("get-selected-path", {
+    multiSelections: true,
   });
-  emit('input', paths);
+  emit("update:dirs", [
+    ...props.dirs,
+    ...paths.map((item) => ({
+      path: item,
+      name: path.basename(item),
+    })),
+  ]);
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+li {
+  em {
+    color: #999;
+  }
+}
+</style>

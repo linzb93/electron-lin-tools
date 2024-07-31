@@ -44,12 +44,12 @@
 import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useGlobalStore } from "@/store";
-const formRef = ref(null);
 import request from "@/plugins/request";
 import Qa from "@/components/Qa.vue";
 
 const globalStore = useGlobalStore();
 
+const formRef = ref(null);
 const form = ref({});
 const rules = {};
 
