@@ -1,29 +1,53 @@
 <template>
-    <p>定时任务结果页</p>
-<el-table :data="list">
-    <el-table-column label="项目名称"></el-table-column>
-    <el-table-column label="文件夹"></el-table-column>
-    <el-table-column label="状态"></el-table-column>
-    <el-table-column label="详情">
-        <template #default="scope">
-            <p>分支：{{ scope.row.branch }}</p>
-            <p>有XX个文件未提交</p>
-            <p>有XX个commit未推送</p>
-        </template>
+  <el-table :data="list">
+    <el-table-column label="项目名称" prop="name"></el-table-column>
+    <el-table-column label="文件夹" prop="path"></el-table-column>
+    <el-table-column label="状态">
+      <template #default="scope">
+        <p class="red" v-if="scope.row.status === 1">未提交</p>
+        <p class="yellow" v-else-if="scope.row.status === 2">未推送</p>
+        <p class="gray" v-else-if="scope.row.status === 4">不在主分支上</p>
+        <p class="green" v-else-if="scope.row.status === 3">成功</p>
+        <p v-else>非Git项目</p>
+      </template>
     </el-table-column>
     <el-table-column label="操作">
-        <el-link type="primary" :underline="false">打开编辑器</el-link>
-        <el-link type="primary" :underline="false">打开文件夹</el-link>
-        <el-link type="primary" :underline="false">自动处理</el-link>
+      <template #default="scope">
+        <el-link
+          type="primary"
+          :underline="false"
+          @click="request('open-is-vscode', scope.row.path)"
+          >打开编辑器</el-link
+        >
+      </template>
     </el-table-column>
-</el-table>
+  </el-table>
 </template>
 
 <script setup>
-import { ref, shallowRef, reactive, shallowReactive } from 'vue';
+import { ref, onMounted } from "vue";
+import request from "@/plugins/request";
 
 const list = ref([]);
+const getList = async () => {
+  const result = await request("schedule-git-scan-result");
+  list.value = result.list;
+};
+onMounted(() => {
+  getList();
+});
 </script>
 <style lang="scss" scoped>
-
+.red {
+  color: #f56c6c;
+}
+.green {
+  color: #67c23a;
+}
+.gray {
+  color: #909399;
+}
+.yellow {
+  color: #e6a23c;
+}
 </style>

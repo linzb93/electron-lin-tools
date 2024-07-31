@@ -3,6 +3,7 @@ import http from "node:http";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { shell, clipboard, dialog, nativeImage } from "electron";
+import { execaCommand as execa } from "execa";
 import { Application } from "@linzb93/event-router";
 import { createClient } from "webdav";
 import axios from "axios";
@@ -13,7 +14,7 @@ import { Request } from "../types/api";
 import sql from "../plugins/sql";
 
 export default async (app: Application) => {
-  const account = await sql(db => db.sync);
+  const account = await sql((db) => db.sync);
   const syncClient = createClient("", account);
   app.handle("copy", async (req: Request<string>) => {
     const text = req.params;
@@ -92,54 +93,64 @@ export default async (app: Application) => {
       };
     }
   );
-  app.handle("get-selected-path", async (req: Request<{multiSelections: boolean}>) => {
-    const {
-      params: { multiSelections },
-    } = req;
-    const result = await dialog.showOpenDialog({
-      properties: multiSelections
-      ? ["openDirectory", "multiSelections"]
-      : ["openDirectory"],
-    });
-    if (result.canceled) {
+  app.handle(
+    "get-selected-path",
+    async (req: Request<{ multiSelections: boolean }>) => {
+      const {
+        params: { multiSelections },
+      } = req;
+      const result = await dialog.showOpenDialog({
+        properties: multiSelections
+          ? ["openDirectory", "multiSelections"]
+          : ["openDirectory"],
+      });
+      if (result.canceled) {
+        return {
+          path: "",
+        };
+      }
+      if (multiSelections) {
+        return {
+          paths: result.filePaths,
+        };
+      }
       return {
-        path: "",
+        path: result.filePaths[0],
       };
     }
-    if (multiSelections) {
+  );
+  app.handle(
+    "get-selected-file",
+    async (req: Request<{ multiSelections: boolean }>) => {
+      const {
+        params: { multiSelections },
+      } = req;
+      const result = await dialog.showOpenDialog({
+        properties: multiSelections
+          ? ["openFile", "multiSelections"]
+          : ["openFile"],
+      });
+      if (result.canceled) {
+        return {
+          paths: "",
+        };
+      }
+      const paths = await pMap(result.filePaths, async (file) => {
+        const stats = await fsp.stat(file);
+        return {
+          path: file,
+          size: stats.size,
+          name: basename(file),
+        };
+      });
       return {
-        paths: result.filePaths,
+        paths,
       };
     }
-    return {
-      path: result.filePaths[0],
-    };
-  });
-  app.handle("get-selected-file", async (req: Request<{multiSelections: boolean}>) => {
-    const {
-      params: { multiSelections },
-    } = req;
-    const result = await dialog.showOpenDialog({
-      properties: multiSelections
-        ? ["openFile", "multiSelections"]
-        : ["openFile"],
-    });
-    if (result.canceled) {
-      return {
-        paths: "",
-      };
-    }
-    const paths = await pMap(result.filePaths, async (file) => {
-      const stats = await fsp.stat(file);
-      return {
-        path: file,
-        size: stats.size,
-        name: basename(file),
-      };
-    });
-    return {
-      paths,
-    };
+  );
+  app.handle("open-is-vscode", async (req: Request<string>) => {
+    const { params } = req;
+    await execa(`code ${params}`);
   });
   // 同步
   app.handle("sync", async () => {
@@ -168,25 +179,28 @@ export default async (app: Application) => {
   //     success: true,
   //   };
   // }
-  app.handle("open-in-browser", (req: Request<{url: string}>) => {
+  app.handle("open-in-browser", (req: Request<{ url: string }>) => {
     const { url } = req.params;
     shell.openExternal(url);
     return null;
   });
-  app.handle("copy-image", async (req: Request<{url: string;type: string;}>) => {
-    const { url, type } = req.params;
-    if (type === "base64") {
-      const buf = Buffer.from(url);
-      const img = nativeImage.createFromBuffer(buf);
-      clipboard.writeImage(img);
+  app.handle(
+    "copy-image",
+    async (req: Request<{ url: string; type: string }>) => {
+      const { url, type } = req.params;
+      if (type === "base64") {
+        const buf = Buffer.from(url);
+        const img = nativeImage.createFromBuffer(buf);
+        clipboard.writeImage(img);
+        return {
+          success: true,
+        };
+      }
       return {
-        success: true,
+        success: false,
       };
     }
-    return {
-      success: false,
-    };
-  });
+  );
   app.handle(
     "fetch-api-cross-origin",
     async (

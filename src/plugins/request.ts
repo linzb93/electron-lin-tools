@@ -1,8 +1,10 @@
 import { unref, isReactive } from "vue";
 import { sleep } from "@linzb93/utils";
 import { createClient } from "@linzb93/event-router";
+import { loading } from "./util";
 interface Option {
   delay: number;
+  showLoading: boolean;
 }
 
 const request = createClient({
@@ -12,7 +14,13 @@ const request = createClient({
 });
 
 export default async (path: string, params: any, options?: Option) => {
+  if (options?.showLoading) {
+    loading.open();
+  }
   const res = await request(path, params);
+  if (options?.showLoading) {
+    loading.close();
+  }
   if (options?.delay) {
     await sleep(options.delay);
   }
