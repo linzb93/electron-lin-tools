@@ -94,8 +94,8 @@ const list = [
     icon: View,
   },
   {
-    title: "定时任务管理",
-    to: "/schedule",
+    title: "Git扫描",
+    to: "/git",
     icon: Clock,
   },
   {

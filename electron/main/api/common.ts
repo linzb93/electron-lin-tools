@@ -151,7 +151,6 @@ export default async (app: Application) => {
   );
   app.handle("open-in-vscode", async (req: Request<string | string[]>) => {
     const { params } = req;
-    console.log(params);
     if (Array.isArray(params)) {
       for (const param of params) {
         await execa(`code ${param}`);

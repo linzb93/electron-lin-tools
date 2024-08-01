@@ -24,6 +24,12 @@
           <el-radio :value="2">缩略图</el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item label="直接进入OSS客户端">
+        <el-radio-group v-model="form.fasterEnter">
+          <el-radio :value="1">是</el-radio>
+          <el-radio :value="2">否</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button type="primary" @click="save">保存</el-button>
@@ -43,6 +49,7 @@ const form = ref({
   pixel: 2,
   platform: 1,
   previewType: 1,
+  fasterEnter: 2,
 });
 
 const getSetting = async () => {

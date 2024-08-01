@@ -13,7 +13,7 @@ const request = createClient({
   },
 });
 
-export default async (path: string, params: any, options?: Option) => {
+export default async (path: string, params?: any, options?: Option) => {
   if (options?.showLoading) {
     loading.open();
   }

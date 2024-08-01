@@ -70,7 +70,12 @@ const getList = async () => {
   const data = await request("oss-get-project-list");
   list.value = data.list;
 };
-onMounted(() => {
+onMounted(async () => {
+  const { setting } = await request("oss-get-setting");
+  if (setting.fasterEnter === 1) {
+    router.replace(`/oss/detail?id=1`);
+    return;
+  }
   getList();
 });
 

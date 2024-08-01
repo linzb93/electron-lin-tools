@@ -29,6 +29,7 @@ export interface Database {
       pixel: 1 | 2;
       platform: 1 | 2;
       previewType: 1 | 2;
+      fasterEnter: 1 | 2;
     };
   };
   css: {

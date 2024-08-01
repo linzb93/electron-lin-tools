@@ -42,7 +42,7 @@
   </el-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { cloneDeep } from "lodash-es";
 import { shallowRef, ref } from "vue";
 import { handleMainPost, download } from "@/plugins/util";
@@ -50,19 +50,22 @@ import request from "@/plugins/request";
 
 const max = 3;
 
-const visibleFiles = ref([]);
-const realFiles = ref([]);
+type FileItem = Blob & {
+  path: string;
+};
+const visibleFiles = ref([] as string[]);
+const realFiles = ref([] as FileItem[]);
 const active = shallowRef(false);
 
 // 拖拽上传
-const dropFile = async (event) => {
+const dropFile = async (event: any) => {
   active.value = false;
-  const fList = event.dataTransfer.files;
+  const fList: FileItem[] = event.dataTransfer.files;
   visibleFiles.value = visibleFiles.value.concat(
     Array.from(fList).map((file) => URL.createObjectURL(file))
   );
   realFiles.value = realFiles.value.concat(
-    Array.from(fList).map((item) => item.path)
+    Array.from(fList).map((item: any) => item.path)
   );
 };
 
@@ -74,9 +77,9 @@ handleMainPost("iPhone-get-img", () => {
 });
 
 // iPhone批量上传图片
-const receiveList = ref([]);
+const receiveList = ref([] as string[]);
 const visible = shallowRef(false);
-handleMainPost("iPhone-upload-img", (url) => {
+handleMainPost("iPhone-upload-img", (url: string) => {
   receiveList.value.push(url);
   visible.value = true;
 });
@@ -91,7 +94,7 @@ const closed = () => {
 };
 
 // 拖拽下载
-const startDrag = async (url) => {
+const startDrag = async (url: string) => {
   await request("drag", {
     url,
   });

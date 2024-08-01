@@ -5,7 +5,7 @@ export const copy = (text: string) => {
   request("copy", text);
   ElMessage.success("复制成功");
 };
-export const download = async (url: string) => {
+export const download = async (url: string | string[]) => {
   try {
     await request("download", url);
   } catch (error) {
@@ -69,3 +69,17 @@ export const loading = {
     return counter === 0;
   },
 };
+
+/**
+ * 用于TypeScript类型判断中
+ * @param {string | number | symbol} key object的key
+ * @param {object} object 用于判断的object
+ * @returns {boolean}
+ */
+export function isValidKey(
+  key: string | number | symbol,
+  object: object
+): key is keyof typeof object {
+  // is 是类型谓词
+  return key in object;
+}

@@ -164,15 +164,18 @@ import { useRoute } from "vue-router";
 import { ElMessageBox, ElMessage } from "element-plus";
 import dayjs from "dayjs";
 import { Folder, ArrowRight, HomeFilled } from "@element-plus/icons-vue";
+import { getSize } from "../util";
+import useUpload from "../hooks/useUpload";
+import pathUtil from "@/plugins/path";
 import { scrollTo } from "@/plugins/scroll-to";
 import request from "@/plugins/request";
 import { copy, download } from "@/plugins/util";
 import FileTypeIcon from "@/components/FileTypeIcon.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import ContextMenu from "@/components/ContextMenu.vue";
-import ProgressDrawer from "./components/Progress.vue";
-import MsgBoxFileList from "./components/FileList.vue";
-import SettingDialog from "./components/Setting.vue";
+import ProgressDrawer from "../components/Progress.vue";
+import MsgBoxFileList from "../components/FileList.vue";
+import SettingDialog from "../components/Setting.vue";
 
 const route = useRoute();
 
@@ -227,7 +230,7 @@ const handleSelectionChange = (selection) => {
 
 // 获取文件后缀
 const getExtName = (name) => {
-  return name.split("/").at(-1).split(".").at(-1).toLowerCase();
+  return pathUtil.basename(name).slice(1).toLowerCase();
 };
 
 // 删除文件
@@ -240,6 +243,8 @@ const del = async (item) => {
   ElMessage.success("删除成功");
   getList();
 };
+
+// 批量删除
 const deleteMulti = () => {
   ElMessageBox({
     message: h(MsgBoxFileList, {
@@ -328,10 +333,10 @@ const createDir = () => {
       //
     });
 };
-
+// 拖拽上传
 const uploadingList = ref([]);
 
-// 拖拽上传
+const {} = useUpload(tableList.value);
 const active = shallowRef(false);
 const dropFile = async (event) => {
   active.value = false;
@@ -362,9 +367,7 @@ const dropFile = async (event) => {
             )
           );
         })
-        .catch((e) => {
-          console.log(e);
-        });
+        .catch(console.log);
     } else {
       resolve(upOriginList);
     }
