@@ -9,16 +9,10 @@
 <script setup>
 import Menus from "./components/Menus.vue";
 import { useGlobalStore } from "@/store";
-import { useRouter } from "vue-router";
-import { handleMainPost } from "@/plugins/util";
-const router = useRouter();
+
 const globalStore = useGlobalStore();
 // globalStore.getSetting();
 // globalStore.listenIpcConnected();
-
-handleMainPost("show-git-scan-result", (data) => {
-  router.push("/schedule/result");
-});
 </script>
 <style scoped>
 .cont {

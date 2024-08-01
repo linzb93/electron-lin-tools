@@ -17,10 +17,15 @@ interface TableItem {
   path: string;
   size: string;
 }
+document.body.addEventListener("click", (e) => {});
+
 export default function useUpload(tableList: TableItem[]) {
-  const dropFile = async (event: any) => {
+  const dropFile = async (event: InputEvent) => {
     active.value = false;
-    const upOriginList = Array.from(event.dataTransfer.files) as TableItem[];
+
+    const upOriginList = Array.from(
+      event.dataTransfer?.files as unknown as TableItem[]
+    );
     const resolveList: TableItem[] = await new Promise((resolve) => {
       // 过滤重名文件，其他正常上传
       const duplicateFiles = upOriginList.filter((item) =>

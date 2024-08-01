@@ -2,10 +2,10 @@
   <div
     class="wrap"
     :class="{ active: active }"
-    @dragover.prevent="active = true"
+    @dragover.prevent="setDragState(true)"
     @drop="dropFile"
   >
-    <div class="layer flex-center" @keyup="active = false">
+    <div class="layer flex-center" @keyup="setDragState(false)">
       <p class="tips">请将需要上传的文件拖拽至此</p>
     </div>
     <div class="flexalign-center">
@@ -67,7 +67,10 @@
                 >
                   <folder />
                 </el-icon>
-                <file-type-icon :type="getExtName(scope.row.name)" v-else />
+                <file-type-icon
+                  :type="pathUtil.extname(scope.row.name)"
+                  v-else
+                />
                 <span class="file-name" @click="jumpInner(scope.row)">{{
                   scope.row.name
                 }}</span>
@@ -131,7 +134,7 @@
   </div>
 
   <progress-drawer
-    v-model:visible="visible.progress"
+    v-model:visible="progressVisible"
     :upload-list="uploadingList"
     :path="fullPath"
     @refresh="getList"
@@ -228,11 +231,6 @@ const handleSelectionChange = (selection) => {
   }
 };
 
-// 获取文件后缀
-const getExtName = (name) => {
-  return pathUtil.basename(name).slice(1).toLowerCase();
-};
-
 // 删除文件
 const del = async (item) => {
   const name = item.type === "dir" ? `${item.name}/` : item.name;
@@ -269,7 +267,7 @@ const deleteMulti = () => {
 // 图片预览
 const previewUrl = shallowRef("");
 const isPic = (item) => {
-  return ["jpg", "png", "gif"].includes(getExtName(item.name));
+  return ["jpg", "png", "gif"].includes(pathUtil.extname(item.name));
 };
 // 进入文件夹内层
 const jumpInner = (item) => {
@@ -283,18 +281,6 @@ const jumpInner = (item) => {
   }
   breadcrumb.value.push(item.name);
   getList();
-};
-
-const getSize = (file) => {
-  const { size } = file;
-  const units = ["B", "KB", "MB", "GB"];
-  let calcSize = size;
-  let index = 0;
-  while (calcSize >= 1024) {
-    index++;
-    calcSize = calcSize / 1024;
-  }
-  return `${calcSize.toFixed(2)}${units[index]}`;
 };
 
 // 批量下载
@@ -334,55 +320,14 @@ const createDir = () => {
     });
 };
 // 拖拽上传
-const uploadingList = ref([]);
 
-const {} = useUpload(tableList.value);
-const active = shallowRef(false);
-const dropFile = async (event) => {
-  active.value = false;
-  const upOriginList = Array.from(event.dataTransfer.files);
-  const resolveList = await new Promise((resolve) => {
-    // 过滤重名文件，其他正常上传
-    const duplicateFiles = upOriginList.filter((item) =>
-      tableList.value.find((sub) => sub.name === item.name)
-    );
-    if (duplicateFiles.length) {
-      ElMessageBox({
-        message: h(MsgBoxFileList, {
-          list: duplicateFiles.map((item) => item.name),
-          tips: "下列文件已存在，是否覆盖？",
-        }),
-        title: "温馨提醒",
-        showCancelButton: true,
-        confirmButtonText: "覆盖",
-        cancelButtonText: "不覆盖",
-      })
-        .then(() => {
-          resolve(upOriginList);
-        })
-        .catch(() => {
-          resolve(
-            upOriginList.filter(
-              (item) => !duplicateFiles.find((d) => d.name === item.name)
-            )
-          );
-        })
-        .catch(console.log);
-    } else {
-      resolve(upOriginList);
-    }
-  });
-  if (resolveList.length) {
-    uploadingList.value = resolveList.map((item) => ({
-      name: item.name,
-      path: item.path,
-      size: getSize(item),
-    }));
-    visible.progress = true;
-  } else {
-    ElMessage.warning("没有文件需要上传");
-  }
-};
+const {
+  visible: progressVisible,
+  active,
+  setDragState,
+  dropFile,
+  uploadingList,
+} = useUpload(tableList.value);
 
 const setting = ref({
   pixel: 2,
