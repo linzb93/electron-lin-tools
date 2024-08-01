@@ -42,10 +42,10 @@ export const getGitScanResult = async () => {
       const dirs = await fsp.readdir(dir.path);
       return acc.concat(
         await pMap(dirs, async (subDir) => {
-          // const stats = await fsp.stat(join(dir.path, subDir));
           return {
             dir: subDir,
             prefix: dir.path,
+            folderName: dir.name,
           };
         })
       );
@@ -59,13 +59,14 @@ export const getGitScanResult = async () => {
       return {
         name: dirInfo.dir,
         path: full,
+        folderName: dirInfo.folderName,
         status: await gitUtil.getPushStatus(full),
       };
     },
-    { concurrency: 4 }
+    { concurrency: 5 }
   );
   return {
-    list: result,
+    list: result.filter(item => ![0, 3].includes(item.status)),
   };
 };
 route.handle("git-scan-result", getGitScanResult);

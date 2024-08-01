@@ -3,8 +3,8 @@ import { sleep } from "@linzb93/utils";
 import { createClient } from "@linzb93/event-router";
 import { loading } from "./util";
 interface Option {
-  delay: number;
-  showLoading: boolean;
+  delay?: number;
+  showLoading?: boolean;
 }
 
 const request = createClient({

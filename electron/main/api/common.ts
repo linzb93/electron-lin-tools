@@ -5,6 +5,7 @@ import fsp from "node:fs/promises";
 import { shell, clipboard, dialog, nativeImage } from "electron";
 import { execaCommand as execa } from "execa";
 import { Application } from "@linzb93/event-router";
+import { sleep } from "@linzb93/utils";
 import { createClient } from "webdav";
 import axios from "axios";
 import pMap from "p-map";
@@ -148,8 +149,16 @@ export default async (app: Application) => {
       };
     }
   );
-  app.handle("open-is-vscode", async (req: Request<string>) => {
+  app.handle("open-in-vscode", async (req: Request<string | string[]>) => {
     const { params } = req;
+    console.log(params);
+    if (Array.isArray(params)) {
+      for (const param of params) {
+        await execa(`code ${param}`);
+        await sleep(2000);
+      }
+      return;
+    }
     await execa(`code ${params}`);
   });
   // 同步
