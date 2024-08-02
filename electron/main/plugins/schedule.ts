@@ -5,7 +5,7 @@ import { tempPath } from "./constant";
 
 (async () => {
   await sql(async (db) => {
-    const { lastModifiedTime, schedule } = db;
+    const { lastModifiedTime } = db;
     const lastTimeDayjs = dayjs(lastModifiedTime).format("YYYY-MM-DD 00:00:00");
     // 每天清理一次.temp文件夹
     if (dayjs().isAfter(lastTimeDayjs, "d") || !lastModifiedTime) {

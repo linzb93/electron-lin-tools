@@ -24,7 +24,7 @@
   </el-popover>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { shallowRef } from "vue";
 const props = defineProps({
   title: {

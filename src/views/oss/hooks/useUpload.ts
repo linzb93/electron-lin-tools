@@ -10,14 +10,13 @@ const setDragState = (state: boolean) => {
 };
 
 const visible = shallowRef(false);
-const uploadingList = ref([] as TableItem[]);
+const uploadingList = ref<TableItem[]>([]);
 
 interface TableItem {
   name: string;
   path: string;
   size: string;
 }
-document.body.addEventListener("click", (e) => {});
 
 export default function useUpload(tableList: TableItem[]) {
   const dropFile = async (event: InputEvent) => {

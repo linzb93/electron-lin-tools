@@ -54,7 +54,9 @@
 </template>
 
 <script setup>
+import { shallowReactive, ref, shallowRef } from "vue";
 import { ElMessage } from "element-plus";
+import { useRoute, useRouter } from "vue-router";
 import {
   Refresh,
   Iphone,
@@ -63,11 +65,8 @@ import {
   View,
   Clock,
 } from "@element-plus/icons-vue";
-import { Oss } from "./icons";
-import { VueIcon } from "./icons/index";
-import { useRoute, useRouter } from "vue-router";
+import { Oss, VueIcon } from "./icons";
 import request from "@/plugins/request";
-import { shallowReactive, ref, shallowRef } from "vue";
 
 const route = useRoute();
 const router = useRouter();

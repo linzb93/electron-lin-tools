@@ -37,6 +37,7 @@ watch(props, async ({ visible }) => {
   }
   let row = 0;
   let column = 0;
+  // 将定位从文件地址中分离出来
   const realPath = props.path.replace(/\:\d+\:\d+/, (match) => {
     const seg = match.split(":");
     row = Number(seg[1]);
@@ -48,21 +49,22 @@ watch(props, async ({ visible }) => {
   });
   const splitedCode = result.split("\n");
   const preCode = splitedCode[row - 1].slice(column - 100, column - 1);
-  const match1 = preCode.match(/[a-zA-Z0-9]+\.$/);
-  if (match1) {
-    code.preEmp = match1[0];
+  const preCodeMatch = preCode.match(/[a-zA-Z0-9]+\.$/);
+  if (preCodeMatch) {
+    code.preEmp = preCodeMatch[0];
   }
   code.pre = preCode.slice(0, -code.preEmp.length);
   const nextCode = splitedCode[row - 1].slice(column - 1, column + 100);
-  const match2 = nextCode.match(/^[a-zA-Z0-9]+/);
-  if (match2) {
-    code.emphasize = match2[0];
+  const nextCodeMatch = nextCode.match(/^[a-zA-Z0-9]+/);
+  if (nextCodeMatch) {
+    code.emphasize = nextCodeMatch[0];
   }
-  code.next = nextCode.slice(match2[0].length);
+  code.next = nextCode.slice(nextCodeMatch[0].length);
   loaded.value = true;
 });
 
 const close = () => emit("update:visible");
+// 关闭后初始化
 const closed = () => {
   code.pre = "";
   code.emphasize = "";

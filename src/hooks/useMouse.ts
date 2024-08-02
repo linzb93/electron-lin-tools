@@ -1,6 +1,7 @@
 import { shallowRef } from "vue";
 import { throttle } from "lodash-es";
-function useMouse(throttleTime = 150) {
+
+export default (throttleTime = 150) => {
   const x = shallowRef(0);
   const y = shallowRef(0);
   window.addEventListener(
@@ -14,5 +15,4 @@ function useMouse(throttleTime = 150) {
     x,
     y,
   };
-}
-export default useMouse;
+};

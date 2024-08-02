@@ -1,5 +1,6 @@
 <template>
   <div>
+    <el-button type="primary" @click="selectDirs">添加目录</el-button>
     <ul>
       <li v-for="item in props.dirs" :key="item.path" class="flexalign-center">
         <span class="path"
@@ -15,7 +16,6 @@
         </delete-confirm>
       </li>
     </ul>
-    <el-button type="primary" @click="selectDirs">添加目录</el-button>
   </div>
   <el-dialog v-model="visible" title="修改项目信息" width="300">
     <p>路径：{{ currentItem.path }}</p>

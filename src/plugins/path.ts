@@ -11,6 +11,6 @@ export default {
    */
   extname(path: string) {
     const base = this.basename(path) as string;
-    return base.split(".")[1].toLowerCase();
+    return base.split(".")[1] ? base.split(".")[1].toLowerCase() : '';
   },
 };

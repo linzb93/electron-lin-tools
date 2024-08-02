@@ -1,10 +1,20 @@
 import { ElMessage, ElLoading } from "element-plus";
 import request from "./request";
 
+/**
+ * 复制文本
+ * @param {string} text 复制的文本
+ */
 export const copy = (text: string) => {
   request("copy", text);
   ElMessage.success("复制成功");
 };
+
+/**
+ * 下载文件，支持单个或批量下载
+ * @param {string | string[]} url 下载地址
+ * @returns 
+ */
 export const download = async (url: string | string[]) => {
   try {
     await request("download", url);
@@ -14,7 +24,11 @@ export const download = async (url: string | string[]) => {
   ElMessage.success("下载成功");
 };
 
-// 处理来自主进程的请求
+/**
+ * 处理来自主进程的请求
+ * @param receiveMethod 请求名称 
+ * @param callback 回调函数
+ */
 export const handleMainPost = (receiveMethod: string, callback: Function) => {
   window.ipcRenderer.on(
     "main-post",
@@ -69,17 +83,3 @@ export const loading = {
     return counter === 0;
   },
 };
-
-/**
- * 用于TypeScript类型判断中
- * @param {string | number | symbol} key object的key
- * @param {object} object 用于判断的object
- * @returns {boolean}
- */
-export function isValidKey(
-  key: string | number | symbol,
-  object: object
-): key is keyof typeof object {
-  // is 是类型谓词
-  return key in object;
-}

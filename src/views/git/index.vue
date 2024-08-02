@@ -2,9 +2,6 @@
   <el-form label-suffix="：">
     <h2>
       <span>Git项目同步检查</span>
-      <router-link to="/schedule/result">
-        <el-button type="primary" size="small" class="ml10">查看结果</el-button>
-      </router-link>
     </h2>
     <el-form-item label="选择项目">
       <select-dirs v-model:dirs="gitForm.dirs" />
@@ -108,7 +105,7 @@ interface Row {
   status: number;
 }
 
-const selected = shallowRef([] as Row[]);
+const selected = shallowRef<Row[]>([]);
 const handleSelectionChange = (rows: Row[]) => {
   selected.value = rows;
 };

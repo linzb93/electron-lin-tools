@@ -48,13 +48,16 @@ import { shallowRef, ref } from "vue";
 import { handleMainPost, download } from "@/plugins/util";
 import request from "@/plugins/request";
 
+/**
+ * 显示的图片最大张数
+ */
 const max = 3;
 
 type FileItem = Blob & {
   path: string;
 };
-const visibleFiles = ref([] as string[]);
-const realFiles = ref([] as FileItem[]);
+const visibleFiles = ref<string[]>([]);
+const realFiles = ref<FileItem[]>([]);
 const active = shallowRef(false);
 
 // 拖拽上传
@@ -77,7 +80,7 @@ handleMainPost("iPhone-get-img", () => {
 });
 
 // iPhone批量上传图片
-const receiveList = ref([] as string[]);
+const receiveList = ref<string[]>([]);
 const visible = shallowRef(false);
 handleMainPost("iPhone-upload-img", (url: string) => {
   receiveList.value.push(url);
@@ -93,7 +96,10 @@ const closed = () => {
   receiveList.value = [];
 };
 
-// 拖拽下载
+/**
+ * 拖拽下载
+ * @param url 文件地址
+ */
 const startDrag = async (url: string) => {
   await request("drag", {
     url,
