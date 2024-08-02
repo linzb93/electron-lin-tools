@@ -1,11 +1,11 @@
-import express from "express";
 import fs from "node:fs";
+import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import iPhoneRouter from "../api/iPhone";
-fs.accessSync(tempPath);
 import { tempPath, serverStaticPath } from "./constant";
 
+fs.accessSync(tempPath);
 export const config = {
   port: 5010,
   static: "/assets",

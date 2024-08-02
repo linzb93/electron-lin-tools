@@ -54,19 +54,19 @@
 </template>
 
 <script setup>
+import { shallowReactive, ref, shallowRef } from "vue";
 import { ElMessage } from "element-plus";
+import { useRoute, useRouter } from "vue-router";
 import {
   Refresh,
   Iphone,
   HomeFilled,
   Setting,
   View,
+  Clock,
 } from "@element-plus/icons-vue";
-import { Oss } from "./icons";
-import { VueIcon } from "./icons/index";
-import { useRoute, useRouter } from "vue-router";
+import { Oss, VueIcon } from "./icons";
 import request from "@/plugins/request";
-import { shallowReactive, ref, shallowRef } from "vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -93,10 +93,15 @@ const list = [
     icon: View,
   },
   {
+    title: "Git扫描",
+    to: "/git",
+    icon: Clock,
+  },
+  {
     title: "Vue项目管理",
     to: "/vue",
     icon: VueIcon,
-    unpublished:true,
+    unpublished: true,
   },
 ];
 const menuList = list.filter((item) => !item.hide);
@@ -128,13 +133,13 @@ const startSync = async () => {
   }
   syncing.value = false;
 };
-const jump = item => {
+const jump = (item) => {
   if (item.unpublished) {
-    ElMessage.warning('正在开发中，敬请期待');
+    ElMessage.warning("正在开发中，敬请期待");
     return;
   }
   router.push(item.to);
-}
+};
 const save = () => {
   accountRef.value.validate(async (isValid) => {
     if (!isValid) {

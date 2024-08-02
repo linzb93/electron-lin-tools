@@ -1,3 +1,5 @@
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   app,
   BrowserWindow,
@@ -8,16 +10,14 @@ import {
   nativeImage,
   dialog,
 } from "electron";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import isDev from "electron-is-dev";
-import registerRoute from "./plugins/route";
-import { root, publicPath } from "./plugins/constant";
 import unhandled from "electron-unhandled";
-unhandled();
+import registerRoute from "./plugins/router";
+import { root, publicPath } from "./plugins/constant";
 import "./plugins/server";
 import "./plugins/schedule";
 
+unhandled();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -101,7 +101,7 @@ app.whenReady().then(async () => {
           label: "about",
           click: async () => {
             const pkg = {
-              version: "v1.5.0",
+              version: "v1.6.1",
             };
             dialog.showMessageBox({
               title: "关于我们",

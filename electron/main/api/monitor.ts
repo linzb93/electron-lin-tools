@@ -1,23 +1,26 @@
-import db from "../plugins/database";
-import Controller from "../plugins/route/Controller";
-import { Route } from "../plugins/route/decorators";
-import { Request, Database } from "../types/api";
+import { Route } from "@linzb93/event-router";
+import { Request } from "../types/api";
+import sql from "../plugins/sql";
 
-export default class extends Controller {
-  // 获取项目列表
-  @Route("monitor-get-apps")
-  async getList() {
-    await db.read();
-    let list = (db.data as Database).monitor;
-    return {
-      list: list || [],
-    };
-  }
-  @Route("monitor-save-apps")
-  async save(req: Request<{ siteId: string; name: string }[]>) {
+const route = Route();
+
+// 获取项目列表
+route.handle("get-apps", async () => {
+  let list = await sql((db) => db.monitor);
+  return {
+    list: list || [],
+  };
+});
+// 保存已选的项目列表
+route.handle(
+  "save-apps",
+  async (req: Request<{ siteId: string; name: string }[]>) => {
     const { params } = req;
-    await db.read();
-    (db.data as Database).monitor = params;
-    await db.write();
+    await sql((db) => {
+      db.monitor = params;
+    });
+    return null;
   }
-}
+);
+
+export default route;
