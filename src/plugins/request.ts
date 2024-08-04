@@ -1,4 +1,4 @@
-import { unref, isReactive } from "vue";
+import { ref, unref, isReactive, shallowRef } from "vue";
 import { sleep } from "@linzb93/utils";
 import { createClient } from "@linzb93/event-router";
 import { loading } from "./util";
@@ -13,7 +13,11 @@ const request = createClient({
   },
 });
 
-export default async (path: string, params?: any, options?: Option) => {
+export default async function doRequest(
+  path: string,
+  params?: any,
+  options?: Option
+) {
   if (options?.showLoading) {
     loading.open();
   }
@@ -34,4 +38,23 @@ export default async (path: string, params?: any, options?: Option) => {
     return Promise.reject(res);
   }
   return res.result;
-};
+}
+
+// hook
+export function useRequest<T = any>(
+  path: string,
+  params?: any,
+  options?: Option
+) {
+  const loaded = shallowRef(false);
+  const result = ref<T>();
+  return {
+    loaded,
+    result,
+    async fetch() {
+      const res = await doRequest(path, params, options);
+      loaded.value = true;
+      result.value = res;
+    },
+  };
+}

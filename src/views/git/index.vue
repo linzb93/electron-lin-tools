@@ -21,7 +21,7 @@
       >
     </div>
     <el-table
-      :data="list"
+      :data="result.list"
       class="mt20"
       @selection-change="handleSelectionChange"
     >
@@ -54,7 +54,7 @@
 import { shallowRef, ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import SelectDirs from "./components/SelectDirs.vue";
-import request from "@/plugins/request";
+import request, { useRequest } from "@/plugins/request";
 
 onMounted(async () => {
   const setting = await request("schedule-get");
@@ -67,13 +67,6 @@ onMounted(async () => {
 const gitForm = ref({
   dirs: [],
 });
-const weeks = [
-  { title: "星期一", id: 1 },
-  { title: "星期二", id: 2 },
-  { title: "星期三", id: 3 },
-  { title: "星期四", id: 4 },
-  { title: "星期五", id: 5 },
-];
 
 const save = async () => {
   await request("schedule-save", {
@@ -81,21 +74,18 @@ const save = async () => {
   });
   ElMessage.success("保存成功");
 };
-const loaded = shallowRef(false);
-const list = shallowRef([]);
+const { fetch, loaded, result } = useRequest(
+  "schedule-git-scan-result",
+  {},
+  {
+    showLoading: true,
+  }
+);
 const duration = shallowRef("0");
 const getList = async () => {
   const startTime = Date.now();
-  const result = await request(
-    "schedule-git-scan-result",
-    {},
-    {
-      showLoading: true,
-    }
-  );
+  fetch();
   duration.value = ((Date.now() - startTime) / 1000).toFixed(2);
-  list.value = result.list;
-  loaded.value = true;
 };
 
 interface Row {
