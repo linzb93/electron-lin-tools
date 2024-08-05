@@ -31,6 +31,7 @@ export interface Database {
       previewType: 1 | 2;
       fasterEnter: 1 | 2;
     };
+    history: string[]
   };
   css: {
     pixio: 1 | 2;

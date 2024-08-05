@@ -205,7 +205,34 @@ route.handle("get-shortcut", async (req: Request<{ id: number }>) => {
   const { params } = req;
   const { accounts } = await sql((db) => db.oss);
   return {
-    shortcut: accounts.find((acc) => acc.id === params.id).shortcut,
+    shortcut: accounts.find((acc) => acc.id === Number(params.id)).shortcut,
   };
+});
+
+// 获取上传记录
+route.handle("get-history", async (req: Request<{
+  path: string;
+  pageSize: number;
+  pageIndex: number;
+}>) => {
+  const { params } = req;
+  const history = await sql(db => db.oss.history);
+  const start = (params.pageIndex - 1) * params.pageSize;
+  const end = start + params.pageSize;
+  const list = history.slice(start, end);
+  return {
+    list,
+    totalCount: history.length,
+  };
+});
+
+// 添加上传记录
+route.handle("add-history", async (req: Request<{
+  path: string;
+}>) => {
+  const { params } = req;
+  await sql(db => {
+    db.oss.history.push(params.path);
+  });
 });
 export default route;
