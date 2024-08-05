@@ -1,11 +1,21 @@
-import request from "./request";
 import { ElMessage, ElLoading } from "element-plus";
+import request from "./request";
 
+/**
+ * 复制文本
+ * @param {string} text 复制的文本
+ */
 export const copy = (text: string) => {
   request("copy", text);
   ElMessage.success("复制成功");
 };
-export const download = async (url: string) => {
+
+/**
+ * 下载文件，支持单个或批量下载
+ * @param {string | string[]} url 下载地址
+ * @returns 
+ */
+export const download = async (url: string | string[]) => {
   try {
     await request("download", url);
   } catch (error) {
@@ -14,7 +24,11 @@ export const download = async (url: string) => {
   ElMessage.success("下载成功");
 };
 
-// 处理来自主进程的请求
+/**
+ * 处理来自主进程的请求
+ * @param receiveMethod 请求名称 
+ * @param callback 回调函数
+ */
 export const handleMainPost = (receiveMethod: string, callback: Function) => {
   window.ipcRenderer.on(
     "main-post",

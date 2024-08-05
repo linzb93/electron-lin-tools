@@ -5,9 +5,12 @@
     :model="form"
     :rules="rules"
     label-suffix="："
-    label-width="80px"
+    label-width="75px"
   >
-    <el-form-item label="IPC">
+    <el-alert type="info" class="mt10" :closable="false"
+      >设置数据仅保留在本地。</el-alert
+    >
+    <el-form-item label="IPC" class="mt20">
       <el-input v-model="form.ipc" placeholder="请输入连接的服务端IPC名称" />
     </el-form-item>
     <el-form-item label="oa api">
@@ -41,12 +44,12 @@
 import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useGlobalStore } from "@/store";
-const formRef = ref(null);
 import request from "@/plugins/request";
 import Qa from "@/components/Qa.vue";
 
 const globalStore = useGlobalStore();
 
+const formRef = ref(null);
 const form = ref({});
 const rules = {};
 

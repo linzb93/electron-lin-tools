@@ -1,4 +1,6 @@
 import { ipcMain } from "electron";
+import dayjs from "dayjs";
+import { timejs } from "@linzb93/utils";
 import { getMainWindow } from "..";
 
 export const uuid = (len = 36) => {
@@ -46,6 +48,16 @@ export const mainPost = ({
         requestId: uid,
         method,
         data,
-        listener
+        listener,
       });
   });
+
+export const onShutDown = (callback: Function) => {
+  const shutDownTime = '18:00';
+  const timer = setInterval(() => {
+    if (timejs(dayjs().format("HH:mm:ss")).isAfter(shutDownTime)) {
+      callback();
+      clearInterval(timer);
+    }
+  }, 1000 * 60);
+};

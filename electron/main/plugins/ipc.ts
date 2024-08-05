@@ -1,10 +1,9 @@
 import ipc from "node-ipc";
-import db from "./database";
-import { Route } from "./route/decorators";
-import Controller from "./route/Controller";
+import sql from "./sql";
+import { Route } from "@linzb93/event-router";
 import { shallowRef } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
-import { Database, Request } from "../types/api";
+import { Request } from "../types/api";
 import { mainPost, uuid } from "./utils";
 
 interface IpcResponse {
@@ -26,41 +25,34 @@ ipc.config.id = "electron-lin-tools";
 ipc.config.retry = 3000;
 ipc.config.silent = true;
 
-export class IpcController extends Controller {
-  @Route("save-ipc")
-  async saveIpc(req: Request<{ name: string }>) {
-    const { name } = req.params;
-    await db.read();
-    (db.data as Database).ipc = name;
-    await db.write();
+const route = Route();
+route.handle('save', async (req: Request<{ name: string }>) => {
+  await sql(db => {
+    db.ipc = req.params.name;
+  });
+  return null;
+});
+route.handle('connect', async () => {
+  const serverIpcId = await sql(db => db.ipc);
+  if (!serverIpcId) {
     return {
-      message: "success",
+      code: 500,
+      message: "ipc not set",
     };
   }
-  @Route("ipc-connect")
-  async connect() {
-    await db.read();
-    const serverIpcId = (db.data as Database).ipc;
-    if (!serverIpcId) {
-      return {
-        message: "ipc not set",
-      };
-    }
-    ipc.connectTo(serverIpcId, () => {
-      ipc.of[serverIpcId].on("connect", () => {
-        isConnected.value = true;
-      });
-      ipc.of[serverIpcId].on("disconnect", () => {
-        isConnected.value = false;
-      });
+  ipc.connectTo(serverIpcId, () => {
+    ipc.of[serverIpcId].on("connect", () => {
+      isConnected.value = true;
     });
-  }
-}
+    ipc.of[serverIpcId].on("disconnect", () => {
+      isConnected.value = false;
+    });
+  });
+});
 
 export const ipcInvoke = (action: string, request: any) =>
   new Promise(async (resolve, reject) => {
-    await db.read();
-    const serverIpcId = (db.data as Database).ipc;
+    const serverIpcId = await sql(db => db.ipc);
     if (!serverIpcId) {
       reject("not to set");
       return;

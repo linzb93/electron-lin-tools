@@ -29,6 +29,7 @@ export interface Database {
       pixel: 1 | 2;
       platform: 1 | 2;
       previewType: 1 | 2;
+      fasterEnter: 1 | 2;
     };
   };
   css: {
@@ -48,4 +49,22 @@ export interface Database {
     siteId: string;
     name: string;
   }[];
+  schedule: {
+    inited: boolean;
+    git: {
+      dirs: {
+        path: string;
+        name: string;
+      }[];
+      period: 1 | 2;
+      weeks: number[];
+    };
+    monitor: {
+      file: string;
+      timeAfterPublish: number;
+      timeNextDay: number;
+      weekDay: number;
+      timeEveryWeek: string;
+    };
+  };
 }

@@ -11,7 +11,7 @@ const routes = [
   },
   {
     path: "/oss/detail",
-    component: () => import("./views/oss/detail.vue"),
+    component: () => import("./views/oss/children/detail.vue"),
   },
   {
     path: "/iPhone",
@@ -24,6 +24,10 @@ const routes = [
   {
     path: "/monitor",
     component: () => import("./views/monitor/index.vue"),
+  },
+  {
+    path: "/git",
+    component: () => import("./views/git/index.vue"),
   },
   {
     path: "/setting",

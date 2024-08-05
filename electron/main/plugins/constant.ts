@@ -1,4 +1,4 @@
-import { join, dirname } from "node:path";
+import { join } from "node:path";
 import { app } from "electron";
 import cachedir from "cachedir";
 

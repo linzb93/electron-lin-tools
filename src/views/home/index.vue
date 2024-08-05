@@ -5,7 +5,6 @@
   </div>
 </template>
 
-<script setup></script>
 <style scoped lang="scss">
 .home {
   text-align: center;

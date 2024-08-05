@@ -1,99 +1,83 @@
 import path from "node:path";
+import { Route } from "@linzb93/event-router";
 import pMap from "p-map";
 import OSS, { OssConfig } from "ali-oss";
 import { omit } from "lodash-es";
-import db from "../plugins/database";
-import Controller from "../plugins/route/Controller";
-import { Route } from "../plugins/route/decorators";
 import { HTTP_STATUS } from "../plugins/constant";
 import { Request, Database } from "../types/api";
+import sql from "../plugins/sql";
 
-export default class extends Controller {
-  constructor() {
-    super();
-  }
-  // 查找对应的用户信息
-  private async findClient(id: number) {
-    await db.read();
-    const match = (db.data as Database).oss.accounts.find(
-      (item) => item.id === id
-    );
-    if (!match) {
-      return {
-        success: false,
-        response: {
-          code: HTTP_STATUS.BAD_REQUEST,
-          message: "不存在",
-        },
-      };
-    }
-    const ossobj = omit(match, ["platform", "name"]) as unknown as OssConfig;
+const route = Route();
+
+// 根据id查找对应的OSS客户端
+async function findClient(id: number) {
+  const accounts = await sql((db) => db.oss.accounts);
+  const match = accounts.find((item) => item.id === id);
+  if (!match) {
     return {
-      success: true,
-      client: new OSS(ossobj),
-      domain: match.domain,
+      code: HTTP_STATUS.BAD_REQUEST,
+      message: "OSS不存在",
     };
   }
+  const ossobj = omit(match, ["platform", "name"]) as unknown as OssConfig;
+  return {
+    code: 200,
+    client: new OSS(ossobj),
+    domain: match.domain,
+  };
+}
 
-  // 添加用户，目前仅支持阿里OSS
-  @Route("oss-create")
-  async create(req: Request<OssConfig>) {
-    await db.read();
-    const data = db.data as Database;
+// 获取已添加的客户端列表
+route.handle("get-project-list", async () => {
+  return {
+    list: await sql((db) => db.oss.accounts),
+  };
+});
+
+// 添加客户端，目前仅支持阿里OSS
+route.handle("create", async (req: Request<OssConfig>) => {
+  await sql((db) => {
     if (req.params.id) {
       // 是编辑
-      const index = data.oss.accounts.findIndex(
+      const index = db.oss.accounts.findIndex(
         (acc) => acc.id === req.params.id
       );
       if (index > -1) {
-        data.oss.accounts[index] = req.params;
+        db.oss.accounts[index] = req.params;
       }
     } else {
-      const id = data.oss.accounts.length
-        ? Number(data.oss.accounts.at(-1).id + 1)
+      const id = db.oss.accounts.length
+        ? Number(db.oss.accounts.at(-1).id + 1)
         : 1;
-      data.oss.accounts.push({
+      db.oss.accounts.push({
         ...req.params,
         id,
       });
     }
-    await db.write();
-    return {
-      message: "ok",
-    };
-  }
+  });
+  return null;
+});
 
-  // 移除用户
-  @Route("oss-remove-account")
-  async removeAccount(req: Request) {
-    const { id } = req.params;
-    await db.read();
-    let { accounts } = (db.data as Database).oss;
+// 移除客户端
+route.handle("remove-account", async (req: Request<{ id: number }>) => {
+  const { id } = req.params;
+  await sql((db) => {
+    let { accounts } = db.oss;
     const index = accounts.findIndex((acc) => acc.id === id);
     accounts.splice(index, 1);
-    await db.write();
-    return {
-      message: "success",
-    };
-  }
+  });
+  return null;
+});
 
-  // 获取用户列表
-  @Route("oss-get-project-list")
-  async getProjectList() {
-    await db.read();
-    return {
-      list: (db.data as Database).oss.accounts,
-    };
-  }
-
-  // 获取文件/目录列表
-  @Route("oss-get-oss-list")
-  async getOssList(req: Request) {
+// 获取文件/目录列表
+route.handle(
+  "get-oss-list",
+  async (req: Request<{ id: number; config: { prefix: string } }>) => {
     // https://help.aliyun.com/zh/oss/developer-reference/list-objects-5?spm=a2c4g.11186623.0.i2
     const { id, config } = req.params;
-    const projectRes = await this.findClient(id);
-    if (!projectRes.success) {
-      return projectRes.response;
+    const projectRes = await findClient(id);
+    if (projectRes.code !== 200) {
+      return projectRes;
     }
     const { client, domain } = projectRes;
     const result = await client.listV2({
@@ -123,14 +107,22 @@ export default class extends Controller {
         : objects,
     };
   }
+);
 
-  // 删除文件
-  @Route("oss-delete-file")
-  async deleteFile(req: Request) {
+// 删除文件
+route.handle(
+  "delete-file",
+  async (
+    req: Request<{
+      id: number;
+      path: string;
+      paths: string[];
+    }>
+  ) => {
     const { id, path, paths } = req.params;
-    const projectRes = await this.findClient(id);
-    if (!projectRes.success) {
-      return projectRes.response;
+    const projectRes = await findClient(id);
+    if (projectRes.code !== 200) {
+      return projectRes;
     }
     const { client } = projectRes;
     if (paths) {
@@ -140,33 +132,46 @@ export default class extends Controller {
     } else {
       await client.delete(path);
     }
-    return {
-      message: "success",
-    };
+    return null;
   }
+);
 
-  // 创建目录
-  @Route("oss-create-directory")
-  async createDirectory(req: Request) {
+// 创建目录
+route.handle(
+  "create-directory",
+  async (
+    req: Request<{
+      id: number;
+      path: string;
+      name: string;
+    }>
+  ) => {
     const { id, path: uploadPath, name } = req.params;
-    const projectRes = await this.findClient(id);
-    if (!projectRes.success) {
-      return projectRes.response;
+    const projectRes = await findClient(id);
+    if (projectRes.code !== 200) {
+      return projectRes;
     }
     const { client } = projectRes;
     await client.put(`${uploadPath}${name}/`, Buffer.from(""));
-    return {
-      message: "success",
-    };
+    return null;
   }
+);
 
-  // 上传文件
-  @Route("oss-upload")
-  async upload(req: Request) {
+// 上传文件
+route.handle(
+  "upload",
+  async (
+    req: Request<{
+      id: number;
+      path: string;
+      name: string;
+      files: string[];
+    }>
+  ) => {
     const { id, path: uploadPath, files } = req.params;
-    const projectRes = await this.findClient(id);
-    if (!projectRes.success) {
-      return projectRes.response;
+    const projectRes = await findClient(id);
+    if (projectRes.code !== 200) {
+      return projectRes;
     }
     const { client } = projectRes;
     await Promise.all(
@@ -174,42 +179,33 @@ export default class extends Controller {
         client.put(`${uploadPath}${path.basename(file)}`, file)
       )
     );
-    return {
-      message: "success",
-    };
+    return null;
   }
+);
 
-  // CSS代码
-  @Route("oss-get-setting")
-  async getSetting() {
-    await db.read();
-    const { setting } = (db.data as Database).oss;
-    return {
-      message: "success",
-      setting,
-    };
-  }
-  @Route("oss-save-setting")
-  async saveSetting(req: Request) {
+// 读取CSS代码设置
+route.handle("get-setting", async () => {
+  return {
+    setting: await sql((db) => db.oss.setting),
+  };
+});
+// 修改CSS代码设置
+route.handle(
+  "save-setting",
+  async (req: Request<Database["oss"]["setting"]>) => {
     const { params } = req;
-    await db.read();
-    (db.data as Database).oss.setting = {
-      pixel: params.pixel,
-      platform: params.platform,
-      previewType: params.previewType,
-    };
-    await db.write();
-    return {
-      message: "success",
-    };
+    await sql((db) => {
+      db.oss.setting = params;
+    });
+    return null;
   }
-  @Route("oss-get-shortcut")
-  async getShortcut(req: Request) {
-    const { params } = req;
-    await db.read();
-    const { accounts } = (db.data as Database).oss;
-    return {
-      result: accounts.find((acc) => acc.id === params.id).shortcut,
-    };
-  }
-}
+);
+// 获取项目前缀，快捷使用
+route.handle("get-shortcut", async (req: Request<{ id: number }>) => {
+  const { params } = req;
+  const { accounts } = await sql((db) => db.oss);
+  return {
+    shortcut: accounts.find((acc) => acc.id === params.id).shortcut,
+  };
+});
+export default route;

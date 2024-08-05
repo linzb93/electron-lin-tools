@@ -1,7 +1,7 @@
 <template>
-  <el-popover :content="content">
+  <el-popover :content="props.content">
     <template #reference
-      ><el-icon :size="14" :color="color"><QuestionFilled /></el-icon
+      ><el-icon :size="14" :color="props.color"><QuestionFilled /></el-icon
     ></template>
   </el-popover>
 </template>

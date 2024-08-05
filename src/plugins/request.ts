@@ -1,16 +1,30 @@
-import { unref, isReactive } from "vue";
+import { ref, unref, isReactive, shallowRef } from "vue";
 import { sleep } from "@linzb93/utils";
+import { createClient } from "@linzb93/event-router";
+import { loading } from "./util";
 interface Option {
-  delay: number;
+  delay?: number;
+  showLoading?: boolean;
 }
-export default async (path: string, params: any, options?: Option) => {
-  const res = await window.ipcRenderer.invoke(
-    "api",
-    JSON.stringify({
-      path,
-      params,
-    })
-  );
+
+const request = createClient({
+  invoke(name, data) {
+    return window.ipcRenderer.invoke(name, JSON.stringify(data));
+  },
+});
+
+export default async function doRequest(
+  path: string,
+  params?: any,
+  options?: Option
+) {
+  if (options?.showLoading) {
+    loading.open();
+  }
+  const res = await request(path, params);
+  if (options?.showLoading) {
+    loading.close();
+  }
   if (options?.delay) {
     await sleep(options.delay);
   }
@@ -24,4 +38,23 @@ export default async (path: string, params: any, options?: Option) => {
     return Promise.reject(res);
   }
   return res.result;
-};
+}
+
+// hook
+export function useRequest<T = any>(
+  path: string,
+  params?: any,
+  options?: Option
+) {
+  const loaded = shallowRef(false);
+  const result = ref<T>();
+  return {
+    loaded,
+    result,
+    async fetch() {
+      const res = await doRequest(path, params, options);
+      loaded.value = true;
+      result.value = res;
+    },
+  };
+}

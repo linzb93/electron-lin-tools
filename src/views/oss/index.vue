@@ -56,19 +56,26 @@
 
 <script setup>
 import { ref, shallowRef, onMounted } from "vue";
-import request from "@/plugins/request";
-import { ElMessage } from "element-plus";
-import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import request from "@/plugins/request";
+import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useOssStore } from "./store";
+
 const router = useRouter();
 const ossStore = useOssStore();
+
 const list = ref([]);
 const getList = async () => {
   const data = await request("oss-get-project-list");
   list.value = data.list;
 };
-onMounted(() => {
+onMounted(async () => {
+  const { setting } = await request("oss-get-setting");
+  if (setting.fasterEnter === 1) {
+    router.replace(`/oss/detail?id=1`);
+    return;
+  }
   getList();
 });
 
@@ -116,23 +123,5 @@ const remove = async (item) => {
 <style lang="scss" scoped>
 .el-link + .el-link {
   margin-left: 10px;
-}
-ul {
-  margin-top: 30px;
-}
-li {
-  margin-left: 30px;
-  padding: 0 10px;
-  width: 120px;
-  height: 30px;
-  border-radius: 4px;
-  line-height: 30px;
-  border: 1px solid #999;
-  font-size: 18px;
-  color: #333;
-  cursor: pointer;
-  &:first-child {
-    margin-left: 0;
-  }
 }
 </style>
