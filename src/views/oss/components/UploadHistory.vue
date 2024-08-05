@@ -10,7 +10,7 @@
       <el-table-column label="名称" prop="name">
         <template #default="scope">
           <el-link type="primary" @click="gotoFile(scope.row)">{{
-            scope.row.name
+            pathUtil.basename(scope.row.path)
           }}</el-link>
         </template>
       </el-table-column>
@@ -20,17 +20,26 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      background
+      class="mt30"
+      :total="totalCount"
+      hide-on-single-page
+      :page-size="query.pageSize"
+      v-model:current-page="query.pageIndex"
+      @change="getList"
+    />
   </el-drawer>
 </template>
 
 <script setup>
 import { ref, shallowRef, reactive, shallowReactive, watch } from "vue";
 import request from "@/plugins/request";
-
+import pathUtil from "@/plugins/path";
 const props = defineProps({
   visible: Boolean,
 });
-const emit = defineEmits(["update:visible"]);
+const emit = defineEmits(["update:visible", "select"]);
 watch(props, ({ visible }) => {
   if (!visible) {
     return;
@@ -41,7 +50,6 @@ const query = shallowReactive({
   pageSize: 10,
   pageIndex: 1,
 });
-const list = shallowRef([]);
 const totalCount = shallowRef(0);
 
 const getList = async () => {
@@ -53,6 +61,7 @@ const getList = async () => {
 const list = shallowRef([]);
 const gotoFile = (row) => {
   close();
+  emit("select", row.path);
 };
 const close = () => {
   emit("update:visible", false);

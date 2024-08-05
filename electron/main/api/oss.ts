@@ -1,4 +1,5 @@
-import path from "node:path";
+import { basename } from "node:path";
+import dayjs from "dayjs";
 import { Route } from "@linzb93/event-router";
 import pMap from "p-map";
 import OSS, { OssConfig } from "ali-oss";
@@ -129,8 +130,10 @@ route.handle(
       await pMap(paths, (path: string) => client.delete(path), {
         concurrency: 4,
       });
+      await removeHistory(paths);
     } else {
       await client.delete(path);
+      await removeHistory(path);
     }
     return null;
   }
@@ -173,12 +176,13 @@ route.handle(
     if (projectRes.code !== 200) {
       return projectRes;
     }
-    const { client } = projectRes;
+    const { client, domain } = projectRes;
     await Promise.all(
       files.map((file: string) =>
-        client.put(`${uploadPath}${path.basename(file)}`, file)
+        client.put(`${uploadPath}${basename(file)}`, file)
       )
     );
+    addHistory(files.map((file) => `${domain}/${uploadPath}${basename(file)}`));
     return null;
   }
 );
@@ -210,29 +214,58 @@ route.handle("get-shortcut", async (req: Request<{ id: number }>) => {
 });
 
 // 获取上传记录
-route.handle("get-history", async (req: Request<{
-  path: string;
-  pageSize: number;
-  pageIndex: number;
-}>) => {
-  const { params } = req;
-  const history = await sql(db => db.oss.history);
-  const start = (params.pageIndex - 1) * params.pageSize;
-  const end = start + params.pageSize;
-  const list = history.slice(start, end);
-  return {
-    list,
-    totalCount: history.length,
-  };
-});
+route.handle(
+  "get-history",
+  async (
+    req: Request<{
+      path: string;
+      pageSize: number;
+      pageIndex: number;
+    }>
+  ) => {
+    const { params } = req;
+    const history = await sql((db) => db.oss.history);
+    if (!history || !history.length) {
+      return {
+        list: [],
+        totalCount: 0,
+      };
+    }
+    const start = (params.pageIndex - 1) * params.pageSize;
+    const end = start + params.pageSize;
+    const list = history.slice(start, end);
+    return {
+      list,
+      totalCount: history.length,
+    };
+  }
+);
 
 // 添加上传记录
-route.handle("add-history", async (req: Request<{
-  path: string;
-}>) => {
-  const { params } = req;
-  await sql(db => {
-    db.oss.history.push(params.path);
+async function addHistory(filePaths: string[]) {
+  await sql((db) => {
+    const uploadLog = filePaths.map((item) => ({
+      path: item,
+      createTime: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    }));
+    db.oss.history = db.oss.history
+      ? db.oss.history.concat(uploadLog)
+      : uploadLog;
   });
-});
+}
+
+// 移除上传记录
+async function removeHistory(filePath: string | string[]) {
+  await sql((db) => {
+    const { history } = db.oss;
+    if (!history) {
+      db.oss.history = [];
+    }
+    if (Array.isArray(filePath)) {
+      db.oss.history = history.filter((item) => filePath.includes(item.path));
+    } else {
+      db.oss.history = history.filter((item) => item.path !== filePath);
+    }
+  });
+}
 export default route;

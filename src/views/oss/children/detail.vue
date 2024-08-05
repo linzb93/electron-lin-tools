@@ -15,6 +15,9 @@
         <el-button type="danger" @click="deleteMulti">批量删除</el-button>
         <el-button type="primary" @click="downloadMulti">批量下载</el-button>
       </template>
+      <el-button type="primary" @click="visible.history = true"
+        >上传历史</el-button
+      >
       <div class="path ml20 flexalign-center">
         <template v-if="breadcrumb.length">
           <el-icon @click="clickPath(-1)" class="curp" :size="16">
@@ -132,7 +135,7 @@
       </context-menu>
     </div>
   </div>
-
+  <upload-history v-model:visible="visible.history" @select="onSelectHistory" />
   <progress-drawer
     v-model:visible="progressVisible"
     :upload-list="uploadingList"
@@ -179,6 +182,7 @@ import ContextMenu from "@/components/ContextMenu.vue";
 import ProgressDrawer from "../components/Progress.vue";
 import MsgBoxFileList from "../components/FileList.vue";
 import SettingDialog from "../components/Setting.vue";
+import UploadHistory from "../components/UploadHistory.vue";
 
 const route = useRoute();
 
@@ -191,6 +195,7 @@ const visible = shallowReactive({
   progress: false,
   preview: false,
   setting: false,
+  history: false,
 });
 const loading = shallowRef(true);
 loading.value = true;
@@ -318,6 +323,12 @@ const createDir = () => {
     .catch(() => {
       //
     });
+};
+
+const onSelectHistory = (filePath) => {
+  const { pathname } = new URL(filePath);
+  breadcrumb.value = pathname.split("/").slice(1, -1);
+  getList();
 };
 // 拖拽上传
 
