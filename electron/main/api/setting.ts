@@ -15,7 +15,7 @@ route.handle("get", async () => {
 });
 route.handle("save", async (req: Request<{
   oaApiPrefix: string;
-  ipc:string;
+  ipc: string;
   user: string;
   password: string;
 }>) => {

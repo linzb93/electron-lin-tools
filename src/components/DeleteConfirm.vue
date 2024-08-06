@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { shallowRef } from "vue";
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     default: "确认删除？",

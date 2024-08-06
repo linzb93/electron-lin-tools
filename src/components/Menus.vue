@@ -65,7 +65,7 @@ import {
   View,
   Clock,
 } from "@element-plus/icons-vue";
-import { Oss, VueIcon } from "./icons";
+import { Oss } from "./icons";
 import request from "@/helpers/request";
 
 const route = useRoute();
@@ -96,12 +96,6 @@ const list = [
     title: "Git扫描",
     to: "/git",
     icon: Clock,
-  },
-  {
-    title: "Vue项目管理",
-    to: "/vue",
-    icon: VueIcon,
-    unpublished: true,
   },
 ];
 const menuList = list.filter((item) => !item.hide);

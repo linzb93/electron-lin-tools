@@ -11,7 +11,7 @@ export default function logger(content: string) {
     fs.appendFile(
       join(root, "error.log"),
       `[${dayjs().format("YYYY-MM-DD HH:mm:ss")}] ${content}\n`,
-      () => {}
+      () => { }
     );
   }
 }

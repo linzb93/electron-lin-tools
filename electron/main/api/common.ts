@@ -69,7 +69,7 @@ export default async (app: Application) => {
       });
     });
   });
-  
+
   // 打开网页或文件
   app.handle("open", async (req: Request<string>) => {
     await shell.openPath(req.params);
@@ -157,24 +157,6 @@ export default async (app: Application) => {
     };
   });
 
-  // 登录
-  // async login(
-  //   req: Request<{
-  //     user: string;
-  //     password: string;
-  //   }>
-  // ) {
-  //   const { params } = req;
-  //   await db.read();
-  //   (db.data as Database).sync = {
-  //     user: params.user,
-  //     password: params.password,
-  //   };
-  //   await db.write();
-  //   return {
-  //     success: true,
-  //   };
-  // }
   app.handle("open-in-browser", (req: Request<{ url: string }>) => {
     const { url } = req.params;
     shell.openExternal(url);

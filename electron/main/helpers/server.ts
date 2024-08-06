@@ -3,7 +3,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import iPhoneRouter from "../api/iPhone";
-import { tempPath, serverStaticPath } from "./constant";
+import { tempPath } from "./constant";
 
 fs.accessSync(tempPath);
 export const config = {
@@ -17,11 +17,6 @@ try {
 } catch (error) {
   fs.mkdirSync(tempPath);
 }
-try {
-  fs.accessSync(serverStaticPath);
-} catch (error) {
-  fs.mkdirSync(serverStaticPath);
-}
 (() => {
   const app = express();
 
@@ -29,8 +24,6 @@ try {
   app.use(bodyParser.json({ limit: "5mb" }));
   app.use(cors());
   app.use(config.static, express.static(tempPath)); // 存放临时文件
-  app.use(config.server, express.static(serverStaticPath)); // 存放前端Vue项目打包页面
-
   app.use("/iPhone-sync", iPhoneRouter);
 
   app.listen(config.port);

@@ -18,10 +18,6 @@ const routes = [
     component: () => import("./views/iPhone/index.vue"),
   },
   {
-    path: "/vue",
-    component: () => import("./views/vue/index.vue"),
-  },
-  {
     path: "/monitor",
     component: () => import("./views/monitor/index.vue"),
   },

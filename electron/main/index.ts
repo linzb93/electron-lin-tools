@@ -99,15 +99,11 @@ app.whenReady().then(async () => {
         { role: "reload" },
         {
           label: "about",
-          click: async () => {
-            const pkg = {
-              version: "v1.6.1",
-            };
+          click: () => {
             dialog.showMessageBox({
               title: "关于我们",
-              message: `${
-                pkg.version
-              }\n @copyright ${new Date().getFullYear()} linzb93`,
+              message: `${app.getVersion()
+                }\n @copyright ${new Date().getFullYear()} linzb93`,
             });
           },
         },
@@ -135,9 +131,6 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
   win = null;
-  // if (process.platform !== "darwin") {
-  //   app.quit();
-  // }
 });
 
 app.on("second-instance", () => {

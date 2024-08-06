@@ -100,11 +100,11 @@ route.handle(
     return {
       list: result.prefixes
         ? result.prefixes
-            .map((subDir) => ({
-              name: subDir.replace(/\/$/, "").split("/").slice(-1)[0],
-              type: "dir",
-            }))
-            .concat(objects)
+          .map((subDir) => ({
+            name: subDir.replace(/\/$/, "").split("/").slice(-1)[0],
+            type: "dir",
+          }))
+          .concat(objects)
         : objects,
     };
   }
