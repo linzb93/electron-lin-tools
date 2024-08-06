@@ -44,7 +44,7 @@
 import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useGlobalStore } from "@/store";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 import Qa from "@/components/Qa.vue";
 
 const globalStore = useGlobalStore();

@@ -5,9 +5,9 @@ import { Observable, debounceTime } from "rxjs";
 import { Notification, clipboard } from "electron";
 import multer from "multer";
 import intoStream from "into-stream";
-import { tempPath } from "../plugins/constant";
-import { mainPost } from "../plugins/utils";
-import { config } from "../plugins/server";
+import { tempPath } from "../helpers/constant";
+import { mainPost } from "../helpers/utils";
+import { config } from "../helpers/server";
 
 const { Router } = express;
 const router = Router();

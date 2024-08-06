@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { handleMainPost } from "./plugins/util";
-import request from "./plugins/request";
+import { handleMainPost } from "./helpers/util";
+import request from "./helpers/request";
 
 export const useGlobalStore = defineStore("oss", {
   state: () => ({

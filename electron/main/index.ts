@@ -12,10 +12,10 @@ import {
 } from "electron";
 import isDev from "electron-is-dev";
 import unhandled from "electron-unhandled";
-import registerRoute from "./plugins/router";
-import { root, publicPath } from "./plugins/constant";
-import "./plugins/server";
-import "./plugins/schedule";
+import registerRoute from "./helpers/router";
+import { root, publicPath } from "./helpers/constant";
+import "./helpers/server";
+import "./helpers/schedule";
 
 unhandled();
 const __filename = fileURLToPath(import.meta.url);

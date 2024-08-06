@@ -111,7 +111,7 @@
 
 <script setup>
 import { ref, shallowRef, onMounted, computed } from "vue";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { ArrowDown } from "@element-plus/icons-vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";

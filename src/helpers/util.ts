@@ -1,28 +1,4 @@
-import { ElMessage, ElLoading } from "element-plus";
-import request from "./request";
-
-/**
- * 复制文本
- * @param {string} text 复制的文本
- */
-export const copy = (text: string) => {
-  request("copy", text);
-  ElMessage.success("复制成功");
-};
-
-/**
- * 下载文件，支持单个或批量下载
- * @param {string | string[]} url 下载地址
- * @returns 
- */
-export const download = async (url: string | string[]) => {
-  try {
-    await request("download", url);
-  } catch (error) {
-    return;
-  }
-  ElMessage.success("下载成功");
-};
+import { ElLoading } from "element-plus";
 
 /**
  * 处理来自主进程的请求

@@ -12,7 +12,7 @@
       <el-button
         type="primary"
         @click="
-          copy(
+          requestUtil.copy(
             list
               .map(
                 (item) =>
@@ -50,7 +50,9 @@
             type="primary"
             :underline="false"
             @click="
-              copy(`${ossStore.platform.domain}/${props.path}${scope.row.name}`)
+              requestUtil.copy(
+                `${ossStore.platform.domain}/${props.path}${scope.row.name}`
+              )
             "
             >复制</el-link
           >
@@ -63,11 +65,10 @@
 <script setup>
 import { ref, watch } from "vue";
 import { ElMessage } from "element-plus";
-import { Check } from "@element-plus/icons-vue";
-import request from "@/plugins/request";
-import { copy } from "@/plugins/util";
 import { cloneDeep } from "lodash-es";
 import { useRoute } from "vue-router";
+import { Check } from "@element-plus/icons-vue";
+import request, { requestUtil } from "@/helpers/request";
 import { useOssStore } from "../store";
 
 const route = useRoute();

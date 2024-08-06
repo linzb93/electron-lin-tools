@@ -24,7 +24,7 @@
 <script setup>
 import { ref, shallowRef, onMounted, watch, onUnmounted, nextTick } from "vue";
 import useMouse from "@/hooks/useMouse";
-import { getScrollLeft, getScrollTop } from "@/plugins/dom";
+import { getScrollLeft, getScrollTop } from "@/helpers/dom";
 const props = defineProps({
   menus: Array,
   scaling: {

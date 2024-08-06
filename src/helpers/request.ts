@@ -1,7 +1,9 @@
 import { ref, unref, isReactive, shallowRef } from "vue";
+import { ElMessage } from "element-plus";
 import { sleep } from "@linzb93/utils";
 import { createClient } from "@linzb93/event-router";
 import { loading } from "./util";
+
 interface Option {
   delay?: number;
   showLoading?: boolean;
@@ -57,4 +59,39 @@ export function useRequest<T = any>(
       result.value = res;
     },
   };
+}
+
+export const requestUtil = {
+  /**
+ * 复制文本
+ * @param {string} text 复制的文本
+ */
+  copy(text: string) {
+    doRequest("copy", text);
+    ElMessage.success("复制成功");
+  },
+
+  /**
+ * 下载文件，支持单个或批量下载
+ * @param {string | string[]} url 下载地址
+ * @returns 
+ */
+  async download(url: string | string[]) {
+    try {
+      await doRequest("download", url);
+    } catch (error) {
+      return;
+    }
+    ElMessage.success("下载成功");
+  },
+  /**
+   * 打开网站或者文件
+   * @param url 网址或者本地文件地址
+   */
+  open(type: "vscode" | "path" | "web", url: string | string[]) {
+    doRequest("open", {
+      type,
+      url
+    });
+  }
 }

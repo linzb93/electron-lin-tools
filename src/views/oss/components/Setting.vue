@@ -39,7 +39,7 @@
 
 <script setup>
 import { ref } from "vue";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 import { ElMessage } from "element-plus";
 const props = defineProps({
   visible: Boolean,

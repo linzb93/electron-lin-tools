@@ -4,9 +4,9 @@ import { Route } from "@linzb93/event-router";
 import pMap from "p-map";
 import OSS, { OssConfig } from "ali-oss";
 import { omit } from "lodash-es";
-import { HTTP_STATUS } from "../plugins/constant";
+import { HTTP_STATUS } from "../helpers/constant";
 import { Request, Database } from "../types/api";
-import sql from "../plugins/sql";
+import sql from "../helpers/sql";
 
 const route = Route();
 

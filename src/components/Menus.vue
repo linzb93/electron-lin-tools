@@ -66,7 +66,7 @@ import {
   Clock,
 } from "@element-plus/icons-vue";
 import { Oss, VueIcon } from "./icons";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 
 const route = useRoute();
 const router = useRouter();

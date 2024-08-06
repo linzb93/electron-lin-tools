@@ -23,7 +23,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import { ElMessage } from "element-plus";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 import { service } from "../utils";
 const props = defineProps({
   visible: Boolean,

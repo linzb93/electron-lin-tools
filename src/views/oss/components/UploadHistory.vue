@@ -34,8 +34,8 @@
 
 <script setup>
 import { ref, shallowRef, reactive, shallowReactive, watch } from "vue";
-import request from "@/plugins/request";
-import pathUtil from "@/plugins/path";
+import request from "@/helpers/request";
+import pathUtil from "@/helpers/path";
 const props = defineProps({
   visible: Boolean,
 });

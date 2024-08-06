@@ -54,7 +54,7 @@
 import { shallowRef, ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import SelectDirs from "./components/SelectDirs.vue";
-import request, { useRequest } from "@/plugins/request";
+import request, { useRequest, requestUtil } from "@/helpers/request";
 
 onMounted(async () => {
   const setting = await request("schedule-get");
@@ -101,13 +101,10 @@ const handleSelectionChange = (rows: Row[]) => {
 };
 const openInEditor = (row?: any) => {
   if (row) {
-    request("open-in-vscode", row.path);
+    requestUtil.open('vscode', row.path);
     return;
   }
-  request(
-    "open-in-vscode",
-    selected.value.map((item) => item.path)
-  );
+  requestUtil.open('vscode', selected.value.map((item) => item.path));
 };
 </script>
 <style lang="scss" scoped>

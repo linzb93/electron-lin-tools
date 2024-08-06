@@ -1,6 +1,11 @@
 const isWin = process.platform === "win32";
 
 export default {
+  /**
+   * 获取文件名
+   * @param path 文件路径
+   * @returns 文件名
+   */
   basename(path: string) {
     return path.split(isWin ? "\\" : "/").at(-1);
   },

@@ -58,7 +58,7 @@
 import { ref, shallowRef, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useOssStore } from "./store";
 

@@ -45,8 +45,8 @@
 <script setup lang="ts">
 import { cloneDeep } from "lodash-es";
 import { shallowRef, ref } from "vue";
-import { handleMainPost, download } from "@/plugins/util";
-import request from "@/plugins/request";
+import { handleMainPost } from "@/helpers/util";
+import request, {requestUtil} from "@/helpers/request";
 
 /**
  * 显示的图片最大张数
@@ -89,7 +89,7 @@ handleMainPost("iPhone-upload-img", (url: string) => {
 
 // 下载
 const startDownload = async () => {
-  await download(receiveList.value);
+  await requestUtil.download(receiveList.value);
   visible.value = false;
 };
 const closed = () => {

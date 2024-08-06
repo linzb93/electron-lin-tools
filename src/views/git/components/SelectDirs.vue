@@ -6,12 +6,25 @@
         <span class="path"
           >{{ item.path }}<em class="ml10"> ({{ item.name }})</em></span
         >
-        <el-icon :size="14" class="curp ml10" @click="edit(item)"
+        <el-icon title="编辑" :size="14" class="curp ml10" @click="edit(item)"
           ><EditPen
         /></el-icon>
+        <el-icon
+          title="打开文件夹"
+          :size="14"
+          class="curp ml10"
+          @click="requestUtil.open({
+            type: 'path',
+            url: item.path
+          })"
+        >
+          <Folder />
+        </el-icon>
         <delete-confirm has-slot @confirm="onDelete(item)">
           <template #icon>
-            <el-icon :size="14" class="curp ml10"><Delete /></el-icon>
+            <el-icon title="删除" :size="14" class="curp ml10"
+              ><Delete
+            /></el-icon>
           </template>
         </delete-confirm>
       </li>
@@ -31,10 +44,10 @@
 import { ref, shallowRef } from "vue";
 import { clone } from "lodash-es";
 import { ElMessage } from "element-plus";
-import { EditPen, Delete } from "@element-plus/icons-vue";
-import request from "@/plugins/request";
-import path from "@/plugins/path";
+import { EditPen, Delete, Folder } from "@element-plus/icons-vue";
+import request, { requestUtil } from "@/helpers/request";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+
 const props = defineProps({
   dirs: {
     type: Array,

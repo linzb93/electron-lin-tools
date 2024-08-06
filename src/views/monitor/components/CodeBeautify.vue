@@ -17,7 +17,7 @@
 
 <script setup>
 import { shallowRef, watch, reactive } from "vue";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 const props = defineProps({
   visible: Boolean,
   path: String,

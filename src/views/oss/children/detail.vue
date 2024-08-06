@@ -111,13 +111,13 @@
                 <el-link
                   type="primary"
                   :underline="false"
-                  @click="copy(scope.row.url)"
+                  @click="requestUtil.copy(scope.row.url)"
                   >获取地址</el-link
                 >
                 <el-link
                   type="primary"
                   :underline="false"
-                  @click="download(scope.row.url)"
+                  @click="requestUtil.download(scope.row.url)"
                   >下载</el-link
                 >
                 <el-link
@@ -172,10 +172,9 @@ import dayjs from "dayjs";
 import { Folder, ArrowRight, HomeFilled } from "@element-plus/icons-vue";
 import { getSize } from "../util";
 import useUpload from "../hooks/useUpload";
-import pathUtil from "@/plugins/path";
-import { scrollTo } from "@/plugins/scroll-to";
-import request from "@/plugins/request";
-import { copy, download } from "@/plugins/util";
+import pathUtil from "@/helpers/path";
+import { scrollTo } from "@/helpers/scroll-to";
+import request, { requestUtil } from "@/helpers/request";
 import FileTypeIcon from "@/components/FileTypeIcon.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import ContextMenu from "@/components/ContextMenu.vue";
@@ -290,7 +289,7 @@ const jumpInner = (item) => {
 
 // 批量下载
 const downloadMulti = async () => {
-  await download(selected.value.map((item) => item.url));
+  await requestUtil.download(selected.value.map((item) => item.url));
   selected.value = [];
 };
 
@@ -361,7 +360,7 @@ const getCss = (item) => {
     };
     background-image: url(${item.url});
     background-size: 100% 100%;`;
-    copy(text);
+    requestUtil.copy(text);
   };
 };
 </script>

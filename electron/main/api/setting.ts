@@ -1,5 +1,5 @@
 import { Route } from "@linzb93/event-router";
-import sql from "../plugins/sql";
+import sql from "../helpers/sql";
 import { Request } from "../types/api";
 
 const route = Route();

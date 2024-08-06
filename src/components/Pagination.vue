@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { scrollTo } from "../plugins/scroll-to";
+import { scrollTo } from "../helpers/scroll-to";
 
 export default {
   name: "Pagination",

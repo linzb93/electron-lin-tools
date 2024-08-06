@@ -100,7 +100,7 @@ import dayjs from "dayjs";
 import { pick } from "lodash-es";
 import pMap from "p-map";
 import { ElMessage } from "element-plus";
-import request from "@/plugins/request";
+import request from "@/helpers/request";
 import { service } from "./utils";
 import Qa from "@/components/Qa.vue";
 import AppManage from "./components/AppManage.vue";

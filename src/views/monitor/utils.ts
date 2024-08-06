@@ -1,5 +1,5 @@
 import axios from "axios";
-import { loading } from "@/plugins/util";
+import { loading } from "@/helpers/util";
 import { useGlobalStore } from "@/store";
 const store = useGlobalStore();
 

@@ -9,22 +9,21 @@ import { sleep } from "@linzb93/utils";
 import { createClient } from "webdav";
 import axios from "axios";
 import pMap from "p-map";
-import { getMainWindow } from "..";
-import { HTTP_STATUS, root } from "../plugins/constant";
+import { root } from "../helpers/constant";
 import { Request } from "../types/api";
-import sql from "../plugins/sql";
+import sql from "../helpers/sql";
 
 export default async (app: Application) => {
   const account = await sql((db) => db.sync);
   const syncClient = createClient("", account);
+
+  // 复制文本
   app.handle("copy", async (req: Request<string>) => {
     const text = req.params;
     clipboard.writeText(text);
-    return {
-      code: HTTP_STATUS.SUCCESS,
-      message: "复制成功",
-    };
   });
+
+  // 下载文件
   app.handle("download", async (req: Request<string | string[]>) => {
     if (Array.isArray(req.params)) {
       // 下载多份文件
@@ -52,10 +51,6 @@ export default async (app: Application) => {
           }),
         { concurrency: 4 }
       );
-      return {
-        code: HTTP_STATUS.SUCCESS,
-        message: "下载成功",
-      };
     }
     const url = req.params as string;
     const result = await dialog.showSaveDialog({
@@ -73,27 +68,14 @@ export default async (app: Application) => {
         }
       });
     });
-    return {
-      code: HTTP_STATUS.SUCCESS,
-      message: "下载成功",
-    };
   });
-  app.handle(
-    "change-window-size",
-    async (
-      req: Request<{
-        width: number;
-        height: number;
-      }>
-    ) => {
-      const { width, height } = req.params;
-      const win = await getMainWindow();
-      win.setSize(width, height);
-      return {
-        message: "ok",
-      };
-    }
-  );
+  
+  // 打开网页或文件
+  app.handle("open", async (req: Request<string>) => {
+    await shell.openPath(req.params);
+  });
+
+  // 选择文件夹路径
   app.handle(
     "get-selected-path",
     async (req: Request<{ multiSelections: boolean }>) => {
@@ -120,6 +102,8 @@ export default async (app: Application) => {
       };
     }
   );
+
+  // 选择文件
   app.handle(
     "get-selected-file",
     async (req: Request<{ multiSelections: boolean }>) => {
@@ -149,6 +133,8 @@ export default async (app: Application) => {
       };
     }
   );
+
+  // 在VSCode中打开
   app.handle("open-in-vscode", async (req: Request<string | string[]>) => {
     const { params } = req;
     if (Array.isArray(params)) {
@@ -160,6 +146,7 @@ export default async (app: Application) => {
     }
     await execa(`code ${params}`);
   });
+
   // 同步
   app.handle("sync", async () => {
     fs.createReadStream(join(root, "sync.json")).pipe(
@@ -169,6 +156,7 @@ export default async (app: Application) => {
       success: true,
     };
   });
+
   // 登录
   // async login(
   //   req: Request<{
@@ -192,6 +180,8 @@ export default async (app: Application) => {
     shell.openExternal(url);
     return null;
   });
+
+  // 复制图片
   app.handle(
     "copy-image",
     async (req: Request<{ url: string; type: string }>) => {
@@ -209,6 +199,8 @@ export default async (app: Application) => {
       };
     }
   );
+
+  // 获取跨域脚本或接口
   app.handle(
     "fetch-api-cross-origin",
     async (
