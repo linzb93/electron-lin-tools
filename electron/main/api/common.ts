@@ -70,10 +70,37 @@ export default async (app: Application) => {
     });
   });
 
-  // 打开网页或文件
-  app.handle("open", async (req: Request<string>) => {
-    await shell.openPath(req.params);
-  });
+  // 打开网页或本地目录、VSCode项目
+  const openPath = (path: string) => shell.openPath(path);
+  const openWeb = (path: string) => shell.openExternal(path);
+  const openInVSCode = async (path: string) => {
+    await execa(`code ${path}`);
+    await sleep(200);
+  };
+  app.handle(
+    "open",
+    async (
+      req: Request<{
+        type: "vscode" | "path" | "web";
+        url: string | string[];
+      }>
+    ) => {
+      const { type, url } = req.params;
+      let callback: (param: string) => Promise<any>;
+      if (type === "path") {
+        callback = openPath;
+      } else if (type === "web") {
+        callback = openWeb;
+      } else {
+        callback = openInVSCode;
+      }
+      if (Array.isArray(url)) {
+        await pMap(url, callback, { concurrency: 4 });
+      } else {
+        await callback(url);
+      }
+    }
+  );
 
   // 选择文件夹路径
   app.handle(
@@ -103,50 +130,6 @@ export default async (app: Application) => {
     }
   );
 
-  // 选择文件
-  app.handle(
-    "get-selected-file",
-    async (req: Request<{ multiSelections: boolean }>) => {
-      const {
-        params: { multiSelections },
-      } = req;
-      const result = await dialog.showOpenDialog({
-        properties: multiSelections
-          ? ["openFile", "multiSelections"]
-          : ["openFile"],
-      });
-      if (result.canceled) {
-        return {
-          paths: "",
-        };
-      }
-      const paths = await pMap(result.filePaths, async (file) => {
-        const stats = await fsp.stat(file);
-        return {
-          path: file,
-          size: stats.size,
-          name: basename(file),
-        };
-      });
-      return {
-        paths,
-      };
-    }
-  );
-
-  // 在VSCode中打开
-  app.handle("open-in-vscode", async (req: Request<string | string[]>) => {
-    const { params } = req;
-    if (Array.isArray(params)) {
-      for (const param of params) {
-        await execa(`code ${param}`);
-        await sleep(2000);
-      }
-      return;
-    }
-    await execa(`code ${params}`);
-  });
-
   // 同步
   app.handle("sync", async () => {
     fs.createReadStream(join(root, "sync.json")).pipe(
@@ -156,31 +139,6 @@ export default async (app: Application) => {
       success: true,
     };
   });
-
-  app.handle("open-in-browser", (req: Request<{ url: string }>) => {
-    const { url } = req.params;
-    shell.openExternal(url);
-    return null;
-  });
-
-  // 复制图片
-  app.handle(
-    "copy-image",
-    async (req: Request<{ url: string; type: string }>) => {
-      const { url, type } = req.params;
-      if (type === "base64") {
-        const buf = Buffer.from(url);
-        const img = nativeImage.createFromBuffer(buf);
-        clipboard.writeImage(img);
-        return {
-          success: true,
-        };
-      }
-      return {
-        success: false,
-      };
-    }
-  );
 
   // 获取跨域脚本或接口
   app.handle(
