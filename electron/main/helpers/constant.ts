@@ -1,6 +1,5 @@
 import { join } from "node:path";
 import { app } from "electron";
-import cachedir from "cachedir";
 
 export const HTTP_STATUS = {
   SUCCESS: 200, // 请求成功
@@ -20,7 +19,7 @@ export const HTTP_STATUS = {
   BUSINESSERROR: 7000, // 业务性异常
 };
 
-export const root = cachedir("electron-lin-tools");
+export const root = join(app.getPath('userData'), 'UserData');
 export const tempPath = join(root, ".temp");
 export const serverStaticPath = join(root, "pages");
 export const publicPath = join(app.getAppPath(), "./public");

@@ -13,10 +13,7 @@
           title="打开文件夹"
           :size="14"
           class="curp ml10"
-          @click="requestUtil.open({
-            type: 'path',
-            url: item.path
-          })"
+          @click="requestUtil.open('path', item.path)"
         >
           <Folder />
         </el-icon>

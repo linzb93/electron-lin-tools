@@ -5,7 +5,6 @@ import cors from "cors";
 import iPhoneRouter from "../api/iPhone";
 import { tempPath } from "./constant";
 
-fs.accessSync(tempPath);
 export const config = {
   port: 5010,
   static: "/assets",

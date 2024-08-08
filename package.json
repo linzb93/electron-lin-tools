@@ -1,6 +1,6 @@
 {
   "name": "electron-lin-tools",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "main": "dist-electron/main/index.js",
   "description": "自用Electron开发的效率工具",
   "author": "linzb93",
@@ -50,7 +50,6 @@
     "ali-oss": "^6.20.0",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
-    "cachedir": "^2.4.0",
     "cors": "^2.8.5",
     "electron-is-dev": "^3.0.1",
     "electron-unhandled": "^4.0.1",
@@ -64,9 +63,8 @@
     "p-map": "^7.0.2",
     "p-reduce": "^3.0.0",
     "qrcode": "^1.5.3",
-    "read-pkg": "^9.0.1",
     "rxjs": "^7.8.1",
-    "sharp": "^0.33.3",
+    "vue-json-viewer": "^3.0.4",
     "webdav": "^5.5.0"
   }
 }
