@@ -84,7 +84,7 @@ const { fetch, loaded, result } = useRequest(
 const duration = shallowRef("0");
 const getList = async () => {
   const startTime = Date.now();
-  fetch();
+  await fetch();
   duration.value = ((Date.now() - startTime) / 1000).toFixed(2);
 };
 

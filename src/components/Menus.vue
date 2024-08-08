@@ -4,14 +4,6 @@
       <router-link to="/setting"
         ><el-icon class="sub-btn curp" title="设置"><Setting /></el-icon
       ></router-link>
-      <el-icon
-        @click="startSync"
-        class="sub-btn curp"
-        title="同步"
-        :class="{ loading: syncing }"
-      >
-        <Refresh />
-      </el-icon>
     </div>
     <ul>
       <li
@@ -28,37 +20,12 @@
       </li>
     </ul>
   </div>
-  <el-dialog v-model="visible" title="登录" width="400px">
-    <el-form
-      label-suffix="："
-      label-width="70px"
-      :model="account"
-      :rules="rules"
-      ref="accountRef"
-    >
-      <el-form-item label="账号">
-        <el-input v-model="account.user" placeholder="请输入账号" />
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input
-          v-model="account.password"
-          type="password"
-          placeholder="请输入密码"
-        />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button type="primary" @click="save">保存</el-button>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup>
-import { shallowReactive, ref, shallowRef } from "vue";
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import {
-  Refresh,
   Iphone,
   HomeFilled,
   Setting,
@@ -66,7 +33,6 @@ import {
   Clock,
 } from "@element-plus/icons-vue";
 import { Oss } from "./icons";
-import request from "@/helpers/request";
 
 const route = useRoute();
 const router = useRouter();
@@ -106,45 +72,12 @@ const isActive = (menu) => {
   return route.path.startsWith(menu.to) && menu.to !== "/";
 };
 
-// 同步
-const syncing = shallowRef(false);
-const visible = shallowRef(false);
-const account = shallowReactive({
-  user: "",
-  password: "",
-});
-const rules = {
-  user: { required: true, message: "请输入账号" },
-  password: { required: true, message: "请输入密码" },
-};
-const accountRef = ref(null);
-const startSync = async () => {
-  syncing.value = true;
-  const result = await request("sync");
-  if (!result.success) {
-    // 未登录账号
-    visible.value = true;
-  }
-  syncing.value = false;
-};
 const jump = (item) => {
   if (item.unpublished) {
     ElMessage.warning("正在开发中，敬请期待");
     return;
   }
   router.push(item.to);
-};
-const save = () => {
-  accountRef.value.validate(async (isValid) => {
-    if (!isValid) {
-      return;
-    }
-    await request("login", ...account);
-    ElMessage.success("登录成功");
-    syncing.value = true;
-    await request("sync");
-    syncing.value = false;
-  });
 };
 </script>
 <style lang="scss" scoped>
