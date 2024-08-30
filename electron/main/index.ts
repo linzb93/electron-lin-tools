@@ -120,7 +120,6 @@ app.whenReady().then(async () => {
           click: () => {
             shell.openPath(root);
           },
-          visible: isDev,
         },
       ],
     },

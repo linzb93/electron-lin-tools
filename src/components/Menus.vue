@@ -32,7 +32,6 @@ import {
   View,
   Clock,
 } from "@element-plus/icons-vue";
-import { Oss } from "./icons";
 
 const route = useRoute();
 const router = useRouter();
@@ -42,11 +41,6 @@ const list = [
     title: "首页",
     to: "/",
     icon: HomeFilled,
-  },
-  {
-    title: "阿里OSS",
-    to: "/oss",
-    icon: Oss,
   },
   {
     title: "iPhone同步",
